@@ -15,7 +15,7 @@ mod tests {
 
     use super::api::Api;
     use super::request::{BasicAuth, HttpReq, MailchimpResult};
-    use super::types::{AuthorizedAppType, AuthorizedAppsType};
+    use super::types::{AuthorizedAppsType, AutomationWorkflowType, AutomationsType};
 
     ///
     ///
@@ -145,5 +145,42 @@ mod tests {
                 resp, expected
             );
         }
+    }
+    #[test]
+    fn test_get_information_about_specific_automation_workflow() {
+        let mock_transport = MockRequest::new(
+            "{\"id\": \"b0a1c24f1a\",\"create_time\": \"2015-09-15T14:31:54+00:00\",\"start_time\": \"\",\"status\": \"save\",\"emails_sent\": 0,\"recipients\": {\"list_id\": \"1a2df69511\"},\"settings\": {\"title\": \"Freddie's best new jokes\",\"from_name\": \"Freddie\",\"reply_to\": \"freddie@freddiesjokes.com\",\"use_conversation\": false,\"to_name\": \"*|FNAME|*\",\"authenticate\": true,\"auto_footer\": false,\"inline_css\": false},\"tracking\": {\"opens\": true,\"html_clicks\": true,\"text_clicks\": false,\"goal_tracking\": false,\"ecomm360\": true,\"google_analytics\": true,\"clicktale\": false},\"trigger_settings\": {\"workflow_type\": \"categoryFollowup\",\"send_immediately\": false,\"category_name\": \"Jokes\",\"runtime\": {\"days\": [\"sunday\",\"monday\",\"tuesday\",\"wednesday\",\"thursday\",\"friday\",\"saturday\"],\"hours\": {\"send_asap\": true}},\"workflow_emails_count\": 3},\"_links\": [{\"rel\": \"parent\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations\",\"method\": \"GET\",\"targetSchema\": \"https://api.mailchimp.com/schema/3.0/Automations/Collection.json\",\"schema\": \"https://api.mailchimp.com/schema/3.0/CollectionLinks/Automations.json\"},{\"rel\": \"self\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a\",\"method\": \"GET\",\"targetSchema\": \"https://api.mailchimp.com/schema/3.0/Automations/Instance.json\"},{\"rel\": \"start-all-emails\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/actions/start-all-emails\",\"method\": \"POST\"},{\"rel\": \"pause-all-emails\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/actions/pause-all-emails\",\"method\": \"POST\"},{\"rel\": \"emails\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/emails\",\"method\": \"GET\",\"targetSchema\": \"https://api.mailchimp.com/schema/3.0/Automations/Emails/Collection.json\"}]}",
+            "",
+        );
+        let api = Api::<MockRequest>::new("us6", "access_token", Box::new(mock_transport));
+
+        let expected = json!({"id": "b0a1c24f1a","create_time": "2015-09-15T14:31:54+00:00","start_time": "","status": "save","emails_sent": 0,"recipients": {"list_id": "1a2df69511"},"settings": {"title": "Freddie's best new jokes","from_name": "Freddie","reply_to": "freddie@freddiesjokes.com","use_conversation": false,"to_name": "*|FNAME|*","authenticate": true,"auto_footer": false,"inline_css": false},"tracking": {"opens": true,"html_clicks": true,"text_clicks": false,"goal_tracking": false,"ecomm360": true,"google_analytics": true,"clicktale": false},"trigger_settings": {"workflow_type": "categoryFollowup","send_immediately": false,"category_name": "Jokes","runtime": {"days": ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"],"hours": {"send_asap": true}},"workflow_emails_count": 3},"_links": [{"rel": "parent","href": "https://usX.api.mailchimp.com/3.0/automations","method": "GET","targetSchema": "https://api.mailchimp.com/schema/3.0/Automations/Collection.json","schema": "https://api.mailchimp.com/schema/3.0/CollectionLinks/Automations.json"},{"rel": "self","href": "https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a","method": "GET","targetSchema": "https://api.mailchimp.com/schema/3.0/Automations/Instance.json"},{"rel": "start-all-emails","href": "https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/actions/start-all-emails","method": "POST"},{"rel": "pause-all-emails","href": "https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/actions/pause-all-emails","method": "POST"},{"rel": "emails","href": "https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/emails","method": "GET","targetSchema": "https://api.mailchimp.com/schema/3.0/Automations/Emails/Collection.json"}]});
+
+        let resp = api
+            .get_edge::<AutomationWorkflowType>("automations/b0a1c24f1a", HashMap::new())
+            .unwrap();
+
+        assert_eq!(
+            resp.id, expected["id"],
+            "Los estados de la petición no coinciden: Valor de la respuesta {:?} Valor esperado: {:?}",
+            resp, expected
+        );
+    }
+    #[test]
+    fn test_get_list_of_automations() {
+        let mock_transport = MockRequest::new(
+            "{\"automations\": [{\"id\": \"b0a1c24f1a\",\"create_time\": \"2015-09-15T14:31:54+00:00\",\"start_time\": \"2015-09-15T15:45:32+00:00\",\"status\": \"paused\",\"emails_sent\": 1,\"recipients\": {\"list_id\": \"57afe96172\"},\"settings\": {\"title\": \"Freddie's Best Jokes\",\"from_name\": \"Freddie\",\"reply_to\": \"freddie@freddiesjokes.com\",\"use_conversation\": false,\"to_name\": \"*|FNAME|*\",\"authenticate\": true,\"auto_footer\": false,\"inline_css\": false},\"tracking\": {\"opens\": true,\"html_clicks\": true,\"text_clicks\": true,\"goal_tracking\": true,\"ecomm360\": true,\"google_analytics\": \"Freddie_s_Best_Jokes9_15_2015\",\"clicktale\": \"\"},\"trigger_settings\": {\"workflow_type\": \"emailSeries\",\"send_immediately\": false,\"trigger_on_import\": false,\"runtime\": {\"days\": [\"sunday\",\"monday\",\"tuesday\",\"wednesday\",\"thursday\",\"friday\",\"saturday\"],\"hours\": {\"send_at\": \"12:00am\"}},\"workflow_emails_count\": 1},\"report_summary\": {\"opens\": 1,\"unique_opens\": 1,\"open_rate\": 1,\"clicks\": 0,\"subscriber_clicks\": 0,\"click_rate\": 0},\"_links\": [{\"rel\": \"parent\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations\",\"method\": \"GET\",\"targetSchema\": \"https://api.mailchimp.com/schema/3.0/Automations/Collection.json\",\"schema\": \"https://api.mailchimp.com/schema/3.0/CollectionLinks/Automations.json\"},{\"rel\": \"self\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a\",\"method\": \"GET\",\"targetSchema\": \"https://api.mailchimp.com/schema/3.0/Automations/Instance.json\"},{\"rel\": \"start-all-emails\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/actions/start-all-emails\",\"method\": \"POST\"},{\"rel\": \"pause-all-emails\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/actions/pause-all-emails\",\"method\": \"POST\"},{\"rel\": \"emails\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/emails\",\"method\": \"GET\",\"targetSchema\": \"https://api.mailchimp.com/schema/3.0/Automations/Emails/Collection.json\"},{\"rel\": \"removed-subscribers\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/removed-subscribers\",\"method\": \"GET\",\"targetSchema\": \"https://api.mailchimp.com/schema/3.0/Automations/RemovedSubscribers/Collection.json\"}]}],\"total_items\": 1,\"_links\": [{\"rel\": \"parent\",\"href\": \"https://usX.api.mailchimp.com/3.0/\",\"method\": \"GET\",\"targetSchema\": \"https://api.mailchimp.com/schema/3.0/Root.json\"},{\"rel\": \"self\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations\",\"method\": \"GET\",\"targetSchema\": \"https://api.mailchimp.com/schema/3.0/Automations/Collection.json\",\"schema\": \"https://api.mailchimp.com/schema/3.0/CollectionLinks/Automations.json\"}]}",
+            "",
+        );
+        let api = Api::<MockRequest>::new("us6", "access_token", Box::new(mock_transport));
+        let resp = api
+            .get_edge::<AutomationsType>("/automations", HashMap::new())
+            .unwrap();
+
+        assert_eq!(
+            resp.automations.len(), resp.total_items as usize,
+            "Los estados de la petición no coinciden: Valor de la respuesta {:?} Valor esperado: {:?}",
+            resp.automations.len(), resp.total_items
+        );
     }
 }

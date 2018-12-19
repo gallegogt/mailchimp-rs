@@ -12,8 +12,20 @@ pub struct LinkType {
     pub method: String,
     /// Desc: For GETs, this is a URL representing the schema that the response should conform to.
     #[serde(rename = "targetSchema")]
-    pub target_schema: String,
+    pub target_schema: Option<String>,
     /// Desc: For HTTP methods that can receive bodies (POST and PUT), this is a URL representing the schema that the body should conform to.
      #[serde(default)]
     pub schema: String,
+}
+
+impl Default for LinkType {
+    fn default() -> Self {
+        LinkType {
+            rel: "".to_string(),
+            href: "".to_string(),
+            method: "".to_string(),
+            target_schema: None,
+            schema: "".to_string(),
+        }
+    }
 }
