@@ -3,6 +3,16 @@ name = "mailchimp"
 version = "0.1.0"
 authors = ["Yolier Galan Tasse <gallegogt@gmail.com>"]
 edition = "2018"
+description = "Biblioteca de desarrollo para acceder al API de [Mailchimp](https://developer.mailchimp.com), utilizando como lenguaje de programación Rust"
+readme = "README.md"
+license-file = "LICENCE"
+repository = "https://github.com/gallegogt/mailchimp-rs.git"
+homepage = "https://github.com/gallegogt/mailchimp-rs"
+keywords = ["mailchimp", "API", "email", "automation"]
+include = [
+    "**/*.rs",
+    "Cargo.toml",
+]
 
 [lib]
 # could be `staticlib` as well
@@ -10,9 +20,9 @@ crate-type = ["rlib", "dylib"]
 # A flag for enabling documentation tests for this target. This is only relevant
 # for libraries, it has no effect on other sections. This is used by
 # `cargo test`.
-# doctest = true
+doctest = true
 # # A flag for enabling documentation of this target. This is used by `cargo doc`.
-# doc = true
+doc = true
 
 [dev-dependencies]
 # This library is meant to be used on development or testing environments
