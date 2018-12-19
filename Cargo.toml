@@ -1,0 +1,35 @@
+[package]
+name = "mailchimp"
+version = "0.1.0"
+authors = ["Yolier Galan Tasse <gallegogt@gmail.com>"]
+edition = "2018"
+
+[lib]
+# could be `staticlib` as well
+crate-type = ["rlib", "dylib"]
+# A flag for enabling documentation tests for this target. This is only relevant
+# for libraries, it has no effect on other sections. This is used by
+# `cargo test`.
+# doctest = true
+# # A flag for enabling documentation of this target. This is used by `cargo doc`.
+# doc = true
+
+[dev-dependencies]
+# This library is meant to be used on development or testing environments
+# in which setting environment variables is not practical.
+dotenv = "^0.13"
+
+[dependencies]
+# The core APIs, including the Serialize and Deserialize traits. Always
+# required when using Serde.
+serde = "^1.0"
+# Support for #[derive(Serialize, Deserialize)]. Required if you want Serde
+# to work for structs and enums defined in your crate.
+serde_derive = "^1.0"
+# Each data format lives in its own crate; the sample code below uses JSON
+# but you may be using a different one.
+serde_json = "1.0"
+# HTTP Request Library
+reqwest="^0.9"
+# Log
+log = "^0.4"
