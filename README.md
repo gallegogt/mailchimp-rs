@@ -5,7 +5,7 @@
 NOTA: Biblioteca en desarrollo, en la sección "**Estado de implementación**" te muestro que he implementado y que no
 ---
 
-## ✅ Ejemplo de como puedes extraer todas las automatizaciones
+### ✅ Ejemplo de como puedes extraer todas las automatizaciones
 
 A continuación te muestro un ejemplo de código para que puedas extraer todas las automatizaciones creadas en tu Mailchimp
 
@@ -16,6 +16,15 @@ Para este ejemplo uso las siguientes dependencias:
 dotenv = "^0.13"
 mailchimp = "0.1.0"
 ```
+
+También he creado un archivo .env con las credenciales para el acceso a mailchimp. A continuación te pongo un ejemplo del archivo .env
+
+```
+MAILCHIMP_DC="<DC>"
+MAILCHIMP_API_KEY="<API_KEY>"
+```
+
+Finalmente el código de ejemplo para visualizar las automatizaciones creadas en tu mailchimp
 
 ```rust
   extern crate dotenv;
