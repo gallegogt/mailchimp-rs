@@ -223,7 +223,7 @@ pub struct AutomationTrackingOptionsType {
     pub google_analytics: String,
     /// Desc: The custom slug for ClickTale tracking (max of 50 bytes).
     #[serde(default)]
-    pub clicktale: bool,
+    pub clicktale: String,
     /// Desc: Salesforce tracking options for an Automation. Must be using Mailchimp’s
     /// built-in Salesforce integration.
     #[serde(default)]
@@ -232,9 +232,6 @@ pub struct AutomationTrackingOptionsType {
     /// built-in Capsule integration.
     #[serde(default)]
     pub capsule: CapsuleCRMTrackingType,
-    /// Desc: Available triggers for Automation workflows.
-    #[serde(default)]
-    pub trigger_settings: AutomationTriggerType,
 }
 
 impl Default for AutomationTrackingOptionsType {
@@ -246,10 +243,9 @@ impl Default for AutomationTrackingOptionsType {
             goal_tracking: false,
             ecomm360: false,
             google_analytics: "".to_string(),
-            clicktale: false,
+            clicktale: "".to_string(),
             salesforce: SalesforceCRMTrackingType::default(),
             capsule: CapsuleCRMTrackingType::default(),
-            trigger_settings: AutomationTriggerType::default(),
         }
     }
 }
@@ -281,13 +277,24 @@ pub struct AutomationWorkflowType {
     /// Desc: List settings for the Automation.
     #[serde(default)]
     pub recipients: RecipientType,
-    /// Desc: List settings for the Automation.
+
+    /// Desc: The settings for the Automation workflow.
     #[serde(default)]
     pub settings: AutomationCampaignSettingsType,
+
+    /// Desc: The tracking options for the Automation.
+    #[serde(default)]
+    pub tracking: AutomationTrackingOptionsType,
+
+    /// Desc: Available triggers for Automation workflows.
+    #[serde(default)]
+    pub trigger_settings: AutomationTriggerType,
+
     /// Desc: A summary of opens, clicks, and unsubscribes for sent campaigns.
     #[serde(default)]
     pub report_summary: CampaignReportSummaryType,
-    /// Desc: A summary of opens, clicks, and unsubscribes for sent campaigns.
+
+    /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
 }
