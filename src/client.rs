@@ -51,11 +51,22 @@ impl MailchimpClient {
     ///
     /// Devuelve una lista de las aplicaciones conectadas y registradas de una cuenta.
     ///
-    pub fn get_authorized_apps(&self) -> MailchimpResult<Vec<AuthorizedAppType>> {
+    /// Argumentos:
+    ///
+    ///     filters: Filtros que requieras aplicar a la hora de obtener las aplicaciones
+    ///
+    ///         fields: Una lista de campos separados por comas para devolver.
+    ///             Parámetros de referencia de subobjetos con notación de puntos.
+    ///         exclude_fields: Una lista de campos separados por comas para excluir.
+    ///            Parámetros de referencia de subobjetos con notación de puntos.
+    ///         count: Cantidad de registros a devolver
+    ///         offset: El número de registros de una colección a omitir. Por defecto es 0
+    ///
+    pub fn get_authorized_apps(&self, filters: HashMap<String, String>) -> MailchimpResult<Vec<AuthorizedAppType>> {
         let resp = self.api.call::<AuthorizedAppsType>(
             RequestMethod::Get,
             "authorized-apps",
-            HashMap::new(),
+            filters,
         );
         match resp {
             Ok(value) => Ok(value.apps.clone()),
