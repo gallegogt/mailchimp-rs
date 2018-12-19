@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use crate::internal::api::Api;
 use crate::internal::request::MailchimpRequest;
-use crate::internal::MailchimpErrorType;
+use crate::internal::types::MailchimpErrorType;
 use serde::de::DeserializeOwned;
 
 ///

@@ -2,10 +2,6 @@ pub mod api;
 pub mod request;
 pub mod types;
 
-pub use crate::internal::types::{
-    AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType, MailchimpErrorType, LinkType,
-};
-
 #[cfg(test)]
 mod tests {
     use reqwest::header::{HeaderMap, AUTHORIZATION, CONTENT_TYPE};

@@ -4,7 +4,7 @@ use serde::de::DeserializeOwned;
 use serde_json;
 use std::collections::HashMap;
 
-use crate::internal::MailchimpErrorType;
+use crate::internal::types::MailchimpErrorType;
 use crate::internal::request::{BasicAuth, HttpReq, MailchimpResult};
 
 ///
