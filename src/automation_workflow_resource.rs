@@ -1,8 +1,9 @@
-use crate::api::MailchimpApi;
+use crate::api::{MailchimpApi, RequestMethod};
 use crate::internal::types::{
     AutomationCampaignSettingsType, AutomationTrackingOptionsType, AutomationWorkflowType,
-    CampaignReportSummaryType, RecipientType,AutomationTriggerType
+    CampaignReportSummaryType, RecipientType,AutomationTriggerType, EmptyType, MailchimpErrorType
 };
+use std::collections::HashMap;
 
 ///
 /// AutomationWorkflowResource
@@ -22,7 +23,7 @@ impl AutomationWorkflowResource {
     pub fn new(api: MailchimpApi, automation: AutomationWorkflowType) -> Self {
         AutomationWorkflowResource {
             api: api,
-            automation: automation,
+            automation: automation
         }
     }
     ///
@@ -89,6 +90,44 @@ impl AutomationWorkflowResource {
     ///
     pub fn get_trigger_settings(&self) -> &AutomationTriggerType {
         &self.automation.trigger_settings
+    }
+
+    // ============== Actions ==============
+    ///
+    /// Detiene todos los emails para esta automatización
+    ///
+    /// En caso de ser satisfactoria la ejecución, devuelve None,
+    /// en caso contrario devuelve el error, con su respectiva descripción
+    ///
+    pub fn pause_all_emails(&self) -> Option<MailchimpErrorType> {
+        let mut b_endpoint = self.get_base_endpoint();
+        b_endpoint.push_str( "/actions/pause-all-emails");
+        match self.api.call::<EmptyType>(RequestMethod::Post, b_endpoint.as_str() , HashMap::new()) {
+            Ok(_) => None,
+            Err(e) => Some(e)
+        }
+    }
+
+    ///
+    /// Inicia todos los emails para esta automatización
+    ///
+    /// En caso de ser satisfactoria la ejecución, devuelve None,
+    /// en caso contrario devuelve el error, con su respectiva descripción
+    ///
+    pub fn start_all_emails(&self) -> Option<MailchimpErrorType> {
+        let mut b_endpoint = self.get_base_endpoint();
+        b_endpoint.push_str( "/actions/start-all-emails");
+        match self.api.call::<EmptyType>(RequestMethod::Post, b_endpoint.as_str() , HashMap::new()) {
+            Ok(_) => None,
+            Err(e) => Some(e)
+        }
+    }
+
+    // ============== Private Functions ==============
+    fn get_base_endpoint(&self) -> String {
+        let mut b_endpoint = String::from("automations/");
+        b_endpoint.push_str(self.automation.id.clone().as_str());
+        b_endpoint
     }
 }
 
