@@ -94,12 +94,12 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
   * ✅ [Action] Start all emails in an Automation workflow
 
   * **Emails**
-    * 🔘 Get a list of automated emails in a workflow
-    * 🔘 Get information about a specific workflow email
+    * ✅ Get a list of automated emails in a workflow
+    * ✅ Get information about a specific workflow email
     * 🔘 Update an Automation workflow email
     * 🔘 Delete a workflow email
-    * 🔘 Pause an automated email
-    * 🔘 Start an automated email
+    * ✅ Pause an automated email
+    * ✅ Start an automated email
 
     * **Queue**
       * 🔘 View queued subscribers for an automated email

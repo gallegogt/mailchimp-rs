@@ -81,4 +81,68 @@ fn main() {
         }
         Err(e) => println!("{:?}", e),
     };
+
+    // ==================== Workflow Emails ========== ====
+    let emails_resp = workflow.get_workflow_emails();
+
+    match emails_resp {
+        Ok(workflow_emails) => {
+            for e in workflow_emails {
+                println!("\nWorkflow Emails");
+                println!("ID   {:?}", e.get_id());
+                println!(
+                    "Emails Enviados   {:?}",
+                    e.get_emails_sent().as_ref().unwrap()
+                );
+                println!(
+                    "Fecha Inicio      {:?}",
+                    e.get_start_time().as_ref().unwrap()
+                );
+                println!(
+                    "Fecha de creacion {:?}",
+                    e.get_create_time().as_ref().unwrap()
+                );
+                println!(
+                    "Recipients        {:?}",
+                    e.get_recipients().as_ref().unwrap()
+                );
+                println!(
+                    "Resumen           {:?}",
+                    e.get_report_summary().as_ref().unwrap()
+                );
+            }
+        }
+        Err(e) => println!("{:?}", e),
+    }
+
+    // ============= Workflow Emails Get Info =======================
+    let we_info = workflow.get_automation_workflow_info("0af0da1da1");
+
+    match we_info {
+        Ok(we) => {
+            println!("\nWorkflow Emails");
+            println!("ID   {:?}", we.get_id());
+            println!(
+                "Emails Enviados   {:?}",
+                we.get_emails_sent().as_ref().unwrap()
+            );
+            println!(
+                "Fecha Inicio      {:?}",
+                we.get_start_time().as_ref().unwrap()
+            );
+            println!(
+                "Fecha de creacion {:?}",
+                we.get_create_time().as_ref().unwrap()
+            );
+            println!(
+                "Recipients        {:?}",
+                we.get_recipients().as_ref().unwrap()
+            );
+            println!(
+                "Resumen           {:?}",
+                we.get_report_summary().as_ref().unwrap()
+            );
+        }
+        Err(e) => println!("{:?}", e),
+    }
 }

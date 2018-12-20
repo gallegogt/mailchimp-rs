@@ -1,11 +1,12 @@
 use crate::api::MailchimpApi;
-use crate::internal::types::{
-    AutomationCampaignSettingsType, AutomationTrackingOptionsType, AutomationTriggerType,
-    AutomationWorkflowType, CampaignReportSummaryType, EmptyType, MailchimpErrorType,
-    RecipientType, AutomationDelayType, AutomationModifier
-};
 use crate::internal::request::MailchimpResult;
-
+use crate::internal::types::{
+    AutomationCampaignSettingsType, AutomationDelayType, AutomationModifier,
+    AutomationTrackingOptionsType, AutomationTriggerType, AutomationWorkflowType,
+    CampaignReportSummaryType, EmptyType, MailchimpErrorType, RecipientType, WorkflowEmailType,
+    WorkflowEmailsType,
+};
+use crate::workflow_email_resource::{WorkflowEmailResource, WorkflowEmailResources};
 use std::collections::HashMap;
 
 ///
@@ -109,10 +110,10 @@ impl AutomationWorkflowResource {
     pub fn pause_all_emails(&self) -> Option<MailchimpErrorType> {
         let mut b_endpoint = self.get_base_endpoint();
         b_endpoint.push_str("/actions/pause-all-emails");
-        match self.api.post::<EmptyType, HashMap<String, String>>(
-            b_endpoint.as_str(),
-            HashMap::new(),
-        ) {
+        match self
+            .api
+            .post::<EmptyType, HashMap<String, String>>(b_endpoint.as_str(), HashMap::new())
+        {
             Ok(_) => None,
             Err(e) => Some(e),
         }
@@ -127,10 +128,10 @@ impl AutomationWorkflowResource {
     pub fn start_all_emails(&self) -> Option<MailchimpErrorType> {
         let mut b_endpoint = self.get_base_endpoint();
         b_endpoint.push_str("/actions/start-all-emails");
-        match self.api.post::<EmptyType, HashMap<String, String>>(
-            b_endpoint.as_str(),
-            HashMap::new(),
-        ) {
+        match self
+            .api
+            .post::<EmptyType, HashMap<String, String>>(b_endpoint.as_str(), HashMap::new())
+        {
             Ok(_) => None,
             Err(e) => Some(e),
         }
@@ -145,12 +146,12 @@ impl AutomationWorkflowResource {
     pub fn remote_update<'a>(
         &self,
         settings: Option<AutomationCampaignSettingsType>,
-        delay: Option<AutomationDelayType>
+        delay: Option<AutomationDelayType>,
     ) -> MailchimpResult<AutomationWorkflowResource> {
         let modifier = AutomationModifier {
             settings: settings,
             delay: delay,
-            recipients:None,
+            recipients: None,
             trigger_settings: None,
         };
         let response = self
@@ -160,6 +161,59 @@ impl AutomationWorkflowResource {
             Ok(automation) => Ok(AutomationWorkflowResource::new(
                 self.api.clone(),
                 &automation,
+            )),
+            Err(e) => Err(e),
+        }
+    }
+    /// ============= EMAILS ============================
+    ///
+    /// Devuelve una lista de los emails automatizados
+    ///
+    pub fn get_workflow_emails(&self) -> MailchimpResult<WorkflowEmailResources> {
+        let endpoint = self.get_base_endpoint() + "/emails";
+        let response = self
+            .api
+            .get::<WorkflowEmailsType>(endpoint.as_str(), HashMap::new());
+        match response {
+            Ok(value) => {
+                let emails = value
+                    .emails
+                    .iter()
+                    .map(move |data| {
+                        let mut inner = endpoint.clone();
+                        inner.push_str(data.id.as_ref().unwrap());
+                        WorkflowEmailResource::new(self.api.clone(), &data, &inner)
+                    })
+                    .collect::<WorkflowEmailResources>();
+                Ok(emails)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    ///
+    /// Devuelve la informacion sobre un flujo de trabajos de automatizacion de emails
+    ///
+    /// Argumentos:
+    ///     workflow_email_id: Identificador único de la automatización
+    ///
+    pub fn get_automation_workflow_info<'a>(
+        &self,
+        workflow_email_id: &'a str,
+    ) -> MailchimpResult<WorkflowEmailResource> {
+        let mut endpoint = self.get_base_endpoint().clone();
+        endpoint.push_str("/emails/");
+        endpoint.push_str(workflow_email_id);
+
+        let response = self
+            .api
+            .get::<WorkflowEmailType>(endpoint.as_str(), HashMap::new());
+
+        match response {
+            Ok(workflow_email) => Ok(WorkflowEmailResource::new(
+                self.api.clone(),
+                &workflow_email,
+                &endpoint
             )),
             Err(e) => Err(e),
         }

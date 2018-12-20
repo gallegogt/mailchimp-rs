@@ -12,9 +12,7 @@ mod tests {
 
     use super::api::Api;
     use super::request::{BasicAuth, HttpReq, MailchimpResult};
-    use super::types::{
-        ApiRootType, AuthorizedAppsType, AutomationWorkflowType, AutomationsType, EmptyType,
-    };
+    use super::types::*;
 
     ///
     ///
@@ -232,6 +230,21 @@ mod tests {
             resp.account_id, "8d3a3db4d97663a9074efcc16",
             "Los estados de la petición no coinciden: Valor de la respuesta {:?} Valor esperado: {:?}",
             resp.account_id, "8d3a3db4d97663a9074efcc16"
+        );
+    }
+    #[test]
+    fn test_workflow_email() {
+        let mock_transport = MockRequest::new(
+            "{\"id\": \"491fec26f1\",\"workflow_id\": \"b0a1c24f1a\",\"position\": 1,\"delay\": {\"amount\": 1,\"type\": \"day\",\"direction\": \"after\",\"action\": \"signup\"},\"create_time\": \"2015-09-15T14:33:20+00:00\",\"start_time\": \"2015-09-15T15:45:32+00:00\",\"archive_url\": \"http://eepurl.com/xxxx\",\"status\": \"paused\",\"emails_sent\": 0,\"send_time\": \"2015-09-15T15:48:05+00:00\",\"content_type\": \"template\",\"recipients\": {\"list_id\": \"57afe96172\"},\"settings\": {\"subject_line\": \"Your first joke from Freddie!\",\"title\": \"Freddie Likes Jokes\",\"from_name\": \"Freddie\",\"reply_to\": \"freddie@freddiesjokes.com\",\"authenticate\": false,\"auto_footer\": false,\"inline_css\": false,\"auto_tweet\": false,\"fb_comments\": true,\"template_id\": 2000020,\"drag_and_drop\": true},\"tracking\": {\"opens\": true,\"html_clicks\": true,\"text_clicks\": true,\"goal_tracking\": true,\"ecomm360\": true,\"google_analytics\": \"true\",\"clicktale\": \"\"},\"report_summary\": {\"opens\": 0,\"unique_opens\": 0,\"open_rate\": 0,\"clicks\": 0,\"subscriber_clicks\": 0,\"click_rate\": 0},\"_links\": [{\"rel\": \"parent\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/emails\",\"method\": \"GET\",\"targetSchema\": \"https://api.mailchimp.com/schema/3.0/Automations/Emails/Collection.json\"},{\"rel\": \"self\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/emails/491fec26f1\",\"method\": \"GET\",\"targetSchema\": \"https://api.mailchimp.com/schema/3.0/Automations/Emails/Instance.json\"},{\"rel\": \"start\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/emails/491fec26f1/actions/start\",\"method\": \"POST\"},{\"rel\": \"pause\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/emails/491fec26f1/actions/pause\",\"method\": \"POST\"},{\"rel\": \"queue\",\"href\": \"https://usX.api.mailchimp.com/3.0/automations/b0a1c24f1a/emails/491fec26f1/queue\",\"method\": \"GET\",\"targetSchema\": \"https://api.mailchimp.com/schema/3.0/Automations/Emails/Queue/Collection.json\"}]}",
+            "",
+        );
+        let api = Api::<MockRequest>::new("us6", "access_token", Box::new(mock_transport));
+        let resp = api.get_edge::<WorkflowEmailType>("", HashMap::new()).unwrap();
+
+        assert_eq!(
+            resp.id.as_ref().unwrap(), "491fec26f1",
+            "Los estados de la petición no coinciden: Valor de la respuesta {:?} Valor esperado: {:?}",
+            resp.id.as_ref().unwrap(), "491fec26f1"
         );
     }
 

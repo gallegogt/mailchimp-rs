@@ -77,6 +77,12 @@ pub struct RecipientType {
     /// Desc: List Name.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub list_name: Option<String>,
+    /// Desc: A description of the segment used for the campaign. Formatted as a string marked up with HTML.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub segment_text: Option<String>,
+    /// Desc: Count of the recipients on the associated list. Formatted as an integer..
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recipient_count: Option<u64>,
     /// Desc: An object representing all segmentation options.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub segment_opts: Option<Vec<SegmentOptionsType>>,
@@ -90,7 +96,9 @@ impl Default for RecipientType {
         RecipientType {
             list_id: None,
             list_is_active: None,
+            segment_text: None,
             list_name: None,
+            recipient_count: None,
             segment_opts: None,
             store_id: None,
         }
@@ -108,8 +116,10 @@ impl RecipientType {
     pub fn create<'a>(list_id: &'a str, store_id: &'a str) -> Self {
         RecipientType {
             list_id: Some(list_id.to_string()),
+            segment_text: None,
             list_is_active: None,
             list_name: None,
+            recipient_count: None,
             segment_opts: None,
             store_id: Some(store_id.to_string()),
         }
@@ -146,9 +156,7 @@ pub struct CapsuleCRMTrackingType {
 
 impl Default for CapsuleCRMTrackingType {
     fn default() -> Self {
-        CapsuleCRMTrackingType {
-            notes: false,
-        }
+        CapsuleCRMTrackingType { notes: false }
     }
 }
 
@@ -204,7 +212,6 @@ impl Default for AutomationTriggerType {
     }
 }
 
-
 impl AutomationTriggerType {
     ///
     /// Shortcut para el proceso de creación de una automatización
@@ -214,7 +221,7 @@ impl AutomationTriggerType {
     ///
     pub fn create<'a>(workflow_type: &'a str) -> Self {
         AutomationTriggerType {
-            workflow_type: Some(workflow_type.to_string())
+            workflow_type: Some(workflow_type.to_string()),
         }
     }
 }
@@ -222,6 +229,12 @@ impl AutomationTriggerType {
 // ============ Automation Campaign Settings ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AutomationCampaignSettingsType {
+    /// The subject line for the campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subject_line: Option<String>,
+    /// The preview text for the campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub preview_text: Option<String>,
     /// The title of the Automation.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
@@ -231,26 +244,43 @@ pub struct AutomationCampaignSettingsType {
     /// Desc: The reply-to email address for the Automation.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reply_to: Option<String>,
+    /// Desc: Whether Mailchimp authenticated the Automation. Defaults to true.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub authenticate: Option<bool>,
     /// Desc: Whether to use Mailchimp’s Conversations feature to manage out-of-office replies.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub use_conversation: Option<bool>,
     /// Desc: The Automation’s custom ‘To’ name, typically the first name merge field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub to_name: Option<String>,
-    /// Desc: Whether Mailchimp authenticated the Automation. Defaults to true.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub authenticate: Option<bool>,
     /// Desc: Whether to automatically append Mailchimp’s default footer to the Automation.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub auto_footer: Option<bool>,
     /// Desc: Whether to automatically inline the CSS included with the Automation content.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub inline_css: Option<bool>,
+    /// Automatically tweet a link to the campaign archive page when the campaign is sent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub auto_tweet: Option<bool>,
+    /// An array of Facebook page ids to auto-post to.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub auto_fb_post: Option<Vec<u64>>,
+    /// Allows Facebook comments on the campaign (also force-enables the Campaign Archive toolbar). Defaults to true.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fb_comments: Option<bool>,
+    /// Allows Facebook comments on the campaign (also force-enables the Campaign Archive toolbar). Defaults to true.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub template_id: Option<u64>,
+    /// Whether the campaign uses the drag-and-drop editor.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub drag_and_drop: Option<bool>,
 }
 
 impl Default for AutomationCampaignSettingsType {
     fn default() -> Self {
         AutomationCampaignSettingsType {
+            subject_line: None,
+            preview_text: None,
             title: None,
             from_name: None,
             reply_to: None,
@@ -259,6 +289,11 @@ impl Default for AutomationCampaignSettingsType {
             authenticate: None,
             auto_footer: None,
             inline_css: None,
+            auto_tweet: None,
+            auto_fb_post: None,
+            fb_comments: None,
+            template_id: None,
+            drag_and_drop: None,
         }
     }
 }
@@ -273,6 +308,8 @@ impl AutomationCampaignSettingsType {
     ///
     pub fn create<'a>(from_name: &'a str, reply_to: &'a str) -> Self {
         AutomationCampaignSettingsType {
+            subject_line: None,
+            preview_text: None,
             title: None,
             from_name: Some(from_name.to_string()),
             reply_to: Some(reply_to.to_string()),
@@ -281,6 +318,11 @@ impl AutomationCampaignSettingsType {
             authenticate: None,
             auto_footer: None,
             inline_css: None,
+            auto_tweet: None,
+            auto_fb_post: None,
+            fb_comments: None,
+            template_id: None,
+            drag_and_drop: None,
         }
     }
     ///
@@ -293,6 +335,8 @@ impl AutomationCampaignSettingsType {
     ///
     pub fn update<'a>(title: &'a str, from_name: &'a str, reply_to: &'a str) -> Self {
         AutomationCampaignSettingsType {
+            subject_line: None,
+            preview_text: None,
             title: Some(title.to_string()),
             from_name: Some(from_name.to_string()),
             reply_to: Some(reply_to.to_string()),
@@ -301,10 +345,14 @@ impl AutomationCampaignSettingsType {
             authenticate: None,
             auto_footer: None,
             inline_css: None,
+            auto_tweet: None,
+            auto_fb_post: None,
+            fb_comments: None,
+            template_id: None,
+            drag_and_drop: None,
         }
     }
 }
-
 
 // ============ Automation Tracking Options ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -394,7 +442,7 @@ pub struct AutomationWorkflowType {
 
     /// Desc: Available triggers for Automation workflows.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub trigger_settings:Option<AutomationTriggerType>,
+    pub trigger_settings: Option<AutomationTriggerType>,
 
     /// Desc: A summary of opens, clicks, and unsubscribes for sent campaigns.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -434,4 +482,108 @@ pub struct AutomationModifier {
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub trigger_settings: Option<AutomationTriggerType>,
+}
+
+// ============ Workflow Email ==============
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct SocialCardType {
+    /// The url for the header image for the card.
+    #[serde(default)]
+    pub image_url: Option<String>,
+    /// A short summary of the campaign to display.
+    #[serde(default)]
+    pub description: Option<String>,
+    /// The title for the card. Typically the subject line of the campaign.
+    #[serde(default)]
+    pub title: Option<String>,
+}
+
+impl Default for SocialCardType {
+    fn default() -> Self {
+        SocialCardType {
+            image_url: None,
+            description: None,
+            title: None,
+        }
+    }
+}
+
+// ============ Workflow Email ==============
+// GET /automations/{workflow_id}/emails/{workflow_email_id}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct WorkflowEmailType {
+    /// A string that uniquely identifies the Automation email.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    /// The ID used in the Mailchimp web application. View this automation in your Mailchimp account at https://{dc}.admin.mailchimp.com/campaigns/show/?id={web_id}.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub web_id: Option<u64>,
+    /// A string that uniquely identifies an Automation workflow.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub workflow_id: Option<String>,
+    /// The position of an Automation email in a workflow.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub position: Option<u64>,
+    /// The delay settings for an Automation email.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub delay: Option<AutomationDelayType>,
+    /// The date and time the campaign was created in ISO 8601 format.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub create_time: Option<String>,
+    /// The date and time the campaign was started in ISO 8601 format.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub start_time: Option<String>,
+    /// The link to the campaign’s archive version in ISO 8601 format.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub archive_url: Option<String>,
+    /// The total number of emails sent for this campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub emails_sent: Option<u64>,
+    /// The date and time a campaign was sent in ISO 8601 format
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub send_time: Option<String>,
+    /// How the campaign’s content is put together (‘template’, ‘drag_and_drop’, ‘html’, ‘url’).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content_type: Option<String>,
+    /// Determines if the automation email needs its blocks refreshed by opening the web-based campaign editor.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub needs_block_refresh: Option<bool>,
+    /// Determines if the campaign contains the |BRAND:LOGO| merge tag.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub has_logo_merge_tag: Option<bool>,
+    /// List settings for the campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recipients: Option<RecipientType>,
+    /// Settings for the campaign including the email subject, from name, and from email address.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub settings: Option<AutomationCampaignSettingsType>,
+    /// The tracking options for a campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tracking: Option<AutomationTrackingOptionsType>,
+    /// The preview for the campaign, rendered by social networks like Facebook and Twitter. Learn more.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub social_card: Option<SocialCardType>,
+    /// Available triggers for Automation workflows.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trigger_settings: Option<AutomationTriggerType>,
+    /// For sent campaigns, a summary of opens, clicks, and unsubscribes.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub report_summary: Option<CampaignReportSummaryType>,
+    /// A list of link types and descriptions for the API schema documents.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub _links: Option<Vec<LinkType>>,
+}
+
+// GET /automations/{workflow_id}/emails
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct WorkflowEmailsType {
+    /// An array of objects, each representing an email in an Automation workflow.
+    #[serde(default)]
+    pub emails: Vec<WorkflowEmailType>,
+    /// Desc: The total number of items matching the query regardless of pagination.
+    #[serde(default)]
+    pub total_items: u32,
+    /// Desc: A list of link types and descriptions for the API schema documents.
+    #[serde(default)]
+    pub _links: Vec<LinkType>,
 }
