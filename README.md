@@ -75,6 +75,7 @@ Finalmente el código de ejemplo para visualizar las automatizaciones creadas en
   }
 ```
 
+###Puedes seguir viendo mas ejemplos en la carpeta examples
 
 # Estado de la implementación
 
