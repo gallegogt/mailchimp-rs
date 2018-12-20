@@ -3,10 +3,11 @@ use crate::automation_workflow_resource::{
 };
 use crate::internal::request::MailchimpResult;
 use crate::internal::types::{
-    ApiRootType, AuthorizedAppType, AuthorizedAppsType, AutomationWorkflowType, AutomationsType,
-    CreatedAuthorizedAppType,
+    ApiRootType, AuthorizedAppType, AuthorizedAppsType, AutomationCampaignSettingsType,
+    AutomationDelayType, AutomationModifier, AutomationWorkflowType, AutomationsType,
+    CreatedAuthorizedAppType, RecipientType,
 };
-use crate::{MailchimpApi, RequestMethod};
+use crate::MailchimpApi;
 
 use std::collections::HashMap;
 
@@ -18,8 +19,8 @@ use std::collections::HashMap;
 /// En este ejemplo se imrpimen el tricker actual de todos los mercados disponibles
 ///
 /// ```
-/// extern crate mailchimp_rs;
-/// use mailchimp_rs::MailchimpClient;
+/// extern crate mailchimp;
+/// use mailchimp::MailchimpClient;
 ///
 /// const DC: &'static str = "<DC>";
 /// const API_KEY: &'static str = "<API KEY>";
@@ -36,7 +37,6 @@ impl MailchimpClient {
     /// Crea una instancia pasandole como parámetros el Mailchimp Datacentery el API Key
     ///
     /// Argumentos:
-    ///
     ///     dc: Datacenter
     ///     api_key: API KEY
     ///
@@ -49,9 +49,7 @@ impl MailchimpClient {
     /// Devuelve detalles de la cuenta de usuario, asi como los links a los recursos asociados
     ///
     /// Argumentos:
-    ///
     ///     filters: Filtros que requieras aplicar a la hora de obtener las aplicaciones
-    ///
     ///         fields: Una lista de campos separados por comas para devolver.
     ///             Parámetros de referencia de subobjetos con notación de puntos.
     ///         exclude_fields: Una lista de campos separados por comas para excluir.
@@ -61,9 +59,9 @@ impl MailchimpClient {
         &self,
         filters: HashMap<String, String>,
     ) -> MailchimpResult<ApiRootType> {
-        let resp = self
-            .api
-            .call::<ApiRootType>(RequestMethod::Get, "", filters);
+        let resp =
+            self.api
+                .get::<ApiRootType>("", filters);
         match resp {
             Ok(value) => Ok(value),
             Err(e) => Err(e),
@@ -76,9 +74,7 @@ impl MailchimpClient {
     /// Devuelve una lista de las aplicaciones conectadas y registradas de una cuenta.
     ///
     /// Argumentos:
-    ///
     ///     filters: Filtros que requieras aplicar a la hora de obtener las aplicaciones
-    ///
     ///         fields: Una lista de campos separados por comas para devolver.
     ///             Parámetros de referencia de subobjetos con notación de puntos.
     ///         exclude_fields: Una lista de campos separados por comas para excluir.
@@ -90,9 +86,12 @@ impl MailchimpClient {
         &self,
         filters: HashMap<String, String>,
     ) -> MailchimpResult<Vec<AuthorizedAppType>> {
-        let resp =
-            self.api
-                .call::<AuthorizedAppsType>(RequestMethod::Get, "authorized-apps", filters);
+        let resp = self
+            .api
+            .get::<AuthorizedAppsType>(
+                "authorized-apps",
+                filters,
+            );
         match resp {
             Ok(value) => Ok(value.apps.clone()),
             Err(e) => Err(e),
@@ -103,7 +102,6 @@ impl MailchimpClient {
     /// la API con su aplicación.
     ///
     /// Argumentos:
-    ///
     ///     client_id: Id o nombre de usuario único para la autorización
     ///     client_secret: Contraseña del cliente para la autorización
     ///
@@ -116,11 +114,12 @@ impl MailchimpClient {
         payload.insert("client_id".to_string(), client_id.to_string());
         payload.insert("client_secret".to_string(), client_secret.to_string());
 
-        let resp = self.api.call::<CreatedAuthorizedAppType>(
-            RequestMethod::Post,
-            "authorized-apps",
-            payload,
-        );
+        let resp = self
+            .api
+            .post::<CreatedAuthorizedAppType, HashMap<String, String>>(
+                "authorized-apps",
+                payload,
+            );
 
         match resp {
             Ok(value) => Ok(value.clone()),
@@ -134,7 +133,6 @@ impl MailchimpClient {
     /// Argumentos:
     ///     app_id: identificador de la aplicación autorizada
     ///     filters: Filtros que requieras aplicar a la hora de obtener las aplicaciones
-    ///
     ///         fields: Una lista de campos separados por comas para devolver.
     ///             Parámetros de referencia de subobjetos con notación de puntos.
     ///         exclude_fields: Una lista de campos separados por comas para excluir.
@@ -146,9 +144,10 @@ impl MailchimpClient {
         filters: HashMap<String, String>,
     ) -> MailchimpResult<AuthorizedAppType> {
         let endpoint = String::from("authorized-apps/") + app_id;
-        let resp =
-            self.api
-                .call::<AuthorizedAppType>(RequestMethod::Get, endpoint.as_str(), filters);
+        let resp = self.api.get::<AuthorizedAppType>(
+            endpoint.as_str(),
+            filters,
+        );
         match resp {
             Ok(value) => Ok(value.clone()),
             Err(e) => Err(e),
@@ -161,11 +160,9 @@ impl MailchimpClient {
     /// Devuelve un resumen de las automatizaciones de una cuenta.
     ///
     /// Argumentos:
-    ///
     ///     filters: Filtros que se requieran aplicar a la hora de obtener las automatizaciones
     ///         Estos filtros se deben pasar en forma de llave, valor donde las llaves puede ser
     ///         cualquiera de los siguientes:
-    ///
     ///         fields: Una lista de campos separados por comas para devolver.
     ///             Parámetros de referencia de subobjetos con notación de puntos.
     ///         exclude_fields: Una lista de campos separados por comas para excluir.
@@ -188,18 +185,17 @@ impl MailchimpClient {
         &self,
         filters: HashMap<String, String>,
     ) -> MailchimpResult<AutomationWorkflowResources> {
-        let response = self
-            .api
-            .call::<AutomationsType>(RequestMethod::Get, "automations", filters);
+        let response = self.api.get::<AutomationsType>(
+            "automations",
+            filters,
+        );
 
         match response {
             Ok(value) => {
                 let automations = value
                     .automations
                     .iter()
-                    .map(move |data| {
-                        AutomationWorkflowResource::new(self.api.clone(), data.clone())
-                    })
+                    .map(move |data| AutomationWorkflowResource::new(self.api.clone(), &data))
                     .collect::<AutomationWorkflowResources>();
                 Ok(automations)
             }
@@ -214,7 +210,6 @@ impl MailchimpClient {
     ///     filters: Filtros requeridos a la hora de obtener las automatizaciones
     ///         Estos filtros se deben pasar en forma de llave, valor donde las llaves puede ser
     ///         cualquiera de los siguientes:
-    ///
     ///         fields: Una lista de campos separados por comas para devolver.
     ///             Parámetros de referencia de subobjetos con notación de puntos.
     ///         exclude_fields: Una lista de campos separados por comas para excluir.
@@ -226,15 +221,54 @@ impl MailchimpClient {
         filters: HashMap<String, String>,
     ) -> MailchimpResult<AutomationWorkflowResource> {
         let endpoint = String::from("automations/") + workflow_id;
-        let response =
-            self.api
-                .call::<AutomationWorkflowType>(RequestMethod::Get, endpoint.as_str(), filters);
+        let response = self
+            .api
+            .get::<AutomationWorkflowType>(
+                endpoint.as_str(),
+                filters,
+            );
 
         match response {
             Ok(automation) => Ok(AutomationWorkflowResource::new(
                 self.api.clone(),
-                automation.clone(),
+                &automation,
             )),
+            Err(e) => Err(e),
+        }
+    }
+    ///
+    /// Devuelve la informacion de la automatizacion especificada
+    ///
+    /// Argumentos:
+    ///     workflow_id: Identificador único de la automatización
+    ///     filters: Filtros requeridos a la hora de obtener las automatizaciones
+    ///         Estos filtros se deben pasar en forma de llave, valor donde las llaves puede ser
+    ///         cualquiera de los siguientes:
+    ///         fields: Una lista de campos separados por comas para devolver.
+    ///             Parámetros de referencia de subobjetos con notación de puntos.
+    ///         exclude_fields: Una lista de campos separados por comas para excluir.
+    ///            Parámetros de referencia de subobjetos con notación de puntos.
+    ///
+    pub fn create_automation<'a>(
+        &self,
+        recipients: RecipientType,
+        settings: AutomationCampaignSettingsType,
+        trigger_settings: AutomationDelayType,
+    ) -> MailchimpResult<AutomationWorkflowResource> {
+        let modifier = AutomationModifier {
+            settings: settings,
+            delay: None,
+            recipients: Some(recipients),
+            trigger_settings: Some(trigger_settings),
+        };
+        let response = self
+            .api
+            .post::<AutomationWorkflowType, AutomationModifier>(
+                "automations",
+                modifier,
+            );
+        match response {
+            Ok(automation) => Ok(AutomationWorkflowResource::new(self.api.clone(), &automation)),
             Err(e) => Err(e),
         }
     }

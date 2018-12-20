@@ -25,8 +25,8 @@ fn main() {
     match account_automations {
         Ok(automations) => {
             for w in &automations {
-                let settings = w.get_settings();
-                last_automation_id = w.get_id().clone();
+                let settings = w.get_settings().as_ref().unwrap();
+                last_automation_id = w.get_id().as_ref().unwrap().to_string();
                 println!("Automatizacion");
                 println!("ID                {:?}", w.get_id());
                 println!("Título            {:?}", settings.title);
@@ -64,7 +64,7 @@ fn main() {
     match filter_automations {
         Ok(automations) => {
             for w in &automations {
-                let settings = w.get_settings();
+                let settings = w.get_settings().as_ref().unwrap();
                 println!("Automatizacion");
                 println!("ID                {:?}", w.get_id());
                 println!("Título            {:?}", settings.title);

@@ -1,8 +1,8 @@
 use crate::reqwest::Client;
 use reqwest::header::HeaderMap;
 use reqwest::{StatusCode, Url};
+use serde::ser::Serialize;
 use serde_json;
-use std::collections::HashMap;
 
 // import macro error
 use log::error;
@@ -42,13 +42,15 @@ pub trait HttpReq {
     ///     headers: Headers
     ///     payload: Datos a enviar a la URL especificada
     ///
-    fn post(
+    fn post<P>(
         &self,
         url: Url,
         headers: HeaderMap,
-        payload: HashMap<String, String>,
+        payload: P,
         basic_auth: &Option<BasicAuth>,
-    ) -> MailchimpResult<String>;
+    ) -> MailchimpResult<String>
+    where
+        P: Serialize;
 }
 
 ///
@@ -130,13 +132,16 @@ impl HttpReq for MailchimpRequest {
     ///     headers: HeaderMap
     ///     payload: Datos a enviar a la URL especificada
     ///
-    fn post(
+    fn post<P>(
         &self,
         url: Url,
         headers: HeaderMap,
-        payload: HashMap<String, String>,
+        payload: P,
         basic_auth: &Option<BasicAuth>,
-    ) -> MailchimpResult<String> {
+    ) -> MailchimpResult<String>
+    where
+        P: Serialize,
+    {
         let builder = match basic_auth {
             Some(auth) => self
                 .client

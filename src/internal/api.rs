@@ -1,6 +1,7 @@
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
 use reqwest::Url;
 use serde::de::DeserializeOwned;
+use serde::ser::Serialize;
 use serde_json;
 use std::collections::HashMap;
 
@@ -132,17 +133,18 @@ where
     ///     payload: Dato a enviar
     ///
     ///
-    pub fn post_edge<'a, T>(
+    pub fn post_edge<'a, T, P>(
         &self,
         endpoint: &'a str,
-        payload: HashMap<String, String>,
+        payload: P,
     ) -> MailchimpResult<T>
     where
         T: DeserializeOwned,
+        P: Serialize
     {
         let api_url = self.build_url(endpoint, &HashMap::new());
         let headers = self.build_headers();
-        let mut result = self.req.post(api_url, headers, payload, &self.basic_auth)?;
+        let mut result = self.req.post::<P>(api_url, headers, payload, &self.basic_auth)?;
         if result.len() == 0 {
             result = "{}".to_string();
         }

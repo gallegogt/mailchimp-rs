@@ -5,7 +5,7 @@ use dotenv::dotenv;
 use std::env;
 
 use std::collections::HashMap;
-use mailchimp::{MailchimpApi, RequestMethod};
+use mailchimp::MailchimpApi;
 use mailchimp::AuthorizedAppsType;
 
 fn main() {
@@ -21,7 +21,7 @@ fn main() {
     // Inicializando el API, con las credenciales
     let api = MailchimpApi::new(&dc, &apk);
     // Se realiza una petición al endpoint /authorized-apps
-    let data = api.call::<AuthorizedAppsType>(RequestMethod::Get, "authorized-apps", HashMap::new());
+    let data = api.get::<AuthorizedAppsType>("authorized-apps", HashMap::new());
 
     match data {
         Ok(resp) => {

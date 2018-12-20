@@ -3,19 +3,10 @@ use crate::internal::api::Api;
 use crate::internal::request::MailchimpRequest;
 use crate::internal::types::MailchimpErrorType;
 use serde::de::DeserializeOwned;
+use serde::ser::Serialize;
 
 ///
-/// Métodos de encuestas soportados por el API
-///
-pub enum RequestMethod {
-    /// HTTP Request POST
-    Post,
-    /// HTTP Request GET
-    Get,
-}
-
-///
-/// # mailchimp_rs API
+/// Mailchimp API
 ///
 /// Permite el acceso al API de Mailchimp si conoces bien los diferentes
 /// endpoints.
@@ -25,8 +16,8 @@ pub enum RequestMethod {
 /// ## Ejemplo
 ///
 /// ```
-/// extern crate mailchimp_rs;
-/// use mailchimp_rs::MailchimpApi;
+/// extern crate mailchimp;
+/// use mailchimp::MailchimpApi;
 ///
 /// let api = MailchimpApi::new("<DC>", "<API Key>");
 /// println!("Api version: {}", api.version());
@@ -72,16 +63,54 @@ impl MailchimpApi {
     }
 
     ///
-    /// Realiza una petición HTTP al servidor
+    /// Realiza una petición de tipo POST
     ///
     /// ```
-    /// extern crate mailchimp_rs;
+    /// extern crate mailchimp;
     /// use std::collections::HashMap;
-    /// use mailchimp_rs::{MailchimpApi, RequestMethod};
-    /// use mailchimp_rs::AuthorizedAppType;
+    /// use mailchimp::MailchimpApi;
+    /// use mailchimp::AuthorizedAppType;
+    ///
     /// fn main() {
     ///     let api = MailchimpApi::new("usX", "aac1e319006883125e18a89e529b5abb73de4c81-usX");
-    ///     let data = api.call::<AuthorizedAppType>(RequestMethod::Get, "authorized-apps", HashMap::new());
+    ///     let mut params = HashMap::new();
+    ///     params.insert("client_id".to_string(), "".to_string());
+    ///     params.insert("client_secret".to_string(), "".to_string());
+    ///     let data = api.get::<AuthorizedAppType>("authorized-apps", params);
+    ///     match data {
+    ///         Ok(resp) => {
+    ///            println!("{:?}", resp)
+    ///         },
+    ///         Err(e) => println!("Error Title: {:?} \n Error detail {:?}", e.title, e.detail)
+    ///     }
+    /// }
+    /// ```
+    /// #Argumentos
+    ///     `endpoint`: Cadena de texto con el endpoint de la API al que se requiere acceder, no debe comenzar por "/"
+    ///     `payload`: Dato a enviar al servidor
+    ///
+    pub fn post<'a, T, P>(
+        &self,
+        endpoint: &'a str,
+        payload: P,
+    ) -> Result<T, MailchimpErrorType>
+    where
+        T: DeserializeOwned,
+        P: Serialize
+    {
+        self.i_api.post_edge::<T, P>(endpoint, payload)
+    }
+
+    ///
+    /// Realiza una petición de tipo GET
+    /// ```
+    /// extern crate mailchimp;
+    /// use std::collections::HashMap;
+    /// use mailchimp::MailchimpApi;
+    /// use mailchimp::AuthorizedAppsType;
+    /// fn main() {
+    ///     let api = MailchimpApi::new("usX", "aac1e319006883125e18a89e529b5abb73de4c81-usX");
+    ///     let data = api.post::<AuthorizedAppsType, HashMap<String, String>>("authorized-apps", HashMap::new());
     ///     match data {
     ///         Ok(resp) => {
     ///             for app in resp.apps.iter() {
@@ -93,22 +122,17 @@ impl MailchimpApi {
     /// }
     /// ```
     /// #Argumentos
-    ///     `method`: Enum que representa el método de encuesta al servidor: Get | Post
     ///     `endpoint`: Cadena de texto con el endpoint de la API al que se requiere acceder, no debe comenzar por "/"
     ///     `payload`: Listado llave valor de los parametros o data
     ///
-    pub fn call<'a, T>(
+    pub fn get<'a, T>(
         &self,
-        method: RequestMethod,
         endpoint: &'a str,
         payload: HashMap<String, String>,
     ) -> Result<T, MailchimpErrorType>
     where
         T: DeserializeOwned,
     {
-        match method {
-            RequestMethod::Get => self.i_api.get_edge(endpoint, payload),
-            RequestMethod::Post => self.i_api.post_edge(endpoint, payload),
-        }
+        self.i_api.get_edge(endpoint, payload)
     }
 }

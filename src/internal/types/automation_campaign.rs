@@ -36,34 +36,82 @@ impl Default for SegmentOptionsType {
     }
 }
 
+// ============ Automation Delay ==============
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AutomationDelayType {
+    /// The delay amount for an automation email.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub amount: Option<u64>,
+    /// The type of delay for an automation email.
+    #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
+    pub delay_type: Option<String>,
+    /// Whether the delay settings describe before or after the delay action of an automation email.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub direction: Option<String>,
+    /// The action that triggers the delay of an automation emails.
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub action: Option<String>,
+}
+
+impl Default for AutomationDelayType {
+    fn default() -> Self {
+        AutomationDelayType {
+            amount: Some(0),
+            delay_type: Some("".to_string()),
+            direction: Some("".to_string()),
+            action: Some("".to_string()),
+        }
+    }
+}
+
 // ============ Recipient ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RecipientType {
     /// The unique list id.
-    #[serde(default)]
-    pub list_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub list_id: Option<String>,
     /// Desc: The status of the list used, namely if it’s deleted or disabled.
-    #[serde(default)]
-    pub list_is_active: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub list_is_active: Option<bool>,
     /// Desc: List Name.
-    #[serde(default)]
-    pub list_name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub list_name: Option<String>,
     /// Desc: An object representing all segmentation options.
-    #[serde(default)]
-    pub segment_opts: Vec<SegmentOptionsType>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub segment_opts: Option<Vec<SegmentOptionsType>>,
     /// Desc: The id of the store.
-    #[serde(default)]
-    pub store_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub store_id: Option<String>,
 }
 
 impl Default for RecipientType {
     fn default() -> Self {
         RecipientType {
-            list_id: "".to_string(),
-            list_is_active: false,
-            list_name: "".to_string(),
-            segment_opts: Vec::new(),
-            store_id: "".to_string(),
+            list_id: None,
+            list_is_active: None,
+            list_name: None,
+            segment_opts: None,
+            store_id: None,
+        }
+    }
+}
+
+impl RecipientType {
+    ///
+    /// Función de ayuda para el proceso creación de una automatización
+    ///
+    /// Argumentos:
+    ///     list_id: Id de la lista
+    ///     store_id: Id de la store
+    ///
+    pub fn create<'a>(list_id: &'a str, store_id: &'a str) -> Self {
+        RecipientType {
+            list_id: Some(list_id.to_string()),
+            list_is_active: None,
+            list_name: None,
+            segment_opts: None,
+            store_id: Some(store_id.to_string()),
         }
     }
 }
@@ -144,14 +192,29 @@ impl Default for CampaignReportSummaryType {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AutomationTriggerType {
     /// The type of Automation workflow.
-    #[serde(default)]
-    pub workflow_type: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub workflow_type: Option<String>,
 }
 
 impl Default for AutomationTriggerType {
     fn default() -> Self {
         AutomationTriggerType {
-            workflow_type: "".to_string(),
+            workflow_type: None,
+        }
+    }
+}
+
+
+impl AutomationTriggerType {
+    ///
+    /// Shortcut para el proceso de creación de una automatización
+    ///
+    /// Argumentos:
+    ///     workflow_type: The type of Automation workflow. Currently only supports ‘abandonedCart’.
+    ///
+    pub fn create<'a>(workflow_type: &'a str) -> Self {
+        AutomationTriggerType {
+            workflow_type: Some(workflow_type.to_string())
         }
     }
 }
@@ -160,45 +223,88 @@ impl Default for AutomationTriggerType {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AutomationCampaignSettingsType {
     /// The title of the Automation.
-    #[serde(default)]
-    pub title: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
     /// Desc: The ‘from’ name for the Automation (not an email address).
-    #[serde(default)]
-    pub from_name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub from_name: Option<String>,
     /// Desc: The reply-to email address for the Automation.
-    #[serde(default)]
-    pub reply_to: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reply_to: Option<String>,
     /// Desc: Whether to use Mailchimp’s Conversations feature to manage out-of-office replies.
-    #[serde(default)]
-    pub use_conversation: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub use_conversation: Option<bool>,
     /// Desc: The Automation’s custom ‘To’ name, typically the first name merge field.
-    #[serde(default)]
-    pub to_name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub to_name: Option<String>,
     /// Desc: Whether Mailchimp authenticated the Automation. Defaults to true.
-    #[serde(default)]
-    pub authenticate: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub authenticate: Option<bool>,
     /// Desc: Whether to automatically append Mailchimp’s default footer to the Automation.
-    #[serde(default)]
-    pub auto_footer: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub auto_footer: Option<bool>,
     /// Desc: Whether to automatically inline the CSS included with the Automation content.
-    #[serde(default)]
-    pub inline_css: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub inline_css: Option<bool>,
 }
 
 impl Default for AutomationCampaignSettingsType {
     fn default() -> Self {
         AutomationCampaignSettingsType {
-            title: "".to_string(),
-            from_name: "".to_string(),
-            reply_to: "".to_string(),
-            use_conversation: false,
-            to_name: "".to_string(),
-            authenticate: true,
-            auto_footer: false,
-            inline_css: false,
+            title: None,
+            from_name: None,
+            reply_to: None,
+            use_conversation: None,
+            to_name: None,
+            authenticate: None,
+            auto_footer: None,
+            inline_css: None,
         }
     }
 }
+
+impl AutomationCampaignSettingsType {
+    ///
+    /// Shortcut para el proceso de creación de una automatización
+    ///
+    /// Argumentos:
+    ///     from_name: El ‘from’ para la automatización.
+    ///     reply_to: La dirección de corrreo para la automatización, reply-to.
+    ///
+    pub fn create<'a>(from_name: &'a str, reply_to: &'a str) -> Self {
+        AutomationCampaignSettingsType {
+            title: None,
+            from_name: Some(from_name.to_string()),
+            reply_to: Some(reply_to.to_string()),
+            use_conversation: None,
+            to_name: None,
+            authenticate: None,
+            auto_footer: None,
+            inline_css: None,
+        }
+    }
+    ///
+    /// Shortcut para el proceso de creación de una automatización
+    ///
+    /// Argumentos:
+    ///     title: Titulo de la automatizacion
+    ///     from_name: El ‘from’ para la automatización.
+    ///     reply_to: La dirección de corrreo para la automatización, reply-to.
+    ///
+    pub fn update<'a>(title: &'a str, from_name: &'a str, reply_to: &'a str) -> Self {
+        AutomationCampaignSettingsType {
+            title: Some(title.to_string()),
+            from_name: Some(from_name.to_string()),
+            reply_to: Some(reply_to.to_string()),
+            use_conversation: None,
+            to_name: None,
+            authenticate: None,
+            auto_footer: None,
+            inline_css: None,
+        }
+    }
+}
+
 
 // ============ Automation Tracking Options ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -255,48 +361,48 @@ impl Default for AutomationTrackingOptionsType {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AutomationWorkflowType {
     /// A string that identifies the Automation.
-    #[serde(default)]
-    pub id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
 
     /// Desc: The date and time the Automation was created in ISO 8601 format.
-    #[serde(default)]
-    pub create_time: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub create_time: Option<String>,
 
     /// Desc: The date and time the Automation was started in ISO 8601 format.
-    #[serde(default)]
-    pub start_time: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub start_time: Option<String>,
 
     /// Desc: The current status of the Automation.
-    #[serde(default)]
-    pub status: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
     /// Desc: The total number of emails sent for the Automation.
-    #[serde(default)]
-    pub emails_sent: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub emails_sent: Option<u64>,
 
     /// Desc: List settings for the Automation.
-    #[serde(default)]
-    pub recipients: RecipientType,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recipients: Option<RecipientType>,
 
     /// Desc: The settings for the Automation workflow.
-    #[serde(default)]
-    pub settings: AutomationCampaignSettingsType,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub settings: Option<AutomationCampaignSettingsType>,
 
     /// Desc: The tracking options for the Automation.
-    #[serde(default)]
-    pub tracking: AutomationTrackingOptionsType,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tracking: Option<AutomationTrackingOptionsType>,
 
     /// Desc: Available triggers for Automation workflows.
-    #[serde(default)]
-    pub trigger_settings: AutomationTriggerType,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trigger_settings:Option<AutomationTriggerType>,
 
     /// Desc: A summary of opens, clicks, and unsubscribes for sent campaigns.
-    #[serde(default)]
-    pub report_summary: CampaignReportSummaryType,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub report_summary: Option<CampaignReportSummaryType>,
 
     /// Desc: A list of link types and descriptions for the API schema documents.
-    #[serde(default)]
-    pub _links: Vec<LinkType>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub _links: Option<Vec<LinkType>>,
 }
 
 // ============ Authorized Apps ==============
@@ -312,4 +418,20 @@ pub struct AutomationsType {
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AutomationModifier {
+    /// The settings for the Automation workflow.
+    #[serde(default)]
+    pub settings: AutomationCampaignSettingsType,
+    /// Desc: The total number of items matching the query regardless of pagination.
+    #[serde(default)]
+    pub delay: Option<AutomationDelayType>,
+    /// Desc: A list of link types and descriptions for the API schema documents.
+    #[serde(default)]
+    pub recipients: Option<RecipientType>,
+    /// Desc: A list of link types and descriptions for the API schema documents.
+    #[serde(default)]
+    pub trigger_settings: Option<AutomationDelayType>,
 }
