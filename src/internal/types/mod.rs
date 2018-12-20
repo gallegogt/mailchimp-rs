@@ -7,3 +7,7 @@ pub use self::error::MailchimpErrorType;
 pub use self::link::LinkType;
 pub use self::authorized_apps::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType};
 pub use self::automation_campaign::*;
+
+// ============ Empty Type ==============
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct EmptyType {}

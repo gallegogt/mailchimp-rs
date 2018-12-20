@@ -144,9 +144,7 @@ impl HttpReq for MailchimpRequest {
                 .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
             None => self.client.post(url),
         };
-
-        let result = builder.headers(headers).form(&payload).send();
-
+        let result = builder.headers(headers).json(&payload).send();
         match result {
             Ok(mut resp) => match resp.status() {
                 StatusCode::OK => match resp.text() {

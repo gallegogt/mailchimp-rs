@@ -11,7 +11,7 @@ mod tests {
 
     use super::api::Api;
     use super::request::{BasicAuth, HttpReq, MailchimpResult};
-    use super::types::{AuthorizedAppsType, AutomationWorkflowType, AutomationsType};
+    use super::types::{AuthorizedAppsType, AutomationWorkflowType, AutomationsType, EmptyType};
 
     ///
     ///
@@ -178,5 +178,24 @@ mod tests {
             "Los estados de la petición no coinciden: Valor de la respuesta {:?} Valor esperado: {:?}",
             resp.automations.len(), resp.total_items
         );
+    }
+
+    #[test]
+    fn test_automations_pause_all_emails() {
+        let mock_transport = MockRequest::new("", "");
+        let api = Api::<MockRequest>::new("us6", "access_token", Box::new(mock_transport));
+        let resp = api.post_edge::<EmptyType>(
+            "/automations/fd9d304eb7/actions/pause-all-emails",
+            HashMap::new(),
+        );
+
+        match resp {
+            Ok(_) => assert_eq!(true, true),
+            Err(e) => assert_eq!(
+                false, true,
+                "Los estados de la petición no coinciden: Valor de la respuesta {:?}",
+                e
+            ),
+        }
     }
 }
