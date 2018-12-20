@@ -90,8 +90,8 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
   * ✅ Get a list of Automations
   * ✅ Get information about a specific Automation workflow
   * 🔘 Update an Automation
-  * 🔘 [Action] Pause all emails in an Automation workflow
-  * 🔘 [Action] Start all emails in an Automation workflow
+  * ✅ [Action] Pause all emails in an Automation workflow
+  * ✅ [Action] Start all emails in an Automation workflow
 
   * **Emails**
     * 🔘 Get a list of automated emails in a workflow
