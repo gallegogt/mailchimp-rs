@@ -3,7 +3,7 @@ use crate::automation_workflow_resource::{
 };
 use crate::internal::request::MailchimpResult;
 use crate::internal::types::{
-    AuthorizedAppType, AuthorizedAppsType, AutomationWorkflowType, AutomationsType,
+    ApiRootType, AuthorizedAppType, AuthorizedAppsType, AutomationWorkflowType, AutomationsType,
     CreatedAuthorizedAppType,
 };
 use crate::{MailchimpApi, RequestMethod};
@@ -43,6 +43,30 @@ impl MailchimpClient {
     pub fn new<'a>(dc: &'a str, api_key: &'a str) -> Self {
         MailchimpClient {
             api: MailchimpApi::new(dc, api_key),
+        }
+    }
+    ///
+    /// Devuelve detalles de la cuenta de usuario, asi como los links a los recursos asociados
+    ///
+    /// Argumentos:
+    ///
+    ///     filters: Filtros que requieras aplicar a la hora de obtener las aplicaciones
+    ///
+    ///         fields: Una lista de campos separados por comas para devolver.
+    ///             Parámetros de referencia de subobjetos con notación de puntos.
+    ///         exclude_fields: Una lista de campos separados por comas para excluir.
+    ///            Parámetros de referencia de subobjetos con notación de puntos.
+    ///
+    pub fn get_account_info(
+        &self,
+        filters: HashMap<String, String>,
+    ) -> MailchimpResult<ApiRootType> {
+        let resp = self
+            .api
+            .call::<ApiRootType>(RequestMethod::Get, "", filters);
+        match resp {
+            Ok(value) => Ok(value),
+            Err(e) => Err(e),
         }
     }
     ///
