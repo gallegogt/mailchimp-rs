@@ -1,6 +1,6 @@
 use crate::reqwest::Client;
 use reqwest::header::HeaderMap;
-use reqwest::{StatusCode, Url};
+use reqwest::{Error, Response, StatusCode, Url};
 use serde::ser::Serialize;
 use serde_json;
 
@@ -51,6 +51,21 @@ pub trait HttpReq {
     ) -> MailchimpResult<String>
     where
         P: Serialize;
+    ///
+    ///  Argumentos:
+    ///     url: Url
+    ///     headers: Headers
+    ///     payload: Datos a enviar a la URL especificada
+    ///
+    fn put<P>(
+        &self,
+        url: Url,
+        headers: HeaderMap,
+        payload: P,
+        basic_auth: &Option<BasicAuth>,
+    ) -> MailchimpResult<String>
+    where
+        P: Serialize;
 }
 
 ///
@@ -93,38 +108,7 @@ impl HttpReq for MailchimpRequest {
         };
 
         let result = builder.headers(headers).send();
-        match result {
-            Ok(mut resp) => match resp.status() {
-                StatusCode::OK => match resp.text() {
-                    Ok(txt) => Ok(txt),
-                    Err(e) => {
-                        error!(target: "mailchimp", "GET: Response Error details: {:?}", e);
-                        Err(MailchimpErrorType::default())
-                    }
-                },
-                status => match resp.text() {
-                    Ok(txt) => match serde_json::from_str(&txt) {
-                        Ok(value) => Err(value),
-                        Err(e) => {
-                            error!(
-                                target: "mailchimp",
-                                "GET: Response Error details: {:?} status {:?}", e, status);
-                            Err(MailchimpErrorType::default())
-                        }
-                    },
-                    Err(e) => {
-                        error!(
-                            target: "mailchimp",
-                            "GET: Response Error details:{:?} status {:?}", e, status);
-                        Err(MailchimpErrorType::default())
-                    }
-                },
-            },
-            Err(e) => {
-                error!(target: "mailchimp", "GET {:?}", e);
-                Err(MailchimpErrorType::default())
-            }
-        }
+        self.process_response(result, "GET")
     }
     ///
     ///  Argumentos:
@@ -150,12 +134,48 @@ impl HttpReq for MailchimpRequest {
             None => self.client.post(url),
         };
         let result = builder.headers(headers).json(&payload).send();
-        match result {
+        self.process_response(result, "POST")
+    }
+    ///
+    ///  Argumentos:
+    ///     url: Url
+    ///     headers: HeaderMap
+    ///     payload: Datos a enviar a la URL especificada
+    ///
+    fn put<P>(
+        &self,
+        url: Url,
+        headers: HeaderMap,
+        payload: P,
+        basic_auth: &Option<BasicAuth>,
+    ) -> MailchimpResult<String>
+    where
+        P: Serialize,
+    {
+        let builder = match basic_auth {
+            Some(auth) => self
+                .client
+                .put(url)
+                .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
+            None => self.client.post(url),
+        };
+        let result = builder.headers(headers).json(&payload).send();
+        self.process_response(result, "PUT")
+    }
+}
+
+impl MailchimpRequest {
+    fn process_response<'a>(
+        &self,
+        response: Result<Response, Error>,
+        method: &'a str,
+    ) -> MailchimpResult<String> {
+        match response {
             Ok(mut resp) => match resp.status() {
                 StatusCode::OK => match resp.text() {
                     Ok(txt) => Ok(txt),
                     Err(e) => {
-                        error!(target: "mailchimp", "POST: Response Error Details: {:?}", e);
+                        error!(target: "mailchimp", "{:?}: Response Error Details: {:?}", method, e);
                         Err(MailchimpErrorType::default())
                     }
                 },
@@ -165,20 +185,20 @@ impl HttpReq for MailchimpRequest {
                         Err(e) => {
                             error!(
                                 target: "mailchimp",
-                                "POST: Response Error details: {:?} status {:?}", e, status);
+                                "{:?}: Response Error details: {:?} status {:?}",  method, e, status);
                             Err(MailchimpErrorType::default())
                         }
                     },
                     Err(e) => {
                         error!(
                             target: "mailchimp",
-                            "POST: Response Error details: {:?} status {:?}", e, status);
+                            "{:?}: Response Error details: {:?} status {:?}",  method, e, status);
                         Err(MailchimpErrorType::default())
                     }
                 },
             },
             Err(e) => {
-                error!(target: "mailchimp", "POST {:?}", e);
+                error!(target: "mailchimp", "{:?} {:?}", method, e);
                 Err(MailchimpErrorType::default())
             }
         }

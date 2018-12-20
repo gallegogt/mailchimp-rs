@@ -2,8 +2,10 @@ use crate::api::MailchimpApi;
 use crate::internal::types::{
     AutomationCampaignSettingsType, AutomationTrackingOptionsType, AutomationTriggerType,
     AutomationWorkflowType, CampaignReportSummaryType, EmptyType, MailchimpErrorType,
-    RecipientType,
+    RecipientType, AutomationDelayType, AutomationModifier
 };
+use crate::internal::request::MailchimpResult;
+
 use std::collections::HashMap;
 
 ///
@@ -131,6 +133,35 @@ impl AutomationWorkflowResource {
         ) {
             Ok(_) => None,
             Err(e) => Some(e),
+        }
+    }
+    ///
+    /// Actualiza la automatizació y devuelve una instancia nueva
+    ///
+    /// Argumentos:
+    ///     settings: Configuracion de la automatización a crear
+    ///     delay: Ajustes de retraso para un correo electrónico de automatización.
+    ///
+    pub fn remote_update<'a>(
+        &self,
+        settings: Option<AutomationCampaignSettingsType>,
+        delay: Option<AutomationDelayType>
+    ) -> MailchimpResult<AutomationWorkflowResource> {
+        let modifier = AutomationModifier {
+            settings: settings,
+            delay: delay,
+            recipients:None,
+            trigger_settings: None,
+        };
+        let response = self
+            .api
+            .post::<AutomationWorkflowType, AutomationModifier>("automations", modifier);
+        match response {
+            Ok(automation) => Ok(AutomationWorkflowResource::new(
+                self.api.clone(),
+                &automation,
+            )),
+            Err(e) => Err(e),
         }
     }
 

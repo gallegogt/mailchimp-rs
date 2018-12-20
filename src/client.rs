@@ -222,17 +222,12 @@ impl MailchimpClient {
         }
     }
     ///
-    /// Devuelve la informacion de la automatizacion especificada
+    ///  Crea una automatización
     ///
     /// Argumentos:
-    ///     workflow_id: Identificador único de la automatización
-    ///     filters: Filtros requeridos a la hora de obtener las automatizaciones
-    ///         Estos filtros se deben pasar en forma de llave, valor donde las llaves puede ser
-    ///         cualquiera de los siguientes:
-    ///         fields: Una lista de campos separados por comas para devolver.
-    ///             Parámetros de referencia de subobjetos con notación de puntos.
-    ///         exclude_fields: Una lista de campos separados por comas para excluir.
-    ///            Parámetros de referencia de subobjetos con notación de puntos.
+    ///     recipients: Contenedores para esta automatización
+    ///     trigger_settings: Configuracion de los disparadores
+    ///     settings: Configuracion de la automatización a crear
     ///
     pub fn create_automation<'a>(
         &self,

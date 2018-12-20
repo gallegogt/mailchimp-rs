@@ -69,6 +69,24 @@ mod tests {
         {
             Ok(self.resp_for_post.clone())
         }
+        ///
+        ///  Argumentos:
+        ///     url: Url
+        ///     headers: HeaderMap
+        ///     payload: Datos a enviar a la URL especificada
+        ///
+        fn put<P>(
+            &self,
+            _url: Url,
+            _headers: HeaderMap,
+            _payload: P,
+            _basic_auth: &Option<BasicAuth>,
+        ) -> MailchimpResult<String>
+        where
+            P: Serialize,
+        {
+            Ok(self.resp_for_post.clone())
+        }
     }
 
     ///
