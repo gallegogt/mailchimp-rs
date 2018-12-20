@@ -424,7 +424,7 @@ pub struct AutomationsType {
 pub struct AutomationModifier {
     /// The settings for the Automation workflow.
     #[serde(default)]
-    pub settings: AutomationCampaignSettingsType,
+    pub settings: Option<AutomationCampaignSettingsType>,
     /// Desc: The total number of items matching the query regardless of pagination.
     #[serde(default)]
     pub delay: Option<AutomationDelayType>,
@@ -433,5 +433,5 @@ pub struct AutomationModifier {
     pub recipients: Option<RecipientType>,
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
-    pub trigger_settings: Option<AutomationDelayType>,
+    pub trigger_settings: Option<AutomationTriggerType>,
 }

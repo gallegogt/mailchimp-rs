@@ -4,7 +4,7 @@ use crate::automation_workflow_resource::{
 use crate::internal::request::MailchimpResult;
 use crate::internal::types::{
     ApiRootType, AuthorizedAppType, AuthorizedAppsType, AutomationCampaignSettingsType,
-    AutomationDelayType, AutomationModifier, AutomationWorkflowType, AutomationsType,
+    AutomationModifier, AutomationTriggerType, AutomationWorkflowType, AutomationsType,
     CreatedAuthorizedAppType, RecipientType,
 };
 use crate::MailchimpApi;
@@ -59,9 +59,7 @@ impl MailchimpClient {
         &self,
         filters: HashMap<String, String>,
     ) -> MailchimpResult<ApiRootType> {
-        let resp =
-            self.api
-                .get::<ApiRootType>("", filters);
+        let resp = self.api.get::<ApiRootType>("", filters);
         match resp {
             Ok(value) => Ok(value),
             Err(e) => Err(e),
@@ -88,10 +86,7 @@ impl MailchimpClient {
     ) -> MailchimpResult<Vec<AuthorizedAppType>> {
         let resp = self
             .api
-            .get::<AuthorizedAppsType>(
-                "authorized-apps",
-                filters,
-            );
+            .get::<AuthorizedAppsType>("authorized-apps", filters);
         match resp {
             Ok(value) => Ok(value.apps.clone()),
             Err(e) => Err(e),
@@ -116,10 +111,7 @@ impl MailchimpClient {
 
         let resp = self
             .api
-            .post::<CreatedAuthorizedAppType, HashMap<String, String>>(
-                "authorized-apps",
-                payload,
-            );
+            .post::<CreatedAuthorizedAppType, HashMap<String, String>>("authorized-apps", payload);
 
         match resp {
             Ok(value) => Ok(value.clone()),
@@ -144,10 +136,9 @@ impl MailchimpClient {
         filters: HashMap<String, String>,
     ) -> MailchimpResult<AuthorizedAppType> {
         let endpoint = String::from("authorized-apps/") + app_id;
-        let resp = self.api.get::<AuthorizedAppType>(
-            endpoint.as_str(),
-            filters,
-        );
+        let resp = self
+            .api
+            .get::<AuthorizedAppType>(endpoint.as_str(), filters);
         match resp {
             Ok(value) => Ok(value.clone()),
             Err(e) => Err(e),
@@ -185,10 +176,7 @@ impl MailchimpClient {
         &self,
         filters: HashMap<String, String>,
     ) -> MailchimpResult<AutomationWorkflowResources> {
-        let response = self.api.get::<AutomationsType>(
-            "automations",
-            filters,
-        );
+        let response = self.api.get::<AutomationsType>("automations", filters);
 
         match response {
             Ok(value) => {
@@ -223,10 +211,7 @@ impl MailchimpClient {
         let endpoint = String::from("automations/") + workflow_id;
         let response = self
             .api
-            .get::<AutomationWorkflowType>(
-                endpoint.as_str(),
-                filters,
-            );
+            .get::<AutomationWorkflowType>(endpoint.as_str(), filters);
 
         match response {
             Ok(automation) => Ok(AutomationWorkflowResource::new(
@@ -252,8 +237,8 @@ impl MailchimpClient {
     pub fn create_automation<'a>(
         &self,
         recipients: RecipientType,
-        settings: AutomationCampaignSettingsType,
-        trigger_settings: AutomationDelayType,
+        trigger_settings: AutomationTriggerType,
+        settings: Option<AutomationCampaignSettingsType>,
     ) -> MailchimpResult<AutomationWorkflowResource> {
         let modifier = AutomationModifier {
             settings: settings,
@@ -263,12 +248,12 @@ impl MailchimpClient {
         };
         let response = self
             .api
-            .post::<AutomationWorkflowType, AutomationModifier>(
-                "automations",
-                modifier,
-            );
+            .post::<AutomationWorkflowType, AutomationModifier>("automations", modifier);
         match response {
-            Ok(automation) => Ok(AutomationWorkflowResource::new(self.api.clone(), &automation)),
+            Ok(automation) => Ok(AutomationWorkflowResource::new(
+                self.api.clone(),
+                &automation,
+            )),
             Err(e) => Err(e),
         }
     }
