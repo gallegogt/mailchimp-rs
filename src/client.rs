@@ -1,4 +1,4 @@
-use crate::automation_workflow_resource::{
+use crate::resources::{
     AutomationWorkflowResource, AutomationWorkflowResources,
 };
 use crate::internal::request::MailchimpResult;

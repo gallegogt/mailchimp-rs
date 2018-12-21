@@ -6,7 +6,7 @@ use crate::internal::types::{
     CampaignReportSummaryType, EmptyType, MailchimpErrorType, RecipientType, WorkflowEmailType,
     WorkflowEmailsType,
 };
-use crate::workflow_email_resource::{WorkflowEmailResource, WorkflowEmailResources};
+use super::workflow_email::{WorkflowEmailResource, WorkflowEmailResources};
 use std::collections::HashMap;
 
 ///
