@@ -130,10 +130,6 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
     * 🔘 **Webhooks**
     * 🔘 **Locations**
 
-### 🔘 Ping
-### 🔘 Reporting
-### 🔘 Reports
-
 ### Campaigns
   * 🔘 Create a new campaign
   * 🔘 Get all campaigns
@@ -154,6 +150,9 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
   * 🔘 **Feedback**
   * 🔘 **Send Checklist**
 
+### 🔘 Ping
+### 🔘 Reporting
+### 🔘 Reports
 
 ### 🔘 Campaign Folders
 ### 🔘 Batch Operations

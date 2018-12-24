@@ -1,4 +1,5 @@
-use crate::internal::types::LinkType;
+use super::ecommerce::ECommerceReportType;
+use super::link::LinkType;
 
 // ============ Segment Conditions ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -22,16 +23,24 @@ pub struct SegmentOptionsType {
     /// The id for an existing saved segment.
     #[serde(default)]
     pub saved_segment_id: u64,
+    /// The prebuilt segment id, if a prebuilt segment has been designated for this campaign.
+    #[serde(default)]
+    pub prebuilt_segment_id: String,
     /// Desc: Segment match type.
     #[serde(default, rename = "match")]
     pub match_filter: String,
+    /// An array of segment conditions.
+    #[serde(default)]
+    pub conditions: Vec<SegmentConditionsType>,
 }
 
 impl Default for SegmentOptionsType {
     fn default() -> Self {
         SegmentOptionsType {
             saved_segment_id: 0,
+            prebuilt_segment_id: "".to_string(),
             match_filter: "".to_string(),
+            conditions: Vec::new(),
         }
     }
 }
@@ -85,7 +94,7 @@ pub struct RecipientType {
     pub recipient_count: Option<u64>,
     /// Desc: An object representing all segmentation options.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub segment_opts: Option<Vec<SegmentOptionsType>>,
+    pub segment_opts: Option<SegmentOptionsType>,
     /// Desc: The id of the store.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub store_id: Option<String>,
@@ -181,6 +190,9 @@ pub struct CampaignReportSummaryType {
     /// The number of unique clicks, divided by the total number of successful deliveries.
     #[serde(default)]
     pub click_rate: f32,
+    /// E-Commerce stats for a campaign.
+    #[serde(default)]
+    pub ecommerce: Option<ECommerceReportType>,
 }
 
 impl Default for CampaignReportSummaryType {
@@ -192,6 +204,7 @@ impl Default for CampaignReportSummaryType {
             clicks: 0,
             subscriber_clicks: 0,
             click_rate: 0.0,
+            ecommerce: None,
         }
     }
 }
@@ -253,6 +266,9 @@ pub struct AutomationCampaignSettingsType {
     /// Desc: The Automation’s custom ‘To’ name, typically the first name merge field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub to_name: Option<String>,
+    /// Desc: If the campaign is listed in a folder, the id for that folder.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub folder_id: Option<u64>,
     /// Desc: Whether to automatically append Mailchimp’s default footer to the Automation.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub auto_footer: Option<bool>,
@@ -268,6 +284,9 @@ pub struct AutomationCampaignSettingsType {
     /// Allows Facebook comments on the campaign (also force-enables the Campaign Archive toolbar). Defaults to true.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fb_comments: Option<bool>,
+    /// Send this campaign using Timewarp.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub timewarp: Option<bool>,
     /// Allows Facebook comments on the campaign (also force-enables the Campaign Archive toolbar). Defaults to true.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub template_id: Option<u64>,
@@ -275,6 +294,8 @@ pub struct AutomationCampaignSettingsType {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub drag_and_drop: Option<bool>,
 }
+
+pub type CampaignSettingsType = AutomationCampaignSettingsType;
 
 impl Default for AutomationCampaignSettingsType {
     fn default() -> Self {
@@ -286,12 +307,14 @@ impl Default for AutomationCampaignSettingsType {
             reply_to: None,
             use_conversation: None,
             to_name: None,
+            folder_id: None,
             authenticate: None,
             auto_footer: None,
             inline_css: None,
             auto_tweet: None,
             auto_fb_post: None,
             fb_comments: None,
+            timewarp: None,
             template_id: None,
             drag_and_drop: None,
         }
@@ -312,6 +335,7 @@ impl AutomationCampaignSettingsType {
             preview_text: None,
             title: None,
             from_name: Some(from_name.to_string()),
+            folder_id: None,
             reply_to: Some(reply_to.to_string()),
             use_conversation: None,
             to_name: None,
@@ -321,6 +345,7 @@ impl AutomationCampaignSettingsType {
             auto_tweet: None,
             auto_fb_post: None,
             fb_comments: None,
+            timewarp: None,
             template_id: None,
             drag_and_drop: None,
         }
@@ -339,6 +364,7 @@ impl AutomationCampaignSettingsType {
             preview_text: None,
             title: Some(title.to_string()),
             from_name: Some(from_name.to_string()),
+            folder_id: None,
             reply_to: Some(reply_to.to_string()),
             use_conversation: None,
             to_name: None,
@@ -348,6 +374,7 @@ impl AutomationCampaignSettingsType {
             auto_tweet: None,
             auto_fb_post: None,
             fb_comments: None,
+            timewarp: None,
             template_id: None,
             drag_and_drop: None,
         }
@@ -403,6 +430,8 @@ impl Default for AutomationTrackingOptionsType {
         }
     }
 }
+
+pub type CampaignTrackingOptionsType = AutomationTrackingOptionsType;
 
 // ============ Automation Workflows ==============
 // GET /automations/{workflow_id}

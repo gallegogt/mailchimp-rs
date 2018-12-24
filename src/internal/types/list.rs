@@ -111,7 +111,6 @@ impl Default for StatisticsType {
     }
 }
 
-
 // ============ List ==============
 // GET /lists/{list_id}
 #[derive(Serialize, Deserialize, Debug, Clone)]

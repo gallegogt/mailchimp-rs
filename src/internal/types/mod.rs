@@ -5,6 +5,8 @@ mod automation_campaign;
 mod contact;
 mod api_root;
 mod list;
+mod ecommerce;
+mod campaign;
 
 pub use self::error::MailchimpErrorType;
 pub use self::link::LinkType;
@@ -13,6 +15,8 @@ pub use self::automation_campaign::*;
 pub use self::contact::ContactType;
 pub use self::api_root::*;
 pub use self::list::*;
+pub use self::ecommerce::*;
+pub use self::campaign::*;
 
 // ============ Empty Type ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
