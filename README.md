@@ -114,8 +114,8 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
 ### List
   * 🔘 Create a new list
   * 🔘 Batch sub/unsub list members
-  * 🔘 Get information about all lists
-  * 🔘 Get information about a specific list
+  * ✅ Get information about all lists
+  * ✅ Get information about a specific list
 
     * 🔘 **Abuse Reports**
     * 🔘 **Activity**

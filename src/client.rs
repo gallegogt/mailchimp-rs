@@ -1,11 +1,11 @@
 use crate::resources::{
-    AutomationWorkflowResource, AutomationWorkflowResources,
+    ListResource, ListResources, AutomationWorkflowResource, AutomationWorkflowResources
 };
 use crate::internal::request::MailchimpResult;
 use crate::internal::types::{
     ApiRootType, AuthorizedAppType, AuthorizedAppsType, AutomationCampaignSettingsType,
     AutomationModifier, AutomationTriggerType, AutomationWorkflowType, AutomationsType,
-    CreatedAuthorizedAppType, RecipientType,
+    CreatedAuthorizedAppType, RecipientType, ListsType, ListType
 };
 use crate::MailchimpApi;
 
@@ -249,6 +249,74 @@ impl MailchimpClient {
                 self.api.clone(),
                 &automation,
             )),
+            Err(e) => Err(e),
+        }
+    }
+    ///
+    ///  ===================== LISTs ==================
+    ///
+    /// Devuelve información de las listas creadas
+    ///
+    /// Argumentos:
+    ///     filters: Filtros que se requieran aplicar a la hora de obtener las automatizaciones
+    ///         Estos filtros se deben pasar en forma de llave, valor donde las llaves puede ser
+    ///         cualquiera de los siguientes:
+    ///         fields: listado de campos deseados, separados por coma
+    ///         exclude_fields: listado de campos excluidos, separados por coma
+    ///         count: Número de registros a devolver
+    ///         offset: El número de registros de una colección a saltar
+    ///         before_date_created: Restrict response to lists created before the set date.
+    ///         since_date_created: Restrict results to lists created after the set date.
+    ///         before_campaign_last_sent: Restrict results to lists created before the last campaign send date.
+    ///         since_campaign_last_sent: Restrict results to lists created after the last campaign send date.
+    ///         email: Restrict results to lists that include a specific subscriber’s email address.
+    ///         sort_field: Returns files sorted by the specified field.
+    ///         sort_dir: Determines the order direction for sorted results.
+    ///
+    pub fn get_lists(
+        &self,
+        filters: HashMap<String, String>,
+    ) -> MailchimpResult<ListResources> {
+        let response = self.api.get::<ListsType>("lists", filters);
+
+        match response {
+            Ok(value) => {
+                let lists = value
+                    .lists
+                    .iter()
+                    .map(move |data| ListResource::new(self.api.clone(), &data))
+                    .collect::<ListResources>();
+                Ok(lists)
+            }
+            Err(e) => Err(e),
+        }
+    }
+    ///
+    /// Get information about a specific list in your Mailchimp account.
+    /// Results include list members who have signed up but haven’t confirmed
+    /// their subscription yet and unsubscribed or cleaned.
+    ///
+    /// Argumentos:
+    ///     list_id: The unique id for the list.
+    ///     filters: Filtros que se requieran aplicar a la hora de obtener las automatizaciones
+    ///         Estos filtros se deben pasar en forma de llave, valor donde las llaves puede ser
+    ///         cualquiera de los siguientes:
+    ///         fields: listado de campos deseados, separados por coma
+    ///         exclude_fields: listado de campos excluidos, separados por coma
+    ///
+    pub fn get_list_info<'a>(
+        &self,
+        list_id: &'a str,
+        filters: HashMap<String, String>,
+    ) -> MailchimpResult<ListResource> {
+        let endpoint = String::from("lists/") + list_id;
+        let response = self.api.get::<ListType>(endpoint.as_str(), filters);
+
+        match response {
+            Ok(data) => {
+                let list = ListResource::new(self.api.clone(), &data);
+                Ok(list)
+            }
             Err(e) => Err(e),
         }
     }
