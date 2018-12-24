@@ -132,8 +132,8 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
 
 ### Campaigns
   * 🔘 Create a new campaign
-  * 🔘 Get all campaigns
-  * 🔘 Get information about a specific campaign
+  * ✅ Get all campaigns
+  * ✅ Get information about a specific campaign
   * 🔘 Update the settings for a campaign
   * 🔘 Delete a campaign
   * 🔘 Cancel a campaign

@@ -1,11 +1,11 @@
 use crate::resources::{
-    ListResource, ListResources, AutomationWorkflowResource, AutomationWorkflowResources
+    ListResource, ListResources, AutomationWorkflowResource, AutomationWorkflowResources, CampaignResources, CampaignResource
 };
 use crate::internal::request::MailchimpResult;
 use crate::internal::types::{
     ApiRootType, AuthorizedAppType, AuthorizedAppsType, AutomationCampaignSettingsType,
     AutomationModifier, AutomationTriggerType, AutomationWorkflowType, AutomationsType,
-    CreatedAuthorizedAppType, RecipientType, ListsType, ListType
+    CreatedAuthorizedAppType, RecipientType, ListsType, ListType, CampaignsType, CampaignType
 };
 use crate::MailchimpApi;
 
@@ -315,6 +315,76 @@ impl MailchimpClient {
         match response {
             Ok(data) => {
                 let list = ListResource::new(self.api.clone(), &data);
+                Ok(list)
+            }
+            Err(e) => Err(e),
+        }
+    }
+    ///
+    ///  ===================== Campaign ==================
+    ///
+    /// Devuelve información de las listas creadas
+    ///
+    /// Argumentos:
+    ///     filters: Filtros que se requieran aplicar a la hora de obtener las automatizaciones
+    ///         Estos filtros se deben pasar en forma de llave, valor donde las llaves puede ser
+    ///         cualquiera de los siguientes:
+    ///         fields: listado de campos deseados, separados por coma
+    ///         exclude_fields: listado de campos excluidos, separados por coma
+    ///         count: Número de registros a devolver
+    ///         offset: El número de registros de una colección a saltar
+    ///         before_date_created: Restrict response to lists created before the set date.
+    ///         since_date_created: Restrict results to lists created after the set date.
+    ///         before_campaign_last_sent: Restrict results to lists created before the last campaign send date.
+    ///         since_campaign_last_sent: Restrict results to lists created after the last campaign send date.
+    ///         email: Restrict results to lists that include a specific subscriber’s email address.
+    ///         sort_field: Returns files sorted by the specified field.
+    ///         sort_dir: Determines the order direction for sorted results.
+    ///         folder_id: The unique folder id.
+    ///         list_id: The unique id for the list.
+    ///
+    pub fn get_campaigns(
+        &self,
+        filters: HashMap<String, String>,
+    ) -> MailchimpResult<CampaignResources> {
+        let response = self.api.get::<CampaignsType>("campaigns", filters);
+
+        match response {
+            Ok(value) => {
+                let lists = value
+                    .campaigns
+                    .iter()
+                    .map(move |data| CampaignResource::new(self.api.clone(), &data))
+                    .collect::<CampaignResources>();
+                Ok(lists)
+            }
+            Err(e) => Err(e),
+        }
+    }
+    ///
+    /// Get information about a specific list in your Mailchimp account.
+    /// Results include list members who have signed up but haven’t confirmed
+    /// their subscription yet and unsubscribed or cleaned.
+    ///
+    /// Argumentos:
+    ///     campaign_id: The unique id for the campaign.
+    ///     filters: Filtros que se requieran aplicar a la hora de obtener las automatizaciones
+    ///         Estos filtros se deben pasar en forma de llave, valor donde las llaves puede ser
+    ///         cualquiera de los siguientes:
+    ///         fields: listado de campos deseados, separados por coma
+    ///         exclude_fields: listado de campos excluidos, separados por coma
+    ///
+    pub fn get_campaign_info<'a>(
+        &self,
+        campaign_id: &'a str,
+        filters: HashMap<String, String>,
+    ) -> MailchimpResult<CampaignResource> {
+        let endpoint = String::from("campaigns/") + campaign_id;
+        let response = self.api.get::<CampaignType>(endpoint.as_str(), filters);
+
+        match response {
+            Ok(data) => {
+                let list = CampaignResource::new(self.api.clone(), &data);
                 Ok(list)
             }
             Err(e) => Err(e),

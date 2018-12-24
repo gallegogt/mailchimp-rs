@@ -268,7 +268,7 @@ pub struct AutomationCampaignSettingsType {
     pub to_name: Option<String>,
     /// Desc: If the campaign is listed in a folder, the id for that folder.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub folder_id: Option<u64>,
+    pub folder_id: Option<String>,
     /// Desc: Whether to automatically append Mailchimp’s default footer to the Automation.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub auto_footer: Option<bool>,
