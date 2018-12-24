@@ -10,6 +10,12 @@ pub struct ContactType {
     /// Desc: The street address for the account contact.
     #[serde(default)]
     pub addr2: String,
+    /// Desc: The street address for the account contact.
+    #[serde(default)]
+    pub address1: String,
+    /// Desc: The street address for the account contact.
+    #[serde(default)]
+    pub address2: String,
     /// Desc: The city for the account contact.
     #[serde(default)]
     pub city: String,
@@ -22,6 +28,9 @@ pub struct ContactType {
     /// Desc: The country for the account contact.
     #[serde(default)]
     pub country: String,
+    /// The phone number for the list contact.
+    #[serde(default)]
+    pub phone: String,
 }
 
 impl Default for ContactType {
@@ -30,10 +39,13 @@ impl Default for ContactType {
             company: "".to_string(),
             addr1: "".to_string(),
             addr2: "".to_string(),
+            address1: "".to_string(),
+            address2: "".to_string(),
             city: "".to_string(),
             state: "".to_string(),
             zip: "".to_string(),
             country: "".to_string(),
+            phone: "".to_string(),
         }
     }
 }
