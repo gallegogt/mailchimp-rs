@@ -16,7 +16,7 @@ include = [
 
 [lib]
 # could be `staticlib` as well
-crate-type = ["rlib", "dylib"]
+crate-type = ["rlib", "dylib", "staticlib"]
 # A flag for enabling documentation tests for this target. This is only relevant
 # for libraries, it has no effect on other sections. This is used by
 # `cargo test`.
@@ -28,6 +28,8 @@ doc = true
 # This library is meant to be used on development or testing environments
 # in which setting environment variables is not practical.
 dotenv = "^0.13"
+# Eclipse Paho MQTT Rust Client Library
+paho-mqtt = {version="^0.5", default-features=false, bundled=true, ssl=true}
 
 [dependencies]
 # The core APIs, including the Serialize and Deserialize traits. Always
