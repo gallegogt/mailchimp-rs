@@ -64,22 +64,19 @@ impl MailchimpApi {
 
     ///
     /// Realiza una petición de tipo POST
-    ///
     /// ```
     /// extern crate mailchimp;
     /// use std::collections::HashMap;
     /// use mailchimp::MailchimpApi;
-    /// use mailchimp::AuthorizedAppType;
-    ///
+    /// use mailchimp::AuthorizedAppsType;
     /// fn main() {
     ///     let api = MailchimpApi::new("usX", "aac1e319006883125e18a89e529b5abb73de4c81-usX");
-    ///     let mut params = HashMap::new();
-    ///     params.insert("client_id".to_string(), "".to_string());
-    ///     params.insert("client_secret".to_string(), "".to_string());
-    ///     let data = api.get::<AuthorizedAppType>("authorized-apps", params);
+    ///     let data = api.post::<AuthorizedAppsType, HashMap<String, String>>("authorized-apps", HashMap::new());
     ///     match data {
     ///         Ok(resp) => {
-    ///            println!("{:?}", resp)
+    ///             for app in resp.apps.iter() {
+    ///                 println!("{:?}", app)
+    ///             }
     ///         },
     ///         Err(e) => println!("Error Title: {:?} \n Error detail {:?}", e.title, e.detail)
     ///     }
@@ -107,15 +104,17 @@ impl MailchimpApi {
     /// extern crate mailchimp;
     /// use std::collections::HashMap;
     /// use mailchimp::MailchimpApi;
-    /// use mailchimp::AuthorizedAppsType;
+    /// use mailchimp::AuthorizedAppType;
+    ///
     /// fn main() {
     ///     let api = MailchimpApi::new("usX", "aac1e319006883125e18a89e529b5abb73de4c81-usX");
-    ///     let data = api.post::<AuthorizedAppsType, HashMap<String, String>>("authorized-apps", HashMap::new());
+    ///     let mut params = HashMap::new();
+    ///     params.insert("client_id".to_string(), "".to_string());
+    ///     params.insert("client_secret".to_string(), "".to_string());
+    ///     let data = api.get::<AuthorizedAppType>("authorized-apps", params);
     ///     match data {
     ///         Ok(resp) => {
-    ///             for app in resp.apps.iter() {
-    ///                 println!("{:?}", app)
-    ///             }
+    ///            println!("{:?}", resp)
     ///         },
     ///         Err(e) => println!("Error Title: {:?} \n Error detail {:?}", e.title, e.detail)
     ///     }

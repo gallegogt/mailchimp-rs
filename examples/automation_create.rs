@@ -4,7 +4,7 @@ extern crate mailchimp;
 use dotenv::dotenv;
 use std::env;
 
-use mailchimp::MailchimpClient;
+use mailchimp::{MailchimpApi, Automations};
 use mailchimp::{RecipientType, AutomationCampaignSettingsType, AutomationTriggerType};
 
 fn main() {
@@ -16,9 +16,9 @@ fn main() {
     let dc = env_mailchimp.next().unwrap().1;
     let apk = env_mailchimp.next().unwrap().1;
     // Inicializando el API, con las credenciales
-    let client = MailchimpClient::new(&dc, &apk);
-
-    let automat_resp = client.create_automation(
+    let api = MailchimpApi::new(&dc, &apk);
+    let automations = Automations::new(api);
+    let automat_resp = automations.create_automation(
         RecipientType::create("<list_id>", "<scope_id>"),
         AutomationTriggerType::create("<workflow_type>"),
         Some(AutomationCampaignSettingsType::create("<from_name>", "<reply_to>"))

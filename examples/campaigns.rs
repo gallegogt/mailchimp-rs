@@ -4,8 +4,9 @@ extern crate mailchimp;
 use dotenv::dotenv;
 use std::env;
 
-use mailchimp::MailchimpClient;
+use mailchimp::MailchimpApi;
 use std::collections::HashMap;
+use mailchimp::{Campaigns, CampaignFilter};
 
 fn main() {
     // Inicializando el dotenv
@@ -16,31 +17,31 @@ fn main() {
     let dc = env_mailchimp.next().unwrap().1;
     let apk = env_mailchimp.next().unwrap().1;
     // Inicializando el API, con las credenciales
-    let client = MailchimpClient::new(&dc, &apk);
+    let api = MailchimpApi::new(&dc, &apk);
 
     // Get all campaigns in an account.
-    let r_campaigns = client.get_campaigns(HashMap::new());
     let mut campaign_id = String::new();
+    let r_campaigns = Campaigns::new(api);
 
-    match r_campaigns {
-        Ok(campaigns) => {
-            println!("Totals: {:?}", campaigns.len());
-            for w in &campaigns {
-                campaign_id = w.id().unwrap().clone();
-                println!("\n Campaign");
-                println!("\t Campaign Type    {:?}", w.campaign_type());
-                println!("\t Campaign Title   {:?}", w.settings().unwrap().title);
-                println!("\t Emails Sent   {:?}", w.emails_sent().unwrap());
-                println!("\t Report Summary   {:?}", w.report_summary().unwrap());
-                println!("\t Delivery Status   {:?}", w.delivery_status().unwrap());
-                println!("=============================================");
-            }
+    let mut count = 0;
+    for w in r_campaigns.iter(CampaignFilter::default()) {
+        count += 1;
+        campaign_id = w.id().as_ref().unwrap().to_string();
+        println!("\n Campaign {:}", count);
+        println!("\t Campaign Type    {:?}", w.campaign_type());
+        println!("\t Campaign Title   {:?}", w.settings().unwrap().title);
+        println!("\t Emails Sent   {:?}", w.emails_sent().unwrap());
+        if let Some(rs) = w.report_summary() {
+            println!("\t Report Summary   {:?}", rs);
         }
-        Err(e) => println!("{:?}", e),
-    };
+        if let Some(rs) = w.delivery_status() {
+            println!("\t Report Summary   {:?}", rs);
+        }
+        println!("=============================================");
+    }
 
     // Get information about a specific campaign.
-    let r_camp = client.get_campaign_info(campaign_id.as_str(), HashMap::new());
+    let r_camp = r_campaigns.get_campaign_info(campaign_id.as_str(), HashMap::new());
     match r_camp {
         Ok(list) => {
             println!("\nCampaign");

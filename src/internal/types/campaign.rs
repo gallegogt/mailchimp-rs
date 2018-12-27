@@ -1,6 +1,8 @@
-use super::automation_campaign::{RecipientType, CampaignSettingsType, CampaignTrackingOptionsType, SocialCardType, CampaignReportSummaryType};
+use super::automation_campaign::{
+    CampaignReportSummaryType, CampaignSettingsType, CampaignTrackingOptionsType, RecipientType,
+    SocialCardType,
+};
 use super::link::LinkType;
-
 ///
 /// The days of the week to send a daily RSS Campaign.
 ///
@@ -248,13 +250,13 @@ pub struct CombinationsType {
 impl Default for CombinationsType {
     fn default() -> Self {
         CombinationsType {
-        id: None,
-        subject_line: None,
-        send_time: None,
-        from_name: None,
-        reply_to: None,
-        content_description: None,
-        recipients: None,
+            id: None,
+            subject_line: None,
+            send_time: None,
+            from_name: None,
+            reply_to: None,
+            content_description: None,
+            recipients: None,
         }
     }
 }
@@ -321,14 +323,14 @@ impl Default for VariateSettingsType {
             winning_combination_id: None,
             winning_campaign_id: None,
             winner_criteria: None,
-            wait_time:  None,
-            test_size:  None,
-            subject_lines:  None,
-            send_times:  None,
-            from_names:  None,
-            reply_to_addresses:  None,
-            contents:  None,
-            combinations:  None,
+            wait_time: None,
+            test_size: None,
+            subject_lines: None,
+            send_times: None,
+            from_names: None,
+            reply_to_addresses: None,
+            contents: None,
+            combinations: None,
         }
     }
 }
@@ -350,7 +352,7 @@ pub struct CampaignType {
     pub parent_campaign_id: Option<String>,
     /// There are four types of campaigns you can create in Mailchimp. A/B Split
     /// campaigns have been deprecated and variate campaigns should be used instead.
-    #[serde(default, skip_serializing_if = "Option::is_none", rename="type")]
+    #[serde(default, skip_serializing_if = "Option::is_none", rename = "type")]
     pub campaign_type: Option<String>,
     /// The date and time the campaign was created in ISO 8601 format.
     #[serde(default, skip_serializing_if = "Option::is_none")]

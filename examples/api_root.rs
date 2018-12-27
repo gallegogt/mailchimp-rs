@@ -4,7 +4,7 @@ extern crate mailchimp;
 use dotenv::dotenv;
 use std::env;
 
-use mailchimp::MailchimpClient;
+use mailchimp::{MailchimpApi, ApiRoot};
 use std::collections::HashMap;
 
 fn main() {
@@ -16,10 +16,10 @@ fn main() {
     let dc = env_mailchimp.next().unwrap().1;
     let apk = env_mailchimp.next().unwrap().1;
     // Inicializando el API, con las credenciales
-    let client = MailchimpClient::new(&dc, &apk);
-
+    let api = MailchimpApi::new(&dc, &apk);
+    let api_root = ApiRoot::new(api);
     // Ejemplo de como obtener todas la automatizaciones
-    let info = client.get_account_info(HashMap::new());
+    let info = api_root.get_info(HashMap::new());
 
     match info {
         Ok(account) => {

@@ -4,7 +4,7 @@ extern crate mailchimp;
 use dotenv::dotenv;
 use std::env;
 
-use mailchimp::MailchimpClient;
+use mailchimp::{MailchimpApi, Lists, ListFilter};
 use std::collections::HashMap;
 
 fn main() {
@@ -16,30 +16,27 @@ fn main() {
     let dc = env_mailchimp.next().unwrap().1;
     let apk = env_mailchimp.next().unwrap().1;
     // Inicializando el API, con las credenciales
-    let client = MailchimpClient::new(&dc, &apk);
-
+    let api = MailchimpApi::new(&dc, &apk);
+    let lists = Lists::new(api);
     // Get information about all lists in the account.
-    let lists_c = client.get_lists(HashMap::new());
+    let lists_c = lists.iter(ListFilter::default());
     let mut list_id = String::new();
+    let mut count = 0;
 
-    match lists_c {
-        Ok(lists) => {
-            for w in &lists {
-                list_id = w.id().unwrap().clone();
-                println!("\n\nList");
-                println!("\tid    {:?}", w.id());
-                println!("\tName    {:?}", w.name());
-                println!("\tStats   {:?}", w.stats());
-                println!("=============================================");
-            }
-        }
-        Err(e) => println!("{:?}", e),
-    };
+    for w in lists_c {
+        list_id = w.id().unwrap().clone();
+        count += 1;
+        println!("\n\nList {:?}", count);
+        println!("\tid    {:?}", w.id());
+        println!("\tName    {:?}", w.name());
+        println!("\tStats   {:?}", w.stats());
+        println!("=============================================");
+    }
 
     // Get information about a specific list in your Mailchimp account.
     // Results include list members who have signed up but haven’t confirmed
     // their subscription yet and unsubscribed or cleaned.
-    let r_list = client.get_list_info(list_id.as_str(), HashMap::new());
+    let r_list = lists.get_list_info(list_id.as_str(), HashMap::new());
     match r_list {
         Ok(list) => {
             println!("\n\nList");
