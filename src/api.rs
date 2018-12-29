@@ -19,7 +19,7 @@ use serde::ser::Serialize;
 /// extern crate mailchimp;
 /// use mailchimp::MailchimpApi;
 ///
-/// let api = MailchimpApi::new("<DC>", "<API Key>");
+/// let api = MailchimpApi::new("<API Key>");
 /// println!("Api version: {}", api.version());
 /// println!("Api domain: {}", api.domain());
 /// ```
@@ -34,15 +34,18 @@ impl MailchimpApi {
     /// Crea la nueva instancia del API
     ///
     /// Argumentos
-    ///     dc: Mailchimp Datacenter
     ///     api_key: Mailchimp API KEY
     ///     http_transport: Interfaz por donde se harían las peticiones Get y Post al servicio
-    pub fn new<'a>(dc: &'a str, api_key: &'a str) -> Self {
+    pub fn new<'a>(api_key: &'a str) -> Self {
+        let mut creds = api_key.split('-').collect::<Vec<&str>>();
+        if creds.len() <= 1 {
+            creds.push("usX");
+        }
         MailchimpApi {
             i_api: Box::new(
                 Api::<MailchimpRequest>::new(
-                    dc,
-                    api_key,
+                    creds[1],
+                    creds[0],
                     Box::new(MailchimpRequest::new()),
                 )
             ),
@@ -70,7 +73,7 @@ impl MailchimpApi {
     /// use mailchimp::MailchimpApi;
     /// use mailchimp::AuthorizedAppsType;
     /// fn main() {
-    ///     let api = MailchimpApi::new("usX", "aac1e319006883125e18a89e529b5abb73de4c81-usX");
+    ///     let api = MailchimpApi::new("aac1e319006883125e18a89e529b5abb73de4c81-usX");
     ///     let data = api.post::<AuthorizedAppsType, HashMap<String, String>>("authorized-apps", HashMap::new());
     ///     match data {
     ///         Ok(resp) => {
@@ -107,7 +110,7 @@ impl MailchimpApi {
     /// use mailchimp::AuthorizedAppType;
     ///
     /// fn main() {
-    ///     let api = MailchimpApi::new("usX", "aac1e319006883125e18a89e529b5abb73de4c81-usX");
+    ///     let api = MailchimpApi::new("aac1e319006883125e18a89e529b5abb73de4c81-usX");
     ///     let mut params = HashMap::new();
     ///     params.insert("client_id".to_string(), "".to_string());
     ///     params.insert("client_secret".to_string(), "".to_string());
