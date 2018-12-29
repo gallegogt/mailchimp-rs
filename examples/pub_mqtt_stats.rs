@@ -10,9 +10,12 @@ use dotenv::dotenv;
 use std::env;
 use std::process;
 
-use mailchimp::{ApiRootType};
-use mailchimp::resources::AutomationWorkflowResource;
-use mailchimp::{ApiRoot, MailchimpApi, Automations, AutomationsFilter};
+use mailchimp::resources::{AutomationWorkflowResource, CampaignResource, ListResource};
+use mailchimp::ApiRootType;
+use mailchimp::{
+    ApiRoot, Automations, AutomationsFilter, CampaignFilter, Campaigns, ListFilter, Lists,
+    MailchimpApi, StatisticsType,
+};
 
 use std::collections::HashMap;
 use std::time::Duration;
@@ -118,7 +121,7 @@ impl MailchimpAutomationStats {
             None
         };
 
-        let mut rs_v = (0 as u64, 0 as u64, 0.0, 0 as u64, 0 as u64, 0.0, );
+        let mut rs_v = (0 as u64, 0 as u64, 0.0, 0 as u64, 0 as u64, 0.0);
 
         if let Some(rp) = &data.get_report_summary() {
             rs_v.0 = rp.opens;
@@ -135,13 +138,161 @@ impl MailchimpAutomationStats {
             status: data.get_status().clone(),
             emails_sent: data.get_emails_sent().clone(),
             recipients_list_name: r_list_name,
-            title:s_title,
+            title: s_title,
             report_summary_opens: Some(rs_v.0),
             report_summary_unique_opens: Some(rs_v.1),
             report_summary_open_rate: Some(rs_v.2),
             report_summary_clicks: Some(rs_v.3),
             report_summary_subscriber_clicks: Some(rs_v.4),
             report_summary_click_rate: Some(rs_v.5),
+        }
+    }
+}
+
+///
+/// ====================================================================
+///
+/// Campaigns
+///
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct MailchimpCampaignStats {
+    // Name of measurement
+    #[serde(default)]
+    pub measurement_name: String,
+    // Mailchimp client or account name
+    #[serde(default)]
+    pub client_name: String,
+
+    // ============ STATS =============
+    /// There are four types of campaigns you can create in Mailchimp. A/B Split
+    /// campaigns have been deprecated and variate campaigns should be used instead.
+    #[serde(default, skip_serializing_if = "Option::is_none", rename = "type")]
+    pub campaign_type: Option<String>,
+    /// The current status of the campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
+    /// The total number of emails sent for this campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub emails_sent: Option<u64>,
+    /// List Name.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recipients_list_name: Option<String>,
+    /// Count of the recipients on the associated list. Formatted as an integer..
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recipients_recipient_count: Option<u64>,
+    /// The title of the Automation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+    /// The total number of opens for a campaign.
+    #[serde(default)]
+    pub report_summary_opens: u64,
+    /// The number of unique opens.
+    #[serde(default)]
+    pub report_summary_unique_opens: u64,
+    /// The number of unique opens divided by the total number of successful deliveries.
+    #[serde(default)]
+    pub report_summary_open_rate: f32,
+    /// The total number of clicks for an campaign.
+    #[serde(default)]
+    pub report_summary_clicks: u64,
+    /// The number of unique clicks.
+    #[serde(default)]
+    pub report_summary_subscriber_clicks: u64,
+    /// The number of unique clicks, divided by the total number of successful deliveries.
+    #[serde(default)]
+    pub report_summary_click_rate: f32,
+    /// The total orders for a campaign.
+    #[serde(default)]
+    pub report_summary_ecommerce_total_orders: u64,
+    /// The total spent for a campaign. Calculated as the sum of
+    /// all order totals with no deductions.
+    #[serde(default)]
+    pub report_summary_ecommerce_total_spent: f32,
+    /// The total revenue for a campaign. Calculated as the sum of
+    /// all order totals minus shipping and tax totals.
+    #[serde(default)]
+    pub report_summary_ecommerce_total_revenue: f32,
+}
+
+impl MailchimpCampaignStats {
+    pub fn create_stats<'a>(data: &CampaignResource, account_name: &'a str) -> Self {
+        let mut settings = (Some(String::new()), None, Some(String::new()));
+        if let Some(rc) = data.recipients() {
+            settings.0 = rc.list_name.clone();
+            settings.1 = rc.recipient_count;
+        }
+        if let Some(ss) = data.settings() {
+            settings.2 = ss.title.clone();
+        }
+
+        let mut report_summary = (0, 0, 0.0, 0, 0, 0.0, 0, 0.0, 0.0);
+        if let Some(rs) = data.report_summary() {
+            report_summary.0 = rs.opens;
+            report_summary.1 = rs.unique_opens;
+            report_summary.2 = rs.open_rate;
+            report_summary.3 = rs.clicks;
+            report_summary.4 = rs.subscriber_clicks;
+            report_summary.5 = rs.click_rate;
+
+            if let Some(e) = &rs.ecommerce {
+                report_summary.6 = e.total_orders;
+                report_summary.7 = e.total_spent;
+                report_summary.8 = e.total_revenue;
+            }
+        }
+
+        MailchimpCampaignStats {
+            measurement_name: "mailchimp_campaigns".to_string(),
+            client_name: account_name.to_string(),
+            campaign_type: data.campaign_type().cloned(),
+            status: data.status().cloned(),
+            emails_sent: data.emails_sent().cloned(),
+            recipients_list_name: settings.0,
+            recipients_recipient_count: settings.1,
+            title: settings.2,
+            report_summary_opens: report_summary.0,
+            report_summary_unique_opens: report_summary.1,
+            report_summary_open_rate: report_summary.2,
+            report_summary_clicks: report_summary.3,
+            report_summary_subscriber_clicks: report_summary.4,
+            report_summary_click_rate: report_summary.5,
+            report_summary_ecommerce_total_orders: report_summary.6,
+            report_summary_ecommerce_total_spent: report_summary.7,
+            report_summary_ecommerce_total_revenue: report_summary.8,
+        }
+    }
+}
+
+///
+/// ====================================================================
+///
+/// Lists
+///
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct MailchimpListStats {
+    // Name of measurement
+    #[serde(default)]
+    pub measurement_name: String,
+    // Mailchimp client or account name
+    #[serde(default)]
+    pub client_name: String,
+
+    // ============ STATS =============
+    /// The name of the list.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Stats for the list. Many of these are cached for at least five minutes.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stats: Option<StatisticsType>,
+}
+
+impl MailchimpListStats {
+    pub fn create_stats<'a>(data: &ListResource, account_name: &'a str) -> Self {
+        MailchimpListStats {
+            measurement_name: "mailchimp_lists".to_string(),
+            client_name: account_name.to_string(),
+            name: data.name().cloned(),
+            stats: data.stats().cloned()
         }
     }
 }
@@ -177,7 +328,9 @@ fn connect_mqtt<'a>(host: &'a str, user_name: &'a str, password: &'a str) -> mqt
 }
 
 fn send_message<'a, T>(cli: &mqtt::Client, topic: &'a str, mas: &T)
-    where T: serde::Serialize {
+where
+    T: serde::Serialize,
+{
     let payload = serde_json::to_string(mas);
     println!("Topic: {:?} payload {:?}", topic, payload);
     // Create a message and publish it
@@ -219,6 +372,8 @@ fn main() {
         }
     }
 
+    println!("MQTT Settings: {:?}", mqtt_settings);
+
     let mqtt_client = connect_mqtt(
         mqtt_settings.2.as_str(),
         mqtt_settings.0.as_str(),
@@ -249,6 +404,21 @@ fn main() {
     for aut in automation.iter(AutomationsFilter::default()) {
         let stats = MailchimpAutomationStats::create_stats(&aut, &account_name);
         send_message(&mqtt_client, "mailchimp/stats/automations", &stats);
+    }
+    // ========== Mailchimp Campaigns ========
+    let campaigns = Campaigns::new(api.clone());
+
+    for data in campaigns.iter(CampaignFilter::default()) {
+        let stats = MailchimpCampaignStats::create_stats(&data, &account_name);
+        send_message(&mqtt_client, "mailchimp/stats/campaigns", &stats);
+    }
+
+    // ========== Mailchimp Lists ========
+    let lists = Lists::new(api.clone());
+
+    for data in lists.iter(ListFilter::default()) {
+        let stats = MailchimpListStats::create_stats(&data, &account_name);
+        send_message(&mqtt_client, "mailchimp/stats/lists", &stats);
     }
 
     disconnect(&mqtt_client);
