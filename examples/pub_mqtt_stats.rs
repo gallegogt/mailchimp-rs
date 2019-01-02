@@ -303,7 +303,11 @@ impl MailchimpListStats {
 ///
 fn connect_mqtt<'a>(host: &'a str, user_name: &'a str, password: &'a str) -> mqtt::Client {
     let endpoint = String::from("tcp://") + host;
-    let cli = mqtt::Client::new(endpoint.as_str()).unwrap_or_else(|err| {
+    let create_options = mqtt::CreateOptionsBuilder::new()
+        .server_uri(endpoint)
+        .persistence(mqtt::PersistenceType::None)
+        .finalize();
+    let cli = mqtt::Client::new(create_options).unwrap_or_else(|err| {
         println!("Error creating the client: {:?}", err);
         process::exit(1);
     });
