@@ -5,8 +5,8 @@ use dotenv::dotenv;
 use std::env;
 
 use mailchimp::MailchimpApi;
+use mailchimp::{CampaignFilter, Campaigns};
 use std::collections::HashMap;
-use mailchimp::{Campaigns, CampaignFilter};
 
 fn main() {
     // Inicializando el dotenv
@@ -25,15 +25,15 @@ fn main() {
     let mut count = 0;
     for w in r_campaigns.iter(CampaignFilter::default()) {
         count += 1;
-        campaign_id = w.id().as_ref().unwrap().to_string();
+        campaign_id = w.id.as_ref().unwrap().to_string();
         println!("\n Campaign {:}", count);
-        println!("\t Campaign Type    {:?}", w.campaign_type());
-        println!("\t Campaign Title   {:?}", w.settings().unwrap().title);
-        println!("\t Emails Sent   {:?}", w.emails_sent().unwrap());
-        if let Some(rs) = w.report_summary() {
+        println!("\t Campaign Type    {:?}", w.campaign_type);
+        println!("\t Campaign Title   {:?}", w.settings.unwrap().title);
+        println!("\t Emails Sent   {:?}", w.emails_sent.unwrap());
+        if let Some(rs) = w.report_summary {
             println!("\t Report Summary   {:?}", rs);
         }
-        if let Some(rs) = w.delivery_status() {
+        if let Some(rs) = w.delivery_status {
             println!("\t Report Summary   {:?}", rs);
         }
         println!("=============================================");
@@ -44,8 +44,8 @@ fn main() {
     match r_camp {
         Ok(list) => {
             println!("\nCampaign");
-            println!("\tid    {:?}", list.id());
-            println!("\tCampaign Title   {:?}", list.settings().unwrap().title);
+            println!("\tid    {:?}", list.id);
+            println!("\tCampaign Title   {:?}", list.settings.unwrap().title);
         }
         Err(e) => println!("{:?}", e),
     };

@@ -1,9 +1,9 @@
-use std::collections::HashMap;
 use crate::internal::api::Api;
+use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpRequest;
-use crate::internal::types::MailchimpErrorType;
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
+use std::collections::HashMap;
 
 ///
 /// Mailchimp API
@@ -42,13 +42,11 @@ impl MailchimpApi {
             creds.push("usX");
         }
         MailchimpApi {
-            i_api: Box::new(
-                Api::<MailchimpRequest>::new(
-                    creds[1],
-                    creds[0],
-                    Box::new(MailchimpRequest::new()),
-                )
-            ),
+            i_api: Box::new(Api::<MailchimpRequest>::new(
+                creds[1],
+                creds[0],
+                Box::new(MailchimpRequest::new()),
+            )),
         }
     }
     ///
@@ -89,14 +87,10 @@ impl MailchimpApi {
     ///     `endpoint`: Cadena de texto con el endpoint de la API al que se requiere acceder, no debe comenzar por "/"
     ///     `payload`: Dato a enviar al servidor
     ///
-    pub fn post<'a, T, P>(
-        &self,
-        endpoint: &'a str,
-        payload: P,
-    ) -> Result<T, MailchimpErrorType>
+    pub fn post<'a, T, P>(&self, endpoint: &'a str, payload: P) -> Result<T, MailchimpErrorType>
     where
         T: DeserializeOwned,
-        P: Serialize
+        P: Serialize,
     {
         self.i_api.post_edge::<T, P>(endpoint, payload)
     }
@@ -137,4 +131,23 @@ impl MailchimpApi {
     {
         self.i_api.get_edge(endpoint, payload)
     }
+}
+
+impl Default for MailchimpApi {
+    fn default() -> Self {
+        MailchimpApi {
+            i_api: Box::new(Api::<MailchimpRequest>::new(
+                "",
+                "",
+                Box::new(MailchimpRequest::new()),
+            )),
+        }
+    }
+}
+
+pub trait MailchimpApiUpdate {
+    /**
+     * Update API
+     */
+    fn set_api(&mut self, api: &MailchimpApi);
 }

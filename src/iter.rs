@@ -1,6 +1,7 @@
+use std::cell::RefCell;
+
 pub trait BuildIter {
     type Item;
-    type Resource;
     type FilterItem;
 
     ///
@@ -10,7 +11,7 @@ pub trait BuildIter {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn create_resource(&self, data: &Self::Item) -> Self::Resource;
+    fn update_item(&self, data: &Self::Item) -> Self::Item;
     ///
     /// Actualiza el offset
     ///
@@ -23,32 +24,35 @@ where
     B: BuildIter,
 {
     pub builder: &'a B,
-    pub data: Vec<B::Item>,
+    pub data: RefCell<Vec<B::Item>>,
     pub cur_filters: B::FilterItem,
     pub cur_it: usize,
+    pub total_items: u32,
 }
 
-impl <'a, B> Iterator for MalchimpIter<'a, B>
+impl<'a, B> Iterator for MalchimpIter<'a, B>
 where
     B: BuildIter,
 {
-    type Item = B::Resource;
+    type Item = B::Item;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.cur_it == self.data.len() - 2 {
+        let mut in_data = self.data.borrow_mut();
+
+        if self.cur_it == in_data.len() - 2 && self.cur_it < (self.total_items as usize) {
             let new_filter = self.builder.update_filter_offset(&self.cur_filters);
             let list_of_types = self.builder.get_data_from_remote(&new_filter);
             self.cur_filters = new_filter;
 
             for r in list_of_types {
-                self.data.push(r);
+                in_data.push(r);
             }
         }
 
-        if self.cur_it < self.data.len() {
-            let data = &self.data[self.cur_it];
+        if self.cur_it < in_data.len() {
+            let data = &in_data[self.cur_it];
             self.cur_it += 1;
-            return Some(self.builder.create_resource(data));
+            return Some(self.builder.update_item(data));
         }
 
         None

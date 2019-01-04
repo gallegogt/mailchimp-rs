@@ -1,4 +1,3 @@
-
 // ============ Error Response ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MailchimpErrorType {
@@ -18,11 +17,14 @@ pub struct MailchimpErrorType {
 impl Default for MailchimpErrorType {
     fn default() -> Self {
         MailchimpErrorType {
-            error_type: "http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/".to_string(),
+            error_type:
+                "http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/"
+                    .to_string(),
             title: "Resource Not Found".to_string(),
             status: 404,
-            detail: "could not find resource for requested class_path:AuthorizedAppType_Collection".to_string(),
-            instance: "3345556-334-434-3444-34343f4f4434f".to_string()
+            detail: "could not find resource for requested class_path:AuthorizedAppType_Collection"
+                .to_string(),
+            instance: "3345556-334-434-3444-34343f4f4434f".to_string(),
         }
     }
 }

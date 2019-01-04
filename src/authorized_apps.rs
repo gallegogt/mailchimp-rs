@@ -1,11 +1,9 @@
-use super::api::MailchimpApi;
+use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
-use super::internal::types::{
-    AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType
-};
 use super::iter::{BuildIter, MalchimpIter};
-use super::resources::AuthorizedAppResource;
+use crate::types::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType};
 use log::error;
+use std::cell::RefCell;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -73,7 +71,6 @@ pub struct AuthorizedApps {
 
 impl BuildIter for AuthorizedApps {
     type Item = AuthorizedAppType;
-    type Resource = AuthorizedAppResource;
     type FilterItem = AuthorizedFilter;
 
     ///
@@ -88,8 +85,10 @@ impl BuildIter for AuthorizedApps {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn create_resource(&self, data: &Self::Item) -> Self::Resource {
-        AuthorizedAppResource::new(self.api.clone(), &data)
+    fn update_item(&self, data: &Self::Item) -> Self::Item {
+        let mut in_data = data.clone();
+        in_data.set_api(&self.api);
+        in_data
     }
     ///
     /// Actualiza el offset
@@ -133,7 +132,9 @@ impl AuthorizedApps {
         if filters.is_some() {
             payload = filters.as_ref().unwrap().get_payload();
         }
-        let response = self.api.get::<AuthorizedAppsType>("authorized-apps", payload);
+        let response = self
+            .api
+            .get::<AuthorizedAppsType>("authorized-apps", payload);
         match response {
             Ok(value) => Some(value),
             Err(e) => {
@@ -205,16 +206,19 @@ impl AuthorizedApps {
         if let Some(remote) = self.get_authorized_apps_from_remote(Some(&filters)) {
             return MalchimpIter {
                 builder: &self,
-                data: remote.apps,
+                data: RefCell::from(remote.apps),
                 cur_filters: filters.clone(),
                 cur_it: 0,
+                total_items: remote.total_items,
             };
         }
+
         MalchimpIter {
             builder: &self,
-            data: Vec::new(),
+            data: RefCell::from(Vec::new()),
             cur_filters: filters.clone(),
             cur_it: 0,
+            total_items: 0,
         }
     }
 }

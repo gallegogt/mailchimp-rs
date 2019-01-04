@@ -1,5 +1,6 @@
-use super::link::LinkType;
 use super::contact::ContactType;
+use super::link::LinkType;
+use crate::api::{MailchimpApi, MailchimpApiUpdate};
 
 // ============ Campaign Defaults	 ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -187,6 +188,20 @@ pub struct ListType {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub _links: Option<Vec<LinkType>>,
 
+    #[serde(skip)]
+    _api: MailchimpApi,
+}
+
+///
+/// MailchimpApiUpdate Impl
+///
+impl MailchimpApiUpdate for ListType {
+    /**
+     * Update API
+     */
+    fn set_api(&mut self, n_api: &MailchimpApi) {
+        self._api = n_api.clone()
+    }
 }
 
 // GET /lists

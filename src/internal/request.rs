@@ -7,7 +7,7 @@ use serde_json;
 // import macro error
 use log::error;
 
-use super::types::MailchimpErrorType;
+use super::error_type::MailchimpErrorType;
 
 // Define un aleas generico al Result para MailchimpErrorType
 pub type MailchimpResult<T> = Result<T, MailchimpErrorType>;

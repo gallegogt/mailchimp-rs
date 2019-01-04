@@ -1,9 +1,9 @@
-use super::resources::ListResource;
-use super::api::MailchimpApi;
-use super::internal::types::{ListType, ListsType};
-use super::iter::{BuildIter, MalchimpIter};
+use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
+use super::iter::{BuildIter, MalchimpIter};
+use super::types::{ListType, ListsType};
 use log::error;
+use std::cell::RefCell;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -126,10 +126,7 @@ impl ListFilter {
         }
 
         if self.email.is_some() {
-            payload.insert(
-                "email".to_string(),
-                self.email.as_ref().unwrap().clone(),
-            );
+            payload.insert("email".to_string(), self.email.as_ref().unwrap().clone());
         }
         if self.sort_field.is_some() {
             payload.insert(
@@ -164,13 +161,12 @@ pub struct Lists {
 
 impl BuildIter for Lists {
     type Item = ListType;
-    type Resource = ListResource;
     type FilterItem = ListFilter;
 
     ///
     /// Obtiene los datos remotos y devuelve un listado
     ///
-   fn get_data_from_remote(&self, filter: &Self::FilterItem) -> Vec<Self::Item> {
+    fn get_data_from_remote(&self, filter: &Self::FilterItem) -> Vec<Self::Item> {
         if let Some(resp) = self.get_campaigns_from_remote(Some(filter)) {
             return resp.lists;
         }
@@ -179,8 +175,10 @@ impl BuildIter for Lists {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn create_resource(&self, data: &Self::Item) -> Self::Resource {
-        ListResource::new(self.api.clone(), &data)
+    fn update_item(&self, data: &Self::Item) -> Self::Item {
+        let mut in_data = data.clone();
+        in_data.set_api(&self.api);
+        in_data
     }
     ///
     /// Actualiza el offset
@@ -218,14 +216,15 @@ impl Lists {
         &self,
         list_id: &'a str,
         filters: HashMap<String, String>,
-    ) -> MailchimpResult<ListResource> {
+    ) -> MailchimpResult<ListType> {
         let endpoint = String::from("lists/") + list_id;
         let response = self.api.get::<ListType>(endpoint.as_str(), filters);
 
         match response {
             Ok(data) => {
-                let list = ListResource::new(self.api.clone(), &data);
-                Ok(list)
+                let mut d = data;
+                d.set_api(&self.api);
+                Ok(d)
             }
             Err(e) => Err(e),
         }
@@ -250,10 +249,7 @@ impl Lists {
     ///         sort_field: Returns files sorted by the specified field.
     ///         sort_dir: Determines the order direction for sorted results.
     ///
-    pub fn get_campaigns_from_remote(
-        &self,
-        filters: Option<&ListFilter>,
-    ) -> Option<ListsType> {
+    pub fn get_campaigns_from_remote(&self, filters: Option<&ListFilter>) -> Option<ListsType> {
         let mut payload = HashMap::new();
         if filters.is_some() {
             payload = filters.as_ref().unwrap().get_payload();
@@ -276,16 +272,18 @@ impl Lists {
         if let Some(remote) = self.get_campaigns_from_remote(Some(&filters)) {
             return MalchimpIter {
                 builder: &self,
-                data: remote.lists,
+                data: RefCell::from(remote.lists),
                 cur_filters: filters.clone(),
                 cur_it: 0,
+                total_items: remote.total_items,
             };
         }
         MalchimpIter {
             builder: &self,
-            data: Vec::new(),
+            data: RefCell::from(Vec::new()),
             cur_filters: filters.clone(),
             cur_it: 0,
+            total_items: 0,
         }
     }
 }

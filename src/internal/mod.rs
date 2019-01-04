@@ -1,6 +1,6 @@
 pub mod api;
+pub mod error_type;
 pub mod request;
-pub mod types;
 
 #[cfg(test)]
 mod tests {
@@ -12,7 +12,7 @@ mod tests {
 
     use super::api::Api;
     use super::request::{BasicAuth, HttpReq, MailchimpResult};
-    use super::types::*;
+    use crate::types::*;
 
     ///
     ///
@@ -239,7 +239,9 @@ mod tests {
             "",
         );
         let api = Api::<MockRequest>::new("us6", "access_token", Box::new(mock_transport));
-        let resp = api.get_edge::<WorkflowEmailType>("", HashMap::new()).unwrap();
+        let resp = api
+            .get_edge::<WorkflowEmailType>("", HashMap::new())
+            .unwrap();
 
         assert_eq!(
             resp.id.as_ref().unwrap(), "491fec26f1",
@@ -269,7 +271,9 @@ mod tests {
             "",
         );
         let api = Api::<MockRequest>::new("us6", "access_token", Box::new(mock_transport));
-        let resp = api.get_edge::<CampaignsType>("campaigns", HashMap::new()).unwrap();
+        let resp = api
+            .get_edge::<CampaignsType>("campaigns", HashMap::new())
+            .unwrap();
 
         assert_eq!(
             resp.campaigns.len(), resp.total_items as usize,

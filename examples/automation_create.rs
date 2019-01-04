@@ -4,8 +4,8 @@ extern crate mailchimp;
 use dotenv::dotenv;
 use std::env;
 
-use mailchimp::{MailchimpApi, Automations};
-use mailchimp::{RecipientType, AutomationCampaignSettingsType, AutomationTriggerType};
+use mailchimp::types::{AutomationCampaignSettingsType, AutomationTriggerType, RecipientType};
+use mailchimp::{Automations, MailchimpApi};
 
 fn main() {
     // Inicializando el dotenv
@@ -20,11 +20,14 @@ fn main() {
     let automat_resp = automations.create_automation(
         RecipientType::create("<list_id>", "<scope_id>"),
         AutomationTriggerType::create("<workflow_type>"),
-        Some(AutomationCampaignSettingsType::create("<from_name>", "<reply_to>"))
+        Some(AutomationCampaignSettingsType::create(
+            "<from_name>",
+            "<reply_to>",
+        )),
     );
 
     match automat_resp {
         Ok(value) => println!("{:?}", value),
-        Err(e) => println!("{:?}", e)
+        Err(e) => println!("{:?}", e),
     }
 }

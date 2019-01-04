@@ -1,5 +1,11 @@
 use super::ecommerce::ECommerceReportType;
+use super::empty::EmptyType;
 use super::link::LinkType;
+use crate::api::{MailchimpApi, MailchimpApiUpdate};
+use crate::internal::error_type::MailchimpErrorType;
+use crate::internal::request::MailchimpResult;
+
+use std::collections::HashMap;
 
 // ============ Segment Conditions ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -480,6 +486,152 @@ pub struct AutomationWorkflowType {
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub _links: Option<Vec<LinkType>>,
+
+    /// Mailchimp APi
+    #[serde(default, skip)]
+    pub _api: MailchimpApi,
+}
+
+impl MailchimpApiUpdate for AutomationWorkflowType {
+    /**
+     * Update API
+     */
+    fn set_api(&mut self, n_api: &MailchimpApi) {
+        self._api = n_api.clone()
+    }
+}
+
+impl AutomationWorkflowType {
+    // ============== Actions ==============
+    ///
+    /// Detiene todos los emails para esta automatización
+    ///
+    /// En caso de ser satisfactoria la ejecución, devuelve None,
+    /// en caso contrario devuelve el error, con su respectiva descripción
+    ///
+    pub fn pause_all_emails(&self) -> Option<MailchimpErrorType> {
+        let mut b_endpoint = self.get_base_endpoint();
+        b_endpoint.push_str("/actions/pause-all-emails");
+        match self
+            ._api
+            .post::<EmptyType, HashMap<String, String>>(b_endpoint.as_str(), HashMap::new())
+        {
+            Ok(_) => None,
+            Err(e) => Some(e),
+        }
+    }
+
+    ///
+    /// Inicia todos los emails para esta automatización
+    ///
+    /// En caso de ser satisfactoria la ejecución, devuelve None,
+    /// en caso contrario devuelve el error, con su respectiva descripción
+    ///
+    pub fn start_all_emails(&self) -> Option<MailchimpErrorType> {
+        let mut b_endpoint = self.get_base_endpoint();
+        b_endpoint.push_str("/actions/start-all-emails");
+        match self
+            ._api
+            .post::<EmptyType, HashMap<String, String>>(b_endpoint.as_str(), HashMap::new())
+        {
+            Ok(_) => None,
+            Err(e) => Some(e),
+        }
+    }
+    ///
+    /// Actualiza la automatizació y devuelve una instancia nueva
+    ///
+    /// Argumentos:
+    ///     settings: Configuracion de la automatización a crear
+    ///     delay: Ajustes de retraso para un correo electrónico de automatización.
+    ///
+    pub fn remote_update<'a>(
+        &self,
+        settings: Option<AutomationCampaignSettingsType>,
+        delay: Option<AutomationDelayType>,
+    ) -> MailchimpResult<Self> {
+        let modifier = AutomationModifier {
+            settings: settings,
+            delay: delay,
+            recipients: None,
+            trigger_settings: None,
+        };
+        let response = self
+            ._api
+            .post::<AutomationWorkflowType, AutomationModifier>("automations", modifier);
+        match response {
+            Ok(automation) => {
+                let mut au = automation;
+                au.set_api(&self._api);
+                Ok(au)
+            }
+            Err(e) => Err(e),
+        }
+    }
+    /// ============= EMAILS ============================
+    ///
+    /// Devuelve una lista de los emails automatizados
+    ///
+    pub fn get_workflow_emails(&self) -> MailchimpResult<Vec<WorkflowEmailType>> {
+        let endpoint = self.get_base_endpoint() + "/emails";
+        let response = self
+            ._api
+            .get::<WorkflowEmailsType>(endpoint.as_str(), HashMap::new());
+        match response {
+            Ok(value) => {
+                let emails = value
+                    .emails
+                    .iter()
+                    .map(move |data| {
+                        let mut inner = endpoint.clone();
+                        inner.push_str(data.id.as_ref().unwrap());
+                        let mut inner_data = data.clone();
+                        inner_data.set_api(&self._api);
+                        inner_data.set_endpoint(&inner);
+                        inner_data
+                    })
+                    .collect::<Vec<WorkflowEmailType>>();
+                Ok(emails)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    ///
+    /// Devuelve la informacion sobre un flujo de trabajos de automatizacion de emails
+    ///
+    /// Argumentos:
+    ///     workflow_email_id: Identificador único de la automatización
+    ///
+    pub fn get_automation_workflow_info<'a>(
+        &self,
+        workflow_email_id: &'a str,
+    ) -> MailchimpResult<WorkflowEmailType> {
+        let mut endpoint = self.get_base_endpoint().clone();
+        endpoint.push_str("/emails/");
+        endpoint.push_str(workflow_email_id);
+
+        let response = self
+            ._api
+            .get::<WorkflowEmailType>(endpoint.as_str(), HashMap::new());
+
+        match response {
+            Ok(workflow_email) => {
+                let mut we = workflow_email;
+                we.set_api(&self._api);
+                we.set_endpoint(&endpoint);
+                Ok(we)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    // ============== Private Functions ==============
+    fn get_base_endpoint(&self) -> String {
+        let mut b_endpoint = String::from("automations/");
+        b_endpoint.push_str(self.id.as_ref().unwrap());
+        b_endpoint
+    }
 }
 
 // ============ Authorized Apps ==============
@@ -601,6 +753,68 @@ pub struct WorkflowEmailType {
     /// A list of link types and descriptions for the API schema documents.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub _links: Option<Vec<LinkType>>,
+
+    /// Mailchimp APi
+    #[serde(skip)]
+    _api: MailchimpApi,
+    #[serde(skip)]
+    _endpoint: String,
+}
+
+impl MailchimpApiUpdate for WorkflowEmailType {
+    /**
+     * Update API
+     */
+    fn set_api(&mut self, n_api: &MailchimpApi) {
+        self._api = n_api.clone()
+    }
+}
+
+impl WorkflowEmailType {
+    // ============== Actions ==============
+    ///
+    /// Detiene un email automatizado
+    ///
+    /// En caso de ser satisfactoria la ejecución, devuelve None,
+    /// en caso contrario devuelve el error, con su respectiva descripción
+    ///
+    pub fn pause_all_emails(&self) -> Option<MailchimpErrorType> {
+        let mut b_endpoint = self._endpoint.clone();
+        b_endpoint.push_str("/actions/pause");
+        match self
+            ._api
+            .post::<EmptyType, HashMap<String, String>>(b_endpoint.as_str(), HashMap::new())
+        {
+            Ok(_) => None,
+            Err(e) => Some(e),
+        }
+    }
+
+    ///
+    /// Inicia un email automatizado
+    ///
+    /// En caso de ser satisfactoria la ejecución, devuelve None,
+    /// en caso contrario devuelve el error, con su respectiva descripción
+    ///
+    pub fn start_all_emails(&self) -> Option<MailchimpErrorType> {
+        let mut b_endpoint = self._endpoint.clone();
+        b_endpoint.push_str("/actions/start");
+        match self
+            ._api
+            .post::<EmptyType, HashMap<String, String>>(b_endpoint.as_str(), HashMap::new())
+        {
+            Ok(_) => None,
+            Err(e) => Some(e),
+        }
+    }
+
+    pub fn get_endpoint(&self) -> &String {
+        &self._endpoint
+    }
+
+    pub fn set_endpoint<'a>(&mut self, n_endpoint: &'a str) {
+        self._endpoint = n_endpoint.to_string();
+    }
 }
 
 // GET /automations/{workflow_id}/emails

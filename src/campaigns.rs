@@ -1,9 +1,9 @@
-use super::resources::CampaignResource;
-use super::api::MailchimpApi;
-use super::internal::types::{CampaignType, CampaignsType};
-use super::iter::{BuildIter, MalchimpIter};
+use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
+use super::iter::{BuildIter, MalchimpIter};
+use super::types::{CampaignType, CampaignsType};
 use log::error;
+use std::cell::RefCell;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -165,13 +165,12 @@ pub struct Campaigns {
 
 impl BuildIter for Campaigns {
     type Item = CampaignType;
-    type Resource = CampaignResource;
     type FilterItem = CampaignFilter;
 
     ///
     /// Obtiene los datos remotos y devuelve un listado
     ///
-   fn get_data_from_remote(&self, filter: &Self::FilterItem) -> Vec<Self::Item> {
+    fn get_data_from_remote(&self, filter: &Self::FilterItem) -> Vec<Self::Item> {
         if let Some(resp) = self.get_campaigns_from_remote(Some(filter)) {
             return resp.campaigns;
         }
@@ -180,8 +179,10 @@ impl BuildIter for Campaigns {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn create_resource(&self, data: &Self::Item) -> Self::Resource {
-        CampaignResource::new(self.api.clone(), &data)
+    fn update_item(&self, data: &Self::Item) -> Self::Item {
+        let mut in_data = data.clone();
+        in_data.set_api(&self.api);
+        in_data
     }
     ///
     /// Actualiza el offset
@@ -219,14 +220,15 @@ impl Campaigns {
         &self,
         campaign_id: &'a str,
         filters: HashMap<String, String>,
-    ) -> MailchimpResult<CampaignResource> {
+    ) -> MailchimpResult<CampaignType> {
         let endpoint = String::from("campaigns/") + campaign_id;
         let response = self.api.get::<CampaignType>(endpoint.as_str(), filters);
 
         match response {
             Ok(data) => {
-                let list = CampaignResource::new(self.api.clone(), &data);
-                Ok(list)
+                let mut d = data;
+                d.set_api(&self.api);
+                Ok(d)
             }
             Err(e) => Err(e),
         }
@@ -279,16 +281,18 @@ impl Campaigns {
         if let Some(remote) = self.get_campaigns_from_remote(Some(&filters)) {
             return MalchimpIter {
                 builder: &self,
-                data: remote.campaigns,
+                data: RefCell::from(remote.campaigns),
                 cur_filters: filters.clone(),
                 cur_it: 0,
+                total_items: remote.total_items,
             };
         }
         MalchimpIter {
             builder: &self,
-            data: Vec::new(),
+            data: RefCell::from(Vec::new()),
             cur_filters: filters.clone(),
             cur_it: 0,
+            total_items: 0,
         }
     }
 }

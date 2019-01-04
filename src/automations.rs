@@ -1,12 +1,12 @@
-use super::api::MailchimpApi;
+use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
-use super::internal::types::{
+use super::iter::{BuildIter, MalchimpIter};
+use super::types::{
     AutomationCampaignSettingsType, AutomationModifier, AutomationTriggerType,
     AutomationWorkflowType, AutomationsType, RecipientType,
 };
-use super::iter::{BuildIter, MalchimpIter};
-use super::resources::AutomationWorkflowResource;
 use log::error;
+use std::cell::RefCell;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -120,7 +120,6 @@ pub struct Automations {
 
 impl BuildIter for Automations {
     type Item = AutomationWorkflowType;
-    type Resource = AutomationWorkflowResource;
     type FilterItem = AutomationsFilter;
 
     ///
@@ -135,8 +134,10 @@ impl BuildIter for Automations {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn create_resource(&self, data: &Self::Item) -> Self::Resource {
-        AutomationWorkflowResource::new(self.api.clone(), &data)
+    fn update_item(&self, data: &Self::Item) -> Self::Item {
+        let mut in_data = data.clone();
+        in_data.set_api(&self.api);
+        in_data
     }
     ///
     /// Actualiza el offset
@@ -213,17 +214,18 @@ impl Automations {
         &self,
         workflow_id: &'a str,
         filters: HashMap<String, String>,
-    ) -> MailchimpResult<AutomationWorkflowResource> {
+    ) -> MailchimpResult<AutomationWorkflowType> {
         let endpoint = String::from("automations/") + workflow_id;
         let response = self
             .api
             .get::<AutomationWorkflowType>(endpoint.as_str(), filters);
 
         match response {
-            Ok(automation) => Ok(AutomationWorkflowResource::new(
-                self.api.clone(),
-                &automation,
-            )),
+            Ok(automation) => {
+                let mut au = automation;
+                au.set_api(&self.api);
+                Ok(au)
+            }
             Err(e) => Err(e),
         }
     }
@@ -240,7 +242,7 @@ impl Automations {
         recipients: RecipientType,
         trigger_settings: AutomationTriggerType,
         settings: Option<AutomationCampaignSettingsType>,
-    ) -> MailchimpResult<AutomationWorkflowResource> {
+    ) -> MailchimpResult<AutomationWorkflowType> {
         let modifier = AutomationModifier {
             settings: settings,
             delay: None,
@@ -251,10 +253,11 @@ impl Automations {
             .api
             .post::<AutomationWorkflowType, AutomationModifier>("automations", modifier);
         match response {
-            Ok(automation) => Ok(AutomationWorkflowResource::new(
-                self.api.clone(),
-                &automation,
-            )),
+            Ok(automation) => {
+                let mut au = automation;
+                au.set_api(&self.api);
+                Ok(au)
+            }
             Err(e) => Err(e),
         }
     }
@@ -267,16 +270,18 @@ impl Automations {
         if let Some(remote) = self.get_automations_from_remote(Some(&filters)) {
             return MalchimpIter {
                 builder: &self,
-                data: remote.automations,
+                data: RefCell::from(remote.automations),
                 cur_filters: filters.clone(),
                 cur_it: 0,
+                total_items: remote.total_items,
             };
         }
         MalchimpIter {
             builder: &self,
-            data: Vec::new(),
+            data: RefCell::from(Vec::new()),
             cur_filters: filters.clone(),
             cur_it: 0,
+            total_items: 0,
         }
     }
 }

@@ -1,11 +1,11 @@
-use super::internal::types::{ApiRootType};
-use super::internal::request::MailchimpResult;
 use super::api::MailchimpApi;
+use super::internal::request::MailchimpResult;
+use super::types::ApiRootType;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct ApiRoot {
-    api: MailchimpApi
+    api: MailchimpApi,
 }
 
 impl ApiRoot {
@@ -27,10 +27,7 @@ impl ApiRoot {
     ///         exclude_fields: Una lista de campos separados por comas para excluir.
     ///            Parámetros de referencia de subobjetos con notación de puntos.
     ///
-    pub fn get_info(
-        &self,
-        filters: HashMap<String, String>,
-    ) -> MailchimpResult<ApiRootType> {
+    pub fn get_info(&self, filters: HashMap<String, String>) -> MailchimpResult<ApiRootType> {
         let resp = self.api.get::<ApiRootType>("", filters);
         match resp {
             Ok(value) => Ok(value),

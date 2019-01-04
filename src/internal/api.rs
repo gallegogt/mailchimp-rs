@@ -5,8 +5,8 @@ use serde::ser::Serialize;
 use serde_json;
 use std::collections::HashMap;
 
-use crate::internal::request::{BasicAuth, HttpReq, MailchimpResult};
-use crate::internal::types::MailchimpErrorType;
+use super::error_type::MailchimpErrorType;
+use super::request::{BasicAuth, HttpReq, MailchimpResult};
 
 ///
 /// Definición del API Interno
@@ -71,9 +71,7 @@ where
         let mut api_url = Url::parse(&self.domain).unwrap();
         let data = self.api_version.clone() + "/";
         // Adiciona la versión del API
-        api_url = api_url
-            .join(data.as_str())
-            .unwrap();
+        api_url = api_url.join(data.as_str()).unwrap();
         // Adiciona Endpoint
         api_url = api_url.join(endpoint).unwrap();
         for (key, value) in params {
@@ -133,18 +131,16 @@ where
     ///     payload: Dato a enviar
     ///
     ///
-    pub fn post_edge<'a, T, P>(
-        &self,
-        endpoint: &'a str,
-        payload: P,
-    ) -> MailchimpResult<T>
+    pub fn post_edge<'a, T, P>(&self, endpoint: &'a str, payload: P) -> MailchimpResult<T>
     where
         T: DeserializeOwned,
-        P: Serialize
+        P: Serialize,
     {
         let api_url = self.build_url(endpoint, &HashMap::new());
         let headers = self.build_headers();
-        let mut result = self.req.post::<P>(api_url, headers, payload, &self.basic_auth)?;
+        let mut result = self
+            .req
+            .post::<P>(api_url, headers, payload, &self.basic_auth)?;
         if result.len() == 0 {
             result = "{}".to_string();
         }

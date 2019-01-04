@@ -10,11 +10,12 @@ use dotenv::dotenv;
 use std::env;
 use std::process;
 
-use mailchimp::resources::{AutomationWorkflowResource, CampaignResource, ListResource};
-use mailchimp::ApiRootType;
+use mailchimp::types::{
+    ApiRootType, AutomationWorkflowType, CampaignType, ListType, StatisticsType,
+};
 use mailchimp::{
     ApiRoot, Automations, AutomationsFilter, CampaignFilter, Campaigns, ListFilter, Lists,
-    MailchimpApi, StatisticsType,
+    MailchimpApi,
 };
 
 use std::collections::HashMap;
@@ -108,14 +109,14 @@ pub struct MailchimpAutomationStats {
 }
 
 impl MailchimpAutomationStats {
-    pub fn create_stats<'a>(data: &AutomationWorkflowResource, account_name: &'a str) -> Self {
-        let r_list_name = if let Some(r) = &data.get_recipients() {
+    pub fn create_stats<'a>(data: &AutomationWorkflowType, account_name: &'a str) -> Self {
+        let r_list_name = if let Some(r) = &data.recipients {
             r.list_name.clone()
         } else {
             None
         };
 
-        let s_title = if let Some(r) = &data.get_settings() {
+        let s_title = if let Some(r) = &data.settings {
             r.title.clone()
         } else {
             None
@@ -123,7 +124,7 @@ impl MailchimpAutomationStats {
 
         let mut rs_v = (0 as u64, 0 as u64, 0.0, 0 as u64, 0 as u64, 0.0);
 
-        if let Some(rp) = &data.get_report_summary() {
+        if let Some(rp) = &data.report_summary {
             rs_v.0 = rp.opens;
             rs_v.1 = rp.unique_opens;
             rs_v.2 = rp.open_rate;
@@ -135,8 +136,8 @@ impl MailchimpAutomationStats {
         MailchimpAutomationStats {
             measurement_name: "mailchimp_automation".to_string(),
             client_name: account_name.to_string(),
-            status: data.get_status().clone(),
-            emails_sent: data.get_emails_sent().clone(),
+            status: data.status.clone(),
+            emails_sent: data.emails_sent.clone(),
             recipients_list_name: r_list_name,
             title: s_title,
             report_summary_opens: Some(rs_v.0),
@@ -215,18 +216,18 @@ pub struct MailchimpCampaignStats {
 }
 
 impl MailchimpCampaignStats {
-    pub fn create_stats<'a>(data: &CampaignResource, account_name: &'a str) -> Self {
+    pub fn create_stats<'a>(data: &CampaignType, account_name: &'a str) -> Self {
         let mut settings = (Some(String::new()), None, Some(String::new()));
-        if let Some(rc) = data.recipients() {
+        if let Some(rc) = data.recipients.as_ref() {
             settings.0 = rc.list_name.clone();
             settings.1 = rc.recipient_count;
         }
-        if let Some(ss) = data.settings() {
+        if let Some(ss) = data.settings.as_ref() {
             settings.2 = ss.title.clone();
         }
 
         let mut report_summary = (0, 0, 0.0, 0, 0, 0.0, 0, 0.0, 0.0);
-        if let Some(rs) = data.report_summary() {
+        if let Some(rs) = data.report_summary.as_ref() {
             report_summary.0 = rs.opens;
             report_summary.1 = rs.unique_opens;
             report_summary.2 = rs.open_rate;
@@ -244,9 +245,9 @@ impl MailchimpCampaignStats {
         MailchimpCampaignStats {
             measurement_name: "mailchimp_campaigns".to_string(),
             client_name: account_name.to_string(),
-            campaign_type: data.campaign_type().cloned(),
-            status: data.status().cloned(),
-            emails_sent: data.emails_sent().cloned(),
+            campaign_type: data.campaign_type.clone(),
+            status: data.status.clone(),
+            emails_sent: data.emails_sent,
             recipients_list_name: settings.0,
             recipients_recipient_count: settings.1,
             title: settings.2,
@@ -287,12 +288,12 @@ pub struct MailchimpListStats {
 }
 
 impl MailchimpListStats {
-    pub fn create_stats<'a>(data: &ListResource, account_name: &'a str) -> Self {
+    pub fn create_stats<'a>(data: &ListType, account_name: &'a str) -> Self {
         MailchimpListStats {
             measurement_name: "mailchimp_lists".to_string(),
             client_name: account_name.to_string(),
-            name: data.name().cloned(),
-            stats: data.stats().cloned()
+            name: data.name.clone(),
+            stats: data.stats.clone(),
         }
     }
 }
