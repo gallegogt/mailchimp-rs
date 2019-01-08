@@ -96,6 +96,22 @@ impl MailchimpApi {
     }
 
     ///
+    /// Función para actualizar los recursos en el servidor
+    ///
+    /// ```
+    /// #Argumentos
+    ///     `endpoint`: Cadena de texto con el endpoint de la API al que se requiere acceder, no debe comenzar por "/"
+    ///     `payload`: Dato a enviar al servidor
+    ///
+    pub fn patch<'a, T, P>(&self, endpoint: &'a str, payload: P) -> Result<T, MailchimpErrorType>
+    where
+        T: DeserializeOwned,
+        P: Serialize,
+    {
+        self.i_api.patch_edge::<T, P>(endpoint, payload)
+    }
+
+    ///
     /// Realiza una petición de tipo GET
     /// ```
     /// extern crate mailchimp;
@@ -130,6 +146,43 @@ impl MailchimpApi {
         T: DeserializeOwned,
     {
         self.i_api.get_edge(endpoint, payload)
+    }
+
+    ///
+    /// Realiza una petición de tipo GET
+    /// ```
+    /// extern crate mailchimp;
+    /// use std::collections::HashMap;
+    /// use mailchimp::MailchimpApi;
+    /// use mailchimp::AuthorizedAppType;
+    ///
+    /// fn main() {
+    ///     let api = MailchimpApi::new("aac1e319006883125e18a89e529b5abb73de4c81-usX");
+    ///     let mut params = HashMap::new();
+    ///     params.insert("client_id".to_string(), "".to_string());
+    ///     params.insert("client_secret".to_string(), "".to_string());
+    ///     let data = api.get::<AuthorizedAppType>("authorized-apps", params);
+    ///     match data {
+    ///         Ok(resp) => {
+    ///            println!("{:?}", resp)
+    ///         },
+    ///         Err(e) => println!("Error Title: {:?} \n Error detail {:?}", e.title, e.detail)
+    ///     }
+    /// }
+    /// ```
+    /// #Argumentos
+    ///     `endpoint`: Cadena de texto con el endpoint de la API al que se requiere acceder, no debe comenzar por "/"
+    ///     `payload`: Listado llave valor de los parametros o data
+    ///
+    pub fn delete<'a, T>(
+        &self,
+        endpoint: &'a str,
+        payload: HashMap<String, String>,
+    ) -> Result<T, MailchimpErrorType>
+    where
+        T: DeserializeOwned,
+    {
+        self.i_api.delete_edge(endpoint, payload)
     }
 }
 
