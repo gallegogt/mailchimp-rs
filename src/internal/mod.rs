@@ -73,7 +73,7 @@ mod tests {
         ///     headers: HeaderMap
         ///     payload: Datos a enviar a la URL especificada
         ///
-        fn put<P>(
+        fn patch<P>(
             &self,
             _url: Url,
             _headers: HeaderMap,
@@ -84,6 +84,20 @@ mod tests {
             P: Serialize,
         {
             Ok(self.resp_for_post.clone())
+        }
+        ///
+        ///  Argumentos:
+        ///     url: Url
+        ///     headers: HeaderMap
+        ///     payload: Datos a enviar a la URL especificada
+        ///
+        fn delete(
+            &self,
+            _url: Url,
+            _headers: HeaderMap,
+            _basic_auth: &Option<BasicAuth>,
+        ) -> MailchimpResult<String> {
+            Ok(self.resp_for_get.clone())
         }
     }
 
