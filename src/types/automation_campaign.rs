@@ -611,7 +611,7 @@ impl AutomationWorkflowType {
     }
 
     ///
-    /// Update settings for a Automation workflow email
+    /// Update settings for a Automation workflow email, and return the Automation workflow email Updated
     ///
     /// Argumentos:
     ///     campaign_id: The unique id for the campaign.
