@@ -103,7 +103,7 @@ fn main() {
     }
 
     // ============= Workflow Emails Get Info =======================
-    let we_info = workflow.get_automation_workflow_info("000da526de");
+    let we_info = workflow.get_automation_workflow_email_info("000da526de");
 
     match we_info {
         Ok(we) => {

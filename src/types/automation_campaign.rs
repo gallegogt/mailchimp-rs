@@ -646,12 +646,38 @@ impl AutomationWorkflowType {
     }
 
     ///
+    /// Removes an individual Automation workflow email. Emails from certain workflow types,
+    /// including the Abandoned Cart Email (abandonedCart) and Product Retargeting Email
+    /// (abandonedBrowse) Workflows, cannot be deleted.
+    ///
+    /// Argumentos:
+    ///     workflow_email_id: The unique id for the Automation workflow email.
+    ///
+    pub fn delete_automation_workflow_email<'a>(
+        &self,
+        workflow_email_id: &'a str,
+    ) -> Option<MailchimpErrorType> {
+        let mut endpoint = self.get_base_endpoint().clone();
+        endpoint.push_str("/emails/");
+        endpoint.push_str(workflow_email_id);
+
+        let response = self
+            ._api
+            .delete::<EmptyType>(endpoint.as_str(), HashMap::new());
+
+        match response {
+            Ok(_) => None,
+            Err(e) => Some(e),
+        }
+    }
+
+    ///
     /// Devuelve la informacion sobre un flujo de trabajos de automatizacion de emails
     ///
     /// Argumentos:
     ///     workflow_email_id: Identificador único de la automatización
     ///
-    pub fn get_automation_workflow_info<'a>(
+    pub fn get_automation_workflow_email_info<'a>(
         &self,
         workflow_email_id: &'a str,
     ) -> MailchimpResult<WorkflowEmailType> {
