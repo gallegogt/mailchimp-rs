@@ -7,6 +7,7 @@ mod ecommerce;
 mod empty;
 mod link;
 mod list;
+mod workflow_email;
 
 pub use self::api_root::*;
 pub use self::authorized_apps::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType};
@@ -17,3 +18,4 @@ pub use self::ecommerce::*;
 pub use self::empty::*;
 pub use self::link::LinkType;
 pub use self::list::*;
+pub use self::workflow_email::*;
