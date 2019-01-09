@@ -162,7 +162,7 @@ impl WorkflowEmailType {
     ///
     /// Return Iter
     ///
-    pub fn iter_email_queue(&self) -> MalchimpIter<AutomationEmailQueueBuilder> {
+    pub fn get_email_queue(&self) -> MalchimpIter<AutomationEmailQueueBuilder> {
         // GET /automations/{workflow_id}/emails/{workflow_email_id}/queue
         let mut queue_endpoint = self._endpoint.clone();
         queue_endpoint.push_str("/queue");

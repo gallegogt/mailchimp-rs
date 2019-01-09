@@ -1,7 +1,12 @@
+use super::automation_subscriber::{
+    AutomationSubscriberBuilder, AutomationSubscriberType, CollectionAutomationSubscriber,
+};
 use super::ecommerce::ECommerceReportType;
 use super::empty::EmptyType;
 use super::link::LinkType;
 use super::workflow_email::{WorkflowEmailType, WorkflowEmailsType};
+use crate::iter::{MalchimpIter, SimpleFilter, ResourceFilter};
+use std::cell::RefCell;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
@@ -702,8 +707,62 @@ impl AutomationWorkflowType {
         }
     }
 
+    // ============== Subscribers Removed ==============
+
+    ///
+    /// View all subscribers removed from a workflow
+    ///
+    /// Return Iterator
+    ///
+    pub fn get_subscribers_removed(&self) -> MalchimpIter<AutomationSubscriberBuilder> {
+        let endpoint = self.get_base_endpoint() + "/removed-subscribers";
+        let filters = SimpleFilter::default();
+        let response = self
+            ._api
+            .get::<CollectionAutomationSubscriber>(endpoint.as_str(), filters.build_payload());
+        match response {
+            Ok(collection) =>  MalchimpIter {
+                builder: AutomationSubscriberBuilder {},
+                data: RefCell::from(collection.subscribers),
+                cur_filters: filters.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(_) => MalchimpIter {
+                builder: AutomationSubscriberBuilder {},
+                data: RefCell::from(Vec::new()),
+                cur_filters: filters.clone(),
+                cur_it: 0,
+                total_items: 0,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+        }
+    }
+
+    ///
+    /// Remove a subscriber from a specific Automation workflow. You can remove a
+    /// subscriber at any point in an Automation workflow, regardless of how many
+    /// emails they’ve been sent from that workflow. Once they’re removed, they can never
+    /// be added back to the same workflow.
+    ///
+    /// Arguments:
+    ///     email_address: The list member’s email address.
+    ///
+    pub fn add_subscriber_to_workflow<'a>(&self, email_address: &'a str) -> MailchimpResult<AutomationSubscriberType> {
+        // POST /automations/{workflow_id}/removed-subscribers
+        let mut queue_endpoint = self.get_base_endpoint() + "/removed-subscribers";
+        queue_endpoint.push_str("/queue");
+        let mut payload = HashMap::new();
+        payload.insert("email_address".to_string(), email_address.to_string());
+        self._api.post::<AutomationSubscriberType, HashMap<String, String>>(&queue_endpoint, payload)
+    }
+
     // ============== Private Functions ==============
     fn get_base_endpoint(&self) -> String {
+        // /automations/{workflow_id}
         let mut b_endpoint = String::from("automations/");
         b_endpoint.push_str(self.id.as_ref().unwrap());
         b_endpoint

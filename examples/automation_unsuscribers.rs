@@ -26,25 +26,10 @@ fn main() {
             workflow.settings.as_ref().unwrap().title
         );
 
-        let emails_resp = workflow.get_workflow_emails();
-
-        match emails_resp {
-            Ok(workflow_emails) => {
-                for e in workflow_emails {
-                    println!("\nWorkflow Emails");
-                    println!("ID   {:?}", e.id);
-                    println!("Emails Enviados   {:?}", e.emails_sent.as_ref().unwrap());
-                    println!("Fecha Inicio      {:?}", e.start_time.as_ref().unwrap());
-                    println!("Fecha de creacion {:?}", e.create_time.as_ref().unwrap());
-                    println!("Resumen           {:?}", e.report_summary.as_ref().unwrap());
-
-                    for aeq in e.get_email_queue() {
-                        println!("\nAutomation Email Queue");
-                        println!("{:?}", aeq);
-                    }
-                }
-            }
-            Err(e) => println!("{:?}", e),
+        for usr in workflow.get_subscribers_removed() {
+            println!("Susbscriber Removed ");
+            println!("ID: {:?}", &usr.id);
+            println!("Email: {:?}", &usr.email_address);
         }
     }
 }

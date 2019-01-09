@@ -103,8 +103,8 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
       * ✅ Add a subscriber to a workflow email
 
   * **Removed Subscribers**
-    * 🔘 Remove subscriber from a workflow
-    * 🔘 View all subscribers removed from a workflow
+    * ✅ Remove subscriber from a workflow
+    * ✅  View all subscribers removed from a workflow
 
 
 ### List
