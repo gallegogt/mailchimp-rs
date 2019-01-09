@@ -4,7 +4,7 @@ extern crate mailchimp;
 use dotenv::dotenv;
 use std::env;
 
-use mailchimp::{MailchimpApi, Lists, ListFilter};
+use mailchimp::{ListFilter, Lists, MailchimpApi};
 use std::collections::HashMap;
 
 fn main() {
@@ -23,12 +23,12 @@ fn main() {
     let mut count = 0;
 
     for w in lists_c {
-        list_id = w.id().unwrap().clone();
+        list_id = w.id.unwrap().clone();
         count += 1;
         println!("\n\nList {:?}", count);
-        println!("\tid    {:?}", w.id());
-        println!("\tName    {:?}", w.name());
-        println!("\tStats   {:?}", w.stats());
+        println!("\tid    {:?}", list_id);
+        println!("\tName    {:?}", w.name);
+        println!("\tStats   {:?}", w.stats);
         println!("=============================================");
     }
 
@@ -39,9 +39,9 @@ fn main() {
     match r_list {
         Ok(list) => {
             println!("\n\nList");
-            println!("\tid    {:?}", list.id());
-            println!("\tName    {:?}", list.name());
-            println!("\tStats   {:?}", list.stats());
+            println!("\tid    {:?}", list.id);
+            println!("\tName    {:?}", list.name);
+            println!("\tStats   {:?}", list.stats);
             println!("=============================================")
         }
         Err(e) => println!("{:?}", e),

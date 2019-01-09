@@ -2,8 +2,8 @@ extern crate dotenv;
 extern crate mailchimp;
 
 use dotenv::dotenv;
+use mailchimp::{AuthorizedApps, AuthorizedFilter, MailchimpApi};
 use std::env;
-use mailchimp::{MailchimpApi, AuthorizedApps, AuthorizedFilter};
 
 fn main() {
     // Inicializando el dotenv
@@ -22,10 +22,10 @@ fn main() {
     for app in apps {
         count += 1;
         println!("\nApp {:?}", count);
-        println!("ID   {:?}", app.id());
-        println!("Name   {:?}", app.name());
-        println!("Descriptions   {:?}", app.description());
-        println!("Users   {:?}", app.users());
+        println!("ID   {:?}", app.id);
+        println!("Name   {:?}", app.name);
+        println!("Descriptions   {:?}", app.description);
+        println!("Users   {:?}", app.users);
         println!("===========================");
     }
 }

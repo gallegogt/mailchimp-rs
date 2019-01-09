@@ -92,18 +92,19 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
   * **Emails**
     * ✅ Get a list of automated emails in a workflow
     * ✅ Get information about a specific workflow email
-    * 🔘 Update an Automation workflow email
-    * 🔘 Delete a workflow email
+    * ✅ Update an Automation workflow email
+    * ✅ Delete a workflow email
     * ✅ Pause an automated email
     * ✅ Start an automated email
 
     * **Queue**
-      * 🔘 View queued subscribers for an automated email
-      * 🔘 View specific subscriber in email queue
+      * ✅ View queued subscribers for an automated email
+      * ✅ View specific subscriber in email queue
+      * ✅ Add a subscriber to a workflow email
 
   * **Removed Subscribers**
-    * 🔘 Remove subscriber from a workflow
-    * 🔘 View all subscribers removed from a workflow
+    * ✅ Remove subscriber from a workflow
+    * ✅  View all subscribers removed from a workflow
 
 
 ### List

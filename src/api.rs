@@ -1,9 +1,9 @@
-use std::collections::HashMap;
 use crate::internal::api::Api;
+use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpRequest;
-use crate::internal::types::MailchimpErrorType;
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
+use std::collections::HashMap;
 
 ///
 /// Mailchimp API
@@ -42,13 +42,11 @@ impl MailchimpApi {
             creds.push("usX");
         }
         MailchimpApi {
-            i_api: Box::new(
-                Api::<MailchimpRequest>::new(
-                    creds[1],
-                    creds[0],
-                    Box::new(MailchimpRequest::new()),
-                )
-            ),
+            i_api: Box::new(Api::<MailchimpRequest>::new(
+                creds[1],
+                creds[0],
+                Box::new(MailchimpRequest::new()),
+            )),
         }
     }
     ///
@@ -89,16 +87,28 @@ impl MailchimpApi {
     ///     `endpoint`: Cadena de texto con el endpoint de la API al que se requiere acceder, no debe comenzar por "/"
     ///     `payload`: Dato a enviar al servidor
     ///
-    pub fn post<'a, T, P>(
-        &self,
-        endpoint: &'a str,
-        payload: P,
-    ) -> Result<T, MailchimpErrorType>
+    pub fn post<'a, T, P>(&self, endpoint: &'a str, payload: P) -> Result<T, MailchimpErrorType>
     where
         T: DeserializeOwned,
-        P: Serialize
+        P: Serialize,
     {
         self.i_api.post_edge::<T, P>(endpoint, payload)
+    }
+
+    ///
+    /// Función para actualizar los recursos en el servidor
+    ///
+    /// ```
+    /// #Argumentos
+    ///     `endpoint`: Cadena de texto con el endpoint de la API al que se requiere acceder, no debe comenzar por "/"
+    ///     `payload`: Dato a enviar al servidor
+    ///
+    pub fn patch<'a, T, P>(&self, endpoint: &'a str, payload: P) -> Result<T, MailchimpErrorType>
+    where
+        T: DeserializeOwned,
+        P: Serialize,
+    {
+        self.i_api.patch_edge::<T, P>(endpoint, payload)
     }
 
     ///
@@ -137,4 +147,60 @@ impl MailchimpApi {
     {
         self.i_api.get_edge(endpoint, payload)
     }
+
+    ///
+    /// Realiza una petición de tipo GET
+    /// ```
+    /// extern crate mailchimp;
+    /// use std::collections::HashMap;
+    /// use mailchimp::MailchimpApi;
+    /// use mailchimp::AuthorizedAppType;
+    ///
+    /// fn main() {
+    ///     let api = MailchimpApi::new("aac1e319006883125e18a89e529b5abb73de4c81-usX");
+    ///     let mut params = HashMap::new();
+    ///     params.insert("client_id".to_string(), "".to_string());
+    ///     params.insert("client_secret".to_string(), "".to_string());
+    ///     let data = api.get::<AuthorizedAppType>("authorized-apps", params);
+    ///     match data {
+    ///         Ok(resp) => {
+    ///            println!("{:?}", resp)
+    ///         },
+    ///         Err(e) => println!("Error Title: {:?} \n Error detail {:?}", e.title, e.detail)
+    ///     }
+    /// }
+    /// ```
+    /// #Argumentos
+    ///     `endpoint`: Cadena de texto con el endpoint de la API al que se requiere acceder, no debe comenzar por "/"
+    ///     `payload`: Listado llave valor de los parametros o data
+    ///
+    pub fn delete<'a, T>(
+        &self,
+        endpoint: &'a str,
+        payload: HashMap<String, String>,
+    ) -> Result<T, MailchimpErrorType>
+    where
+        T: DeserializeOwned,
+    {
+        self.i_api.delete_edge(endpoint, payload)
+    }
+}
+
+impl Default for MailchimpApi {
+    fn default() -> Self {
+        MailchimpApi {
+            i_api: Box::new(Api::<MailchimpRequest>::new(
+                "",
+                "",
+                Box::new(MailchimpRequest::new()),
+            )),
+        }
+    }
+}
+
+pub trait MailchimpApiUpdate {
+    /**
+     * Update API
+     */
+    fn set_api(&mut self, api: &MailchimpApi);
 }

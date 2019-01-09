@@ -5,8 +5,8 @@ use serde::ser::Serialize;
 use serde_json;
 use std::collections::HashMap;
 
-use crate::internal::request::{BasicAuth, HttpReq, MailchimpResult};
-use crate::internal::types::MailchimpErrorType;
+use super::error_type::MailchimpErrorType;
+use super::request::{BasicAuth, HttpReq, MailchimpResult};
 
 ///
 /// Definición del API Interno
@@ -71,9 +71,7 @@ where
         let mut api_url = Url::parse(&self.domain).unwrap();
         let data = self.api_version.clone() + "/";
         // Adiciona la versión del API
-        api_url = api_url
-            .join(data.as_str())
-            .unwrap();
+        api_url = api_url.join(data.as_str()).unwrap();
         // Adiciona Endpoint
         api_url = api_url.join(endpoint).unwrap();
         for (key, value) in params {
@@ -125,6 +123,35 @@ where
             }
         }
     }
+    ///
+    ///
+    /// Argumentos
+    ///     endpoint: Endpoint desde donde se va a extraer los datos
+    ///     params: Parámetros de la url
+    ///     is_public: indica si el endpoint es public
+    ///
+    pub fn delete_edge<'a, T>(
+        &self,
+        endpoint: &'a str,
+        params: HashMap<String, String>,
+    ) -> MailchimpResult<T>
+    where
+        T: DeserializeOwned,
+    {
+        let api_url = self.build_url(endpoint, &params);
+        let headers = self.build_headers();
+        let mut result = self.req.delete(api_url, headers, &self.basic_auth)?;
+        if result.len() == 0 {
+            result = "{}".to_string();
+        }
+        match serde_json::from_str(&result) {
+            Ok(sr) => Ok(sr),
+            Err(e) => {
+                println!("{:?}", e);
+                Err(MailchimpErrorType::default())
+            }
+        }
+    }
 
     ///
     ///
@@ -133,18 +160,44 @@ where
     ///     payload: Dato a enviar
     ///
     ///
-    pub fn post_edge<'a, T, P>(
-        &self,
-        endpoint: &'a str,
-        payload: P,
-    ) -> MailchimpResult<T>
+    pub fn post_edge<'a, T, P>(&self, endpoint: &'a str, payload: P) -> MailchimpResult<T>
     where
         T: DeserializeOwned,
-        P: Serialize
+        P: Serialize,
     {
         let api_url = self.build_url(endpoint, &HashMap::new());
         let headers = self.build_headers();
-        let mut result = self.req.post::<P>(api_url, headers, payload, &self.basic_auth)?;
+        let mut result = self
+            .req
+            .post::<P>(api_url, headers, payload, &self.basic_auth)?;
+        if result.len() == 0 {
+            result = "{}".to_string();
+        }
+        match serde_json::from_str(&result) {
+            Ok(sr) => Ok(sr),
+            Err(e) => {
+                println!("Post Edge {:?}", e);
+                Err(MailchimpErrorType::default())
+            }
+        }
+    }
+    ///
+    ///
+    /// Argumentos
+    ///     endpoint: Endpoint hacia donde se van a enviar los datos
+    ///     payload: Dato a enviar
+    ///
+    ///
+    pub fn patch_edge<'a, T, P>(&self, endpoint: &'a str, payload: P) -> MailchimpResult<T>
+    where
+        T: DeserializeOwned,
+        P: Serialize,
+    {
+        let api_url = self.build_url(endpoint, &HashMap::new());
+        let headers = self.build_headers();
+        let mut result = self
+            .req
+            .patch::<P>(api_url, headers, payload, &self.basic_auth)?;
         if result.len() == 0 {
             result = "{}".to_string();
         }

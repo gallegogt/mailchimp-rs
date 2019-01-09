@@ -4,7 +4,7 @@ extern crate mailchimp;
 use dotenv::dotenv;
 use std::env;
 
-use mailchimp::{MailchimpApi, ApiRoot};
+use mailchimp::{ApiRoot, MailchimpApi};
 use std::collections::HashMap;
 
 fn main() {

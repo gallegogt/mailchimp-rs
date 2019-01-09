@@ -7,7 +7,7 @@ use serde_json;
 // import macro error
 use log::error;
 
-use super::types::MailchimpErrorType;
+use super::error_type::MailchimpErrorType;
 
 // Define un aleas generico al Result para MailchimpErrorType
 pub type MailchimpResult<T> = Result<T, MailchimpErrorType>;
@@ -26,6 +26,8 @@ pub struct BasicAuth {
 ///
 pub trait HttpReq {
     ///
+    /// Función para leer los recursos desde el servidor
+    ///
     ///  Argumentos:
     ///     url: Url
     ///     headers: HeaderMap
@@ -36,6 +38,8 @@ pub trait HttpReq {
         headers: HeaderMap,
         basic_auth: &Option<BasicAuth>,
     ) -> MailchimpResult<String>;
+    ///
+    /// Función para crear algún recurso en el servidor
     ///
     ///  Argumentos:
     ///     url: Url
@@ -52,12 +56,14 @@ pub trait HttpReq {
     where
         P: Serialize;
     ///
+    /// Función para Actualizar algún recurso en el servidor
+    ///
     ///  Argumentos:
     ///     url: Url
     ///     headers: Headers
     ///     payload: Datos a enviar a la URL especificada
     ///
-    fn put<P>(
+    fn patch<P>(
         &self,
         url: Url,
         headers: HeaderMap,
@@ -66,6 +72,19 @@ pub trait HttpReq {
     ) -> MailchimpResult<String>
     where
         P: Serialize;
+    ///
+    /// Función para eliminar algun recursos en el servidor
+    ///
+    ///  Argumentos:
+    ///     url: Url
+    ///     headers: HeaderMap
+    ///
+    fn delete(
+        &self,
+        url: Url,
+        headers: HeaderMap,
+        basic_auth: &Option<BasicAuth>,
+    ) -> MailchimpResult<String>;
 }
 
 ///
@@ -142,7 +161,7 @@ impl HttpReq for MailchimpRequest {
     ///     headers: HeaderMap
     ///     payload: Datos a enviar a la URL especificada
     ///
-    fn put<P>(
+    fn patch<P>(
         &self,
         url: Url,
         headers: HeaderMap,
@@ -155,12 +174,34 @@ impl HttpReq for MailchimpRequest {
         let builder = match basic_auth {
             Some(auth) => self
                 .client
-                .put(url)
+                .patch(url)
                 .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
             None => self.client.post(url),
         };
         let result = builder.headers(headers).json(&payload).send();
-        self.process_response(result, "PUT")
+        self.process_response(result, "PATCH")
+    }
+    ///
+    ///  Argumentos:
+    ///     url: Url
+    ///     headers: HeaderMap
+    ///
+    fn delete(
+        &self,
+        url: Url,
+        headers: HeaderMap,
+        basic_auth: &Option<BasicAuth>,
+    ) -> MailchimpResult<String> {
+        let builder = match basic_auth {
+            Some(auth) => self
+                .client
+                .delete(url)
+                .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
+            None => self.client.get(url),
+        };
+
+        let result = builder.headers(headers).send();
+        self.process_response(result, "DELETE")
     }
 }
 

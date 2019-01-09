@@ -1,6 +1,6 @@
 pub mod api;
+pub mod error_type;
 pub mod request;
-pub mod types;
 
 #[cfg(test)]
 mod tests {
@@ -12,7 +12,7 @@ mod tests {
 
     use super::api::Api;
     use super::request::{BasicAuth, HttpReq, MailchimpResult};
-    use super::types::*;
+    use crate::types::*;
 
     ///
     ///
@@ -73,7 +73,7 @@ mod tests {
         ///     headers: HeaderMap
         ///     payload: Datos a enviar a la URL especificada
         ///
-        fn put<P>(
+        fn patch<P>(
             &self,
             _url: Url,
             _headers: HeaderMap,
@@ -84,6 +84,20 @@ mod tests {
             P: Serialize,
         {
             Ok(self.resp_for_post.clone())
+        }
+        ///
+        ///  Argumentos:
+        ///     url: Url
+        ///     headers: HeaderMap
+        ///     payload: Datos a enviar a la URL especificada
+        ///
+        fn delete(
+            &self,
+            _url: Url,
+            _headers: HeaderMap,
+            _basic_auth: &Option<BasicAuth>,
+        ) -> MailchimpResult<String> {
+            Ok(self.resp_for_get.clone())
         }
     }
 
@@ -188,7 +202,7 @@ mod tests {
         );
         let api = Api::<MockRequest>::new("us6", "access_token", Box::new(mock_transport));
         let resp = api
-            .get_edge::<AutomationsType>("/automations", HashMap::new())
+            .get_edge::<CollectionAutomation>("/automations", HashMap::new())
             .unwrap();
 
         assert_eq!(
@@ -239,7 +253,9 @@ mod tests {
             "",
         );
         let api = Api::<MockRequest>::new("us6", "access_token", Box::new(mock_transport));
-        let resp = api.get_edge::<WorkflowEmailType>("", HashMap::new()).unwrap();
+        let resp = api
+            .get_edge::<WorkflowEmailType>("", HashMap::new())
+            .unwrap();
 
         assert_eq!(
             resp.id.as_ref().unwrap(), "491fec26f1",
@@ -269,7 +285,9 @@ mod tests {
             "",
         );
         let api = Api::<MockRequest>::new("us6", "access_token", Box::new(mock_transport));
-        let resp = api.get_edge::<CampaignsType>("campaigns", HashMap::new()).unwrap();
+        let resp = api
+            .get_edge::<CampaignsType>("campaigns", HashMap::new())
+            .unwrap();
 
         assert_eq!(
             resp.campaigns.len(), resp.total_items as usize,

@@ -3,6 +3,9 @@ use super::automation_campaign::{
     SocialCardType,
 };
 use super::link::LinkType;
+use crate::api::{MailchimpApi, MailchimpApiUpdate};
+use crate::iter::MailchimpCollection;
+
 ///
 /// The days of the week to send a daily RSS Campaign.
 ///
@@ -416,6 +419,19 @@ pub struct CampaignType {
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub _links: Option<Vec<LinkType>>,
+
+    // Mailchimp API
+    #[serde(skip)]
+    _api: MailchimpApi,
+}
+
+impl MailchimpApiUpdate for CampaignType {
+    /**
+     * Update API
+     */
+    fn set_api(&mut self, n_api: &MailchimpApi) {
+        self._api = n_api.clone()
+    }
 }
 
 // GET /campaigns
@@ -430,4 +446,25 @@ pub struct CampaignsType {
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
+}
+
+impl MailchimpCollection<CampaignType> for CampaignsType {
+    /// Total Items
+    fn get_total_items(&self) -> u32 {
+        self.total_items
+    }
+    /// Data
+    fn get_values(&self) -> Vec<CampaignType> {
+        self.campaigns.clone()
+    }
+}
+
+impl Default for CampaignsType {
+    fn default() -> Self {
+        CampaignsType {
+            campaigns: Vec::new(),
+            total_items: 0,
+            _links: Vec::new(),
+        }
+    }
 }

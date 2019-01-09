@@ -1,5 +1,18 @@
+use super::automation_subscriber::{
+    AutomationSubscriberBuilder, AutomationSubscriberType, CollectionAutomationSubscriber,
+};
 use super::ecommerce::ECommerceReportType;
+use super::empty::EmptyType;
 use super::link::LinkType;
+use super::workflow_email::{WorkflowEmailType, WorkflowEmailsType};
+use crate::iter::{MalchimpIter, SimpleFilter, ResourceFilter};
+use std::cell::RefCell;
+use crate::api::{MailchimpApi, MailchimpApiUpdate};
+use crate::internal::error_type::MailchimpErrorType;
+use crate::internal::request::MailchimpResult;
+use crate::iter::MailchimpCollection;
+
+use std::collections::HashMap;
 
 // ============ Segment Conditions ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -480,12 +493,286 @@ pub struct AutomationWorkflowType {
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub _links: Option<Vec<LinkType>>,
+
+    /// Mailchimp APi
+    #[serde(default, skip)]
+    pub _api: MailchimpApi,
+}
+
+impl MailchimpApiUpdate for AutomationWorkflowType {
+    /**
+     * Update API
+     */
+    fn set_api(&mut self, n_api: &MailchimpApi) {
+        self._api = n_api.clone()
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct UpdateParamsForWorkflowEmail {
+    /// Settings for the campaign including the email subject, from name, and from email address.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub settings: Option<AutomationCampaignSettingsType>,
+    /// The delay settings for an Automation email.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub delay: Option<AutomationDelayType>,
+}
+
+impl AutomationWorkflowType {
+    // ============== Actions ==============
+    ///
+    /// Detiene todos los emails para esta automatización
+    ///
+    /// En caso de ser satisfactoria la ejecución, devuelve None,
+    /// en caso contrario devuelve el error, con su respectiva descripción
+    ///
+    pub fn pause_all_emails(&self) -> Option<MailchimpErrorType> {
+        let mut b_endpoint = self.get_base_endpoint();
+        b_endpoint.push_str("/actions/pause-all-emails");
+        match self
+            ._api
+            .post::<EmptyType, HashMap<String, String>>(b_endpoint.as_str(), HashMap::new())
+        {
+            Ok(_) => None,
+            Err(e) => Some(e),
+        }
+    }
+
+    ///
+    /// Inicia todos los emails para esta automatización
+    ///
+    /// En caso de ser satisfactoria la ejecución, devuelve None,
+    /// en caso contrario devuelve el error, con su respectiva descripción
+    ///
+    pub fn start_all_emails(&self) -> Option<MailchimpErrorType> {
+        let mut b_endpoint = self.get_base_endpoint();
+        b_endpoint.push_str("/actions/start-all-emails");
+        match self
+            ._api
+            .post::<EmptyType, HashMap<String, String>>(b_endpoint.as_str(), HashMap::new())
+        {
+            Ok(_) => None,
+            Err(e) => Some(e),
+        }
+    }
+    ///
+    /// Actualiza la automatización y devuelve una instancia nueva
+    ///
+    /// Argumentos:
+    ///     settings: Configuracion de la automatización a crear
+    ///     delay: Ajustes de retraso para un correo electrónico de automatización.
+    ///
+    pub fn remote_update<'a>(
+        &self,
+        settings: Option<AutomationCampaignSettingsType>,
+        delay: Option<AutomationDelayType>,
+    ) -> MailchimpResult<Self> {
+        let modifier = AutomationModifier {
+            settings: settings,
+            delay: delay,
+            recipients: None,
+            trigger_settings: None,
+        };
+        let response = self
+            ._api
+            .patch::<AutomationWorkflowType, AutomationModifier>("automations", modifier);
+        match response {
+            Ok(automation) => {
+                let mut au = automation;
+                au.set_api(&self._api);
+                Ok(au)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    /// ============= EMAILS ============================
+    ///
+    /// Devuelve una lista de los emails automatizados
+    ///
+    pub fn get_workflow_emails(&self) -> MailchimpResult<Vec<WorkflowEmailType>> {
+        let endpoint = self.get_base_endpoint() + "/emails";
+        let response = self
+            ._api
+            .get::<WorkflowEmailsType>(endpoint.as_str(), HashMap::new());
+        match response {
+            Ok(value) => {
+                let emails = value
+                    .emails
+                    .iter()
+                    .map(move |data| {
+                        let mut inner = endpoint.clone();
+                        inner.push_str(data.id.as_ref().unwrap());
+                        let mut inner_data = data.clone();
+                        inner_data.set_api(&self._api);
+                        inner_data.set_endpoint(&inner);
+                        inner_data
+                    })
+                    .collect::<Vec<WorkflowEmailType>>();
+                Ok(emails)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    ///
+    /// Update settings for a Automation workflow email, and return the Automation workflow email Updated
+    ///
+    /// Argumentos:
+    ///     campaign_id: The unique id for the campaign.
+    ///     settings: Settings for the campaign including the email subject, from name, and from email address.
+    ///     delay: The delay settings for an automation email.
+    ///
+    pub fn update_workflow_email<'a>(
+        &self,
+        workflow_email_id: &'a str,
+        settings: &AutomationCampaignSettingsType,
+        delay: &AutomationDelayType,
+    ) -> MailchimpResult<WorkflowEmailType> {
+        let mut endpoint = self.get_base_endpoint().clone();
+        endpoint.push_str("/emails/");
+        endpoint.push_str(workflow_email_id);
+
+        let payload = UpdateParamsForWorkflowEmail {
+            settings: Some(settings.clone()),
+            delay: Some(delay.clone()),
+        };
+
+        let response = self
+            ._api
+            .patch::<WorkflowEmailType, UpdateParamsForWorkflowEmail>(endpoint.as_str(), payload);
+        match response {
+            Ok(workflow_email) => {
+                let mut eml = workflow_email;
+                eml.set_api(&self._api);
+                eml.set_endpoint(&endpoint);
+                Ok(eml)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    ///
+    /// Removes an individual Automation workflow email. Emails from certain workflow types,
+    /// including the Abandoned Cart Email (abandonedCart) and Product Retargeting Email
+    /// (abandonedBrowse) Workflows, cannot be deleted.
+    ///
+    /// Argumentos:
+    ///     workflow_email_id: The unique id for the Automation workflow email.
+    ///
+    pub fn delete_automation_workflow_email<'a>(
+        &self,
+        workflow_email_id: &'a str,
+    ) -> Option<MailchimpErrorType> {
+        let mut endpoint = self.get_base_endpoint().clone();
+        endpoint.push_str("/emails/");
+        endpoint.push_str(workflow_email_id);
+
+        let response = self
+            ._api
+            .delete::<EmptyType>(endpoint.as_str(), HashMap::new());
+
+        match response {
+            Ok(_) => None,
+            Err(e) => Some(e),
+        }
+    }
+
+    ///
+    /// Devuelve la informacion sobre un flujo de trabajos de automatizacion de emails
+    ///
+    /// Argumentos:
+    ///     workflow_email_id: Identificador único de la automatización
+    ///
+    pub fn get_automation_workflow_email_info<'a>(
+        &self,
+        workflow_email_id: &'a str,
+    ) -> MailchimpResult<WorkflowEmailType> {
+        let mut endpoint = self.get_base_endpoint().clone();
+        endpoint.push_str("/emails/");
+        endpoint.push_str(workflow_email_id);
+
+        let response = self
+            ._api
+            .get::<WorkflowEmailType>(endpoint.as_str(), HashMap::new());
+
+        match response {
+            Ok(workflow_email) => {
+                let mut we = workflow_email;
+                we.set_api(&self._api);
+                we.set_endpoint(&endpoint);
+                Ok(we)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    // ============== Subscribers Removed ==============
+
+    ///
+    /// View all subscribers removed from a workflow
+    ///
+    /// Return Iterator
+    ///
+    pub fn get_subscribers_removed(&self) -> MalchimpIter<AutomationSubscriberBuilder> {
+        let endpoint = self.get_base_endpoint() + "/removed-subscribers";
+        let filters = SimpleFilter::default();
+        let response = self
+            ._api
+            .get::<CollectionAutomationSubscriber>(endpoint.as_str(), filters.build_payload());
+        match response {
+            Ok(collection) =>  MalchimpIter {
+                builder: AutomationSubscriberBuilder {},
+                data: RefCell::from(collection.subscribers),
+                cur_filters: filters.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(_) => MalchimpIter {
+                builder: AutomationSubscriberBuilder {},
+                data: RefCell::from(Vec::new()),
+                cur_filters: filters.clone(),
+                cur_it: 0,
+                total_items: 0,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+        }
+    }
+
+    ///
+    /// Remove a subscriber from a specific Automation workflow. You can remove a
+    /// subscriber at any point in an Automation workflow, regardless of how many
+    /// emails they’ve been sent from that workflow. Once they’re removed, they can never
+    /// be added back to the same workflow.
+    ///
+    /// Arguments:
+    ///     email_address: The list member’s email address.
+    ///
+    pub fn add_subscriber_to_workflow<'a>(&self, email_address: &'a str) -> MailchimpResult<AutomationSubscriberType> {
+        // POST /automations/{workflow_id}/removed-subscribers
+        let mut queue_endpoint = self.get_base_endpoint() + "/removed-subscribers";
+        queue_endpoint.push_str("/queue");
+        let mut payload = HashMap::new();
+        payload.insert("email_address".to_string(), email_address.to_string());
+        self._api.post::<AutomationSubscriberType, HashMap<String, String>>(&queue_endpoint, payload)
+    }
+
+    // ============== Private Functions ==============
+    fn get_base_endpoint(&self) -> String {
+        // /automations/{workflow_id}
+        let mut b_endpoint = String::from("automations/");
+        b_endpoint.push_str(self.id.as_ref().unwrap());
+        b_endpoint
+    }
 }
 
 // ============ Authorized Apps ==============
 // GET /automations
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct AutomationsType {
+pub struct CollectionAutomation {
     /// An array of objects, each representing an authorized application.
     #[serde(default)]
     pub automations: Vec<AutomationWorkflowType>,
@@ -495,6 +782,28 @@ pub struct AutomationsType {
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
+}
+
+impl MailchimpCollection<AutomationWorkflowType> for CollectionAutomation {
+    /// Total Items
+    fn get_total_items(&self) -> u32 {
+        self.total_items
+    }
+
+    /// Data
+    fn get_values(&self) -> Vec<AutomationWorkflowType> {
+        self.automations.clone()
+    }
+}
+
+impl Default for CollectionAutomation {
+    fn default() -> Self {
+        CollectionAutomation {
+            automations: Vec::new(),
+            total_items: 0,
+            _links: Vec::new(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -535,84 +844,4 @@ impl Default for SocialCardType {
             title: None,
         }
     }
-}
-
-// ============ Workflow Email ==============
-// GET /automations/{workflow_id}/emails/{workflow_email_id}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct WorkflowEmailType {
-    /// A string that uniquely identifies the Automation email.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
-    /// The ID used in the Mailchimp web application. View this automation in your Mailchimp account at https://{dc}.admin.mailchimp.com/campaigns/show/?id={web_id}.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub web_id: Option<u64>,
-    /// A string that uniquely identifies an Automation workflow.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub workflow_id: Option<String>,
-    /// The position of an Automation email in a workflow.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub position: Option<u64>,
-    /// The delay settings for an Automation email.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub delay: Option<AutomationDelayType>,
-    /// The date and time the campaign was created in ISO 8601 format.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub create_time: Option<String>,
-    /// The date and time the campaign was started in ISO 8601 format.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub start_time: Option<String>,
-    /// The link to the campaign’s archive version in ISO 8601 format.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub archive_url: Option<String>,
-    /// The total number of emails sent for this campaign.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub emails_sent: Option<u64>,
-    /// The date and time a campaign was sent in ISO 8601 format
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub send_time: Option<String>,
-    /// How the campaign’s content is put together (‘template’, ‘drag_and_drop’, ‘html’, ‘url’).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub content_type: Option<String>,
-    /// Determines if the automation email needs its blocks refreshed by opening the web-based campaign editor.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub needs_block_refresh: Option<bool>,
-    /// Determines if the campaign contains the |BRAND:LOGO| merge tag.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub has_logo_merge_tag: Option<bool>,
-    /// List settings for the campaign.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub recipients: Option<RecipientType>,
-    /// Settings for the campaign including the email subject, from name, and from email address.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub settings: Option<AutomationCampaignSettingsType>,
-    /// The tracking options for a campaign.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub tracking: Option<AutomationTrackingOptionsType>,
-    /// The preview for the campaign, rendered by social networks like Facebook and Twitter. Learn more.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub social_card: Option<SocialCardType>,
-    /// Available triggers for Automation workflows.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub trigger_settings: Option<AutomationTriggerType>,
-    /// For sent campaigns, a summary of opens, clicks, and unsubscribes.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub report_summary: Option<CampaignReportSummaryType>,
-    /// A list of link types and descriptions for the API schema documents.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub _links: Option<Vec<LinkType>>,
-}
-
-// GET /automations/{workflow_id}/emails
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct WorkflowEmailsType {
-    /// An array of objects, each representing an email in an Automation workflow.
-    #[serde(default)]
-    pub emails: Vec<WorkflowEmailType>,
-    /// Desc: The total number of items matching the query regardless of pagination.
-    #[serde(default)]
-    pub total_items: u32,
-    /// Desc: A list of link types and descriptions for the API schema documents.
-    #[serde(default)]
-    pub _links: Vec<LinkType>,
 }
