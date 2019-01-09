@@ -2,10 +2,12 @@ use super::automation_campaign::{
     CampaignReportSummaryType, CampaignSettingsType, CampaignTrackingOptionsType, RecipientType,
     SocialCardType,
 };
+use super::empty::EmptyType;
 use super::link::LinkType;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
+use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
-
+use std::collections::HashMap;
 ///
 /// The days of the week to send a daily RSS Campaign.
 ///
@@ -466,5 +468,158 @@ impl Default for CampaignsType {
             total_items: 0,
             _links: Vec::new(),
         }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ScheduleBatchDelivery {
+    /// The delay, in minutes, between batches.
+    #[serde(default)]
+    pub batch_delay: u64,
+    /// The number of batches for the campaign send.
+    #[serde(default)]
+    pub batch_count: u64,
+}
+
+impl Default for ScheduleBatchDelivery {
+    fn default() -> Self {
+        ScheduleBatchDelivery {
+            batch_delay: 0,
+            batch_count: 0,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ScheduleParam {
+    /// The UTC date and time to schedule the campaign for delivery in ISO 8601 format.
+    /// Campaigns may only be scheduled to send on the quarter-hour (:00, :15, :30, :45).
+    #[serde(default)]
+    pub schedule_time: String,
+    /// Choose whether the campaign should use Timewarp when sending. Campaigns
+    /// scheduled with Timewarp are localized based on the recipients’ time zones.
+    /// For example, a Timewarp campaign with a schedule_time of 13:00 will be sent
+    /// to each recipient at 1:00pm in their local time. Cannot be set to true for
+    /// campaigns using Batch Delivery.
+    #[serde(default)]
+    pub timewarp: bool,
+    /// Choose whether the campaign should use Batch Delivery. Cannot be set
+    /// to true for campaigns using Timewarp.
+    #[serde(default)]
+    pub batch_delivery: Option<ScheduleBatchDelivery>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct EmailParam {
+    /// An array of email addresses to send the test email to.
+    #[serde(default)]
+    pub test_emails: Vec<String>,
+    /// Choose the type of test email to send.  html or plaintext
+    #[serde(default)]
+    pub send_type: String,
+}
+
+impl EmailParam {
+    fn new(test_emails: Vec<String>, send_type: String) -> Self {
+        EmailParam {
+            test_emails: test_emails,
+            send_type: send_type,
+        }
+    }
+}
+
+impl CampaignType {
+    // ==== Actions ===========
+
+    ///
+    ///  Cancel a campaign
+    ///
+    pub fn cancel_campaign(&self) -> MailchimpResult<EmptyType> {
+        // POST /campaigns/{campaign_id}/actions/cancel-send
+        let endpoint = self.get_base_endpoint() + "/actions/cancel-send";
+        self._api
+            .post::<EmptyType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+    ///
+    ///  Resend a campaign
+    ///
+    pub fn resend_campaign(&self) -> MailchimpResult<CampaignType> {
+        // POST /campaigns/{campaign_id}/actions/create-resend
+        let endpoint = self.get_base_endpoint() + "/actions/create-resend";
+        self._api
+            .post::<CampaignType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+    ///
+    /// Pause an RSS-Driven campaign
+    ///
+    pub fn pause_rss_driven_campaign(&self) -> MailchimpResult<EmptyType> {
+        // POST /campaigns/{campaign_id}/actions/pause
+        let endpoint = self.get_base_endpoint() + "/actions/pause";
+        self._api
+            .post::<EmptyType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+    ///
+    /// Replicate a campaign in saved or send status.
+    ///
+    pub fn replicate_campaign(&self) -> MailchimpResult<CampaignType> {
+        // POST /campaigns/{campaign_id}/actions/replicate
+        let endpoint = self.get_base_endpoint() + "/actions/replicate";
+        self._api
+            .post::<CampaignType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+    ///
+    /// Resume an RSS-Driven campaign.
+    ///
+    pub fn resume_rss_driven_campaign(&self) -> MailchimpResult<EmptyType> {
+        // POST /campaigns/{campaign_id}/actions/resume
+        let endpoint = self.get_base_endpoint() + "/actions/resume";
+        self._api
+            .post::<EmptyType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+    ///
+    /// Schedule a campaign for delivery. If you’re using Multivariate Campaigns to
+    /// test send times or sending RSS Campaigns, use the send action instead.
+    ///
+    pub fn schedule_campaign(&self, param: ScheduleParam) -> MailchimpResult<EmptyType> {
+        // POST /campaigns/{campaign_id}/actions/schedule
+        let endpoint = self.get_base_endpoint() + "/actions/schedule";
+        self._api.post::<EmptyType, ScheduleParam>(&endpoint, param)
+    }
+
+    ///
+    /// Send a Mailchimp campaign. For RSS Campaigns, the campaign will send
+    /// according to its schedule. All other campaigns will send immediately.
+    ///
+    pub fn send_campaign(&self) -> MailchimpResult<EmptyType> {
+        // POST  /campaigns/{campaign_id}/actions/send
+        let endpoint = self.get_base_endpoint() + "/actions/send";
+        self._api
+            .post::<EmptyType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+
+    ///
+    /// Send a test email.
+    ///
+    pub fn send_test_email(&self, param: EmailParam) -> MailchimpResult<EmptyType> {
+        // POST /campaigns/{campaign_id}/actions/test
+        let endpoint = self.get_base_endpoint() + "/actions/test";
+        self._api.post::<EmptyType, EmailParam>(&endpoint, param)
+    }
+
+    ///
+    /// Unschedule a scheduled campaign that hasn’t started sending.
+    ///
+    pub fn unschedule_campaign(&self) -> MailchimpResult<EmptyType> {
+        // POST  POST /campaigns/{campaign_id}/actions/unschedule
+        let endpoint = self.get_base_endpoint() + "/actions/unschedule";
+        self._api
+            .post::<EmptyType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+
+    ///
+    /// Return the endpoint path
+    ///
+    fn get_base_endpoint(&self) -> String {
+        String::from("/campaigns/") + &self.id.as_ref().unwrap()
     }
 }
