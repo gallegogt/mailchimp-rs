@@ -530,7 +530,6 @@ impl EmailParam {
 
 impl CampaignType {
     // ==== Actions ===========
-
     ///
     ///  Cancel a campaign
     ///
@@ -614,6 +613,19 @@ impl CampaignType {
         let endpoint = self.get_base_endpoint() + "/actions/unschedule";
         self._api
             .post::<EmptyType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+
+    // ==== DELETE ===========
+    ///
+    /// Remove a campaign from your Mailchimp account.
+    ///
+    pub fn delete(&self) -> MailchimpResult<bool> {
+        // DELETE /campaigns/{campaign_id}
+        let endpoint = self.get_base_endpoint();
+        match self._api.delete::<EmptyType>(&endpoint, HashMap::new()) {
+            Ok(_) => Ok(true),
+            Err(e) => Err(e),
+        }
     }
 
     ///
