@@ -10,6 +10,7 @@ mod link;
 mod list;
 mod workflow_email;
 mod automation_subscriber;
+mod campaign_content;
 
 pub use self::api_root::*;
 pub use self::authorized_apps::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType};
@@ -23,3 +24,4 @@ pub use self::link::LinkType;
 pub use self::list::*;
 pub use self::workflow_email::*;
 pub use self::automation_subscriber::*;
+pub use self::campaign_content::*;

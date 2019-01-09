@@ -250,7 +250,7 @@ impl Campaigns {
     ///         folder_id: The unique folder id.
     ///         list_id: The unique id for the list.
     ///
-    pub fn get_campaigns_from_remote(
+    pub fn get_campaigns(
         &self,
         filters: Option<&CampaignFilter>,
     ) -> Option<CampaignsType> {
@@ -273,7 +273,7 @@ impl Campaigns {
     /// anterior esta función te devuelve un iterador
     ///
     pub fn iter(&self, filters: CampaignFilter) -> MalchimpIter<CampaignsBuilder> {
-        if let Some(remote) = self.get_campaigns_from_remote(Some(&filters)) {
+        if let Some(remote) = self.get_campaigns(Some(&filters)) {
             return MalchimpIter {
                 builder: CampaignsBuilder {},
                 data: RefCell::from(remote.campaigns),

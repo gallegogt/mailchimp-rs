@@ -2,6 +2,7 @@ use super::automation_campaign::{
     CampaignReportSummaryType, CampaignSettingsType, CampaignTrackingOptionsType, RecipientType,
     SocialCardType,
 };
+use super::campaign_content::{CampaignContentType, CampaignContentParam};
 use super::empty::EmptyType;
 use super::link::LinkType;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
@@ -659,13 +660,51 @@ impl CampaignType {
     pub fn update(&self, param: UpdateCampaignParam) -> MailchimpResult<CampaignType> {
         // DELETE /campaigns/{campaign_id}
         let endpoint = self.get_base_endpoint();
-        self._api.patch::<CampaignType, UpdateCampaignParam>(&endpoint, param)
+        self._api
+            .patch::<CampaignType, UpdateCampaignParam>(&endpoint, param)
+    }
+
+    // ======================== Content ===========
+
+    ///
+    /// Get the the HTML and plain-text content for a campaign.
+    ///
+    /// Arguments:
+    ///     fields: A comma-separated list of fields to return. Reference parameters
+    ///         of sub-objects with dot notation.
+    ///     exclude_fields: A comma-separated list of fields to exclude. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///
+    pub fn get_content(
+        &self,
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+    ) -> MailchimpResult<CampaignContentType> {
+        // GET /campaigns/{campaign_id}/content
+        let endpoint = self.get_base_endpoint() + "/content";
+        let mut payload = HashMap::new();
+        if let Some(field) = fields {
+            payload.insert("fields".to_string(), field);
+        }
+        if let Some(ef) = exclude_fields {
+            payload.insert("exclude_fields".to_string(), ef);
+        }
+        self._api.get::<CampaignContentType>(endpoint.as_str(), payload)
+    }
+
+    ///
+    /// Set the content for a campaign.
+    ///
+    pub fn update_content(&self, param: CampaignContentParam) -> MailchimpResult<CampaignContentType> {
+        // PUT /campaigns/{campaign_id}/content
+        let endpoint = self.get_base_endpoint() + "/content";
+        self._api.put::<CampaignContentType, CampaignContentParam>(&endpoint, param)
     }
 
     ///
     /// Return the endpoint path
     ///
     fn get_base_endpoint(&self) -> String {
-        String::from("/campaigns/") + &self.id.as_ref().unwrap()
+        String::from("campaigns/") + &self.id.as_ref().unwrap()
     }
 }

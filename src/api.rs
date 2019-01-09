@@ -110,6 +110,21 @@ impl MailchimpApi {
     {
         self.i_api.patch_edge::<T, P>(endpoint, payload)
     }
+    ///
+    /// Función para actualizar los recursos en el servidor
+    ///
+    /// ```
+    /// #Argumentos
+    ///     `endpoint`: Cadena de texto con el endpoint de la API al que se requiere acceder, no debe comenzar por "/"
+    ///     `payload`: Dato a enviar al servidor
+    ///
+    pub fn put<'a, T, P>(&self, endpoint: &'a str, payload: P) -> Result<T, MailchimpErrorType>
+    where
+        T: DeserializeOwned,
+        P: Serialize,
+    {
+        self.i_api.put_edge::<T, P>(endpoint, payload)
+    }
 
     ///
     /// Realiza una petición de tipo GET
