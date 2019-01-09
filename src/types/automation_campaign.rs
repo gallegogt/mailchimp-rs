@@ -5,6 +5,7 @@ use super::workflow_email::{WorkflowEmailType, WorkflowEmailsType};
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
+use crate::iter::MailchimpCollection;
 
 use std::collections::HashMap;
 
@@ -512,7 +513,6 @@ struct UpdateParamsForWorkflowEmail {
     pub delay: Option<AutomationDelayType>,
 }
 
-
 impl AutomationWorkflowType {
     // ============== Actions ==============
     ///
@@ -630,10 +630,12 @@ impl AutomationWorkflowType {
 
         let payload = UpdateParamsForWorkflowEmail {
             settings: Some(settings.clone()),
-            delay: Some(delay.clone())
+            delay: Some(delay.clone()),
         };
 
-        let response = self._api.patch::<WorkflowEmailType, UpdateParamsForWorkflowEmail>(endpoint.as_str(), payload);
+        let response = self
+            ._api
+            .patch::<WorkflowEmailType, UpdateParamsForWorkflowEmail>(endpoint.as_str(), payload);
         match response {
             Ok(workflow_email) => {
                 let mut eml = workflow_email;
@@ -711,7 +713,7 @@ impl AutomationWorkflowType {
 // ============ Authorized Apps ==============
 // GET /automations
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct AutomationsType {
+pub struct CollectionAutomation {
     /// An array of objects, each representing an authorized application.
     #[serde(default)]
     pub automations: Vec<AutomationWorkflowType>,
@@ -721,6 +723,28 @@ pub struct AutomationsType {
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
+}
+
+impl MailchimpCollection<AutomationWorkflowType> for CollectionAutomation {
+    /// Total Items
+    fn get_total_items(&self) -> u32 {
+        self.total_items
+    }
+
+    /// Data
+    fn get_values(&self) -> Vec<AutomationWorkflowType> {
+        self.automations.clone()
+    }
+}
+
+impl Default for CollectionAutomation {
+    fn default() -> Self {
+        CollectionAutomation {
+            automations: Vec::new(),
+            total_items: 0,
+            _links: Vec::new(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

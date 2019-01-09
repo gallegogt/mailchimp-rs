@@ -98,8 +98,9 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
     * ✅ Start an automated email
 
     * **Queue**
-      * 🔘 View queued subscribers for an automated email
-      * 🔘 View specific subscriber in email queue
+      * ✅ View queued subscribers for an automated email
+      * ✅ View specific subscriber in email queue
+      * ✅ Add a subscriber to a workflow email
 
   * **Removed Subscribers**
     * 🔘 Remove subscriber from a workflow

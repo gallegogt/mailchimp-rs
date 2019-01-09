@@ -1,6 +1,7 @@
 mod api_root;
 mod authorized_apps;
 mod automation_campaign;
+mod automation_email_queue;
 mod campaign;
 mod contact;
 mod ecommerce;
@@ -12,6 +13,7 @@ mod workflow_email;
 pub use self::api_root::*;
 pub use self::authorized_apps::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType};
 pub use self::automation_campaign::*;
+pub use self::automation_email_queue::*;
 pub use self::campaign::*;
 pub use self::contact::ContactType;
 pub use self::ecommerce::*;

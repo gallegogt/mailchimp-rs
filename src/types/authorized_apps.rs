@@ -1,5 +1,6 @@
 use super::LinkType;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
+use crate::iter::MailchimpCollection;
 
 // ============ Authorized Apps ==============
 // POST /authorized-apps
@@ -65,4 +66,25 @@ pub struct AuthorizedAppsType {
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
+}
+
+impl MailchimpCollection<AuthorizedAppType> for AuthorizedAppsType {
+    /// Total Items
+    fn get_total_items(&self) -> u32 {
+        self.total_items
+    }
+    /// Data
+    fn get_values(&self) -> Vec<AuthorizedAppType> {
+        self.apps.clone()
+    }
+}
+
+impl Default for AuthorizedAppsType {
+    fn default() -> Self {
+        AuthorizedAppsType {
+            apps: Vec::new(),
+            total_items: 0,
+            _links: Vec::new(),
+        }
+    }
 }

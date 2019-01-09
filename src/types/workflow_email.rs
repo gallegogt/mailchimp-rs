@@ -1,13 +1,19 @@
-use std::collections::HashMap;
-
 use super::automation_campaign::{
     AutomationCampaignSettingsType, AutomationDelayType, AutomationTrackingOptionsType,
     AutomationTriggerType, CampaignReportSummaryType, RecipientType, SocialCardType,
+};
+use super::automation_email_queue::{
+    AutomationEmailQueueBuilder, AutomationEmailQueueFilter, AutomationEmailQueueType,
+    CollectionAutomationEmailQueue,
 };
 use super::empty::EmptyType;
 use super::link::LinkType;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::error_type::MailchimpErrorType;
+use crate::internal::request::MailchimpResult;
+use crate::iter::{MalchimpIter, ResourceFilter};
+use std::cell::RefCell;
+use std::collections::HashMap;
 
 // ============ Workflow Email ==============
 // GET /automations/{workflow_id}/emails/{workflow_email_id}
@@ -148,6 +154,72 @@ impl WorkflowEmailType {
             Ok(_) => None,
             Err(e) => Some(e),
         }
+    }
+
+    // ============== QUEUE ==============
+    ///
+    /// Get information about an Automation email queue.
+    ///
+    /// Return Iter
+    ///
+    pub fn iter_email_queue(&self) -> MalchimpIter<AutomationEmailQueueBuilder> {
+        // GET /automations/{workflow_id}/emails/{workflow_email_id}/queue
+        let mut queue_endpoint = self._endpoint.clone();
+        queue_endpoint.push_str("/queue");
+        let filters = AutomationEmailQueueFilter::default();
+        let payload = filters.build_payload();
+        let response = self
+            ._api
+            .get::<CollectionAutomationEmailQueue>(&queue_endpoint, payload);
+        match response {
+            Ok(collection) => MalchimpIter {
+                builder: AutomationEmailQueueBuilder {},
+                data: RefCell::from(collection.queue),
+                cur_filters: filters.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: queue_endpoint.clone(),
+            },
+            Err(_) => MalchimpIter {
+                builder: AutomationEmailQueueBuilder {},
+                data: RefCell::from(Vec::new()),
+                cur_filters: filters.clone(),
+                cur_it: 0,
+                total_items: 0,
+                api: self._api.clone(),
+                endpoint: queue_endpoint.clone(),
+            },
+        }
+    }
+
+    ///
+    /// Get information about a specific subscriber in an Automation email queue.
+    ///
+    /// Argument:
+    ///     subscriber_hash: The MD5 hash of the lowercase version of the list member’s email address.
+    ///
+    pub fn get_email_queue_info<'a>(
+        &self,
+        subscriber_hash: &'a str,
+    ) -> MailchimpResult<AutomationEmailQueueType> {
+        // GET /automations/{workflow_id}/emails/{workflow_email_id}/queue/{subscriber_hash}
+        let mut queue_endpoint = self.get_endpoint().clone();
+        queue_endpoint.push_str("/queue/");
+        queue_endpoint.push_str(subscriber_hash);
+        self._api.get::<AutomationEmailQueueType>(&queue_endpoint, HashMap::new())
+    }
+
+    ///
+    /// Add a subscriber to a workflow email
+    ///
+    pub fn add_subscriber_to_workflow<'a>(&self, email_address: &'a str) -> MailchimpResult<AutomationEmailQueueType> {
+        // POST /automations/{workflow_id}/emails/{workflow_email_id}/queue
+        let mut queue_endpoint = self._endpoint.clone();
+        queue_endpoint.push_str("/queue");
+        let mut payload = HashMap::new();
+        payload.insert("email_address".to_string(), email_address.to_string());
+        self._api.post::<AutomationEmailQueueType, HashMap<String, String>>(&queue_endpoint, payload)
     }
 
     ///

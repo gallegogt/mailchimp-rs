@@ -1,6 +1,6 @@
 use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
-use super::iter::{BuildIter, MalchimpIter};
+use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
 use super::types::{CampaignType, CampaignsType};
 use log::error;
 use std::cell::RefCell;
@@ -69,8 +69,8 @@ impl Default for CampaignFilter {
     }
 }
 
-impl CampaignFilter {
-    pub fn get_payload(&self) -> HashMap<String, String> {
+impl ResourceFilter for CampaignFilter {
+    fn build_payload(&self) -> HashMap<String, String> {
         let mut payload = HashMap::new();
 
         if self.fields.is_some() {
@@ -163,25 +163,20 @@ pub struct Campaigns {
     api: MailchimpApi,
 }
 
-impl BuildIter for Campaigns {
+#[derive(Debug)]
+pub struct CampaignsBuilder {}
+
+impl BuildIter for CampaignsBuilder {
     type Item = CampaignType;
     type FilterItem = CampaignFilter;
+    type Collection = CampaignsType;
 
-    ///
-    /// Obtiene los datos remotos y devuelve un listado
-    ///
-    fn get_data_from_remote(&self, filter: &Self::FilterItem) -> Vec<Self::Item> {
-        if let Some(resp) = self.get_campaigns_from_remote(Some(filter)) {
-            return resp.campaigns;
-        }
-        Vec::new()
-    }
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
         let mut in_data = data.clone();
-        in_data.set_api(&self.api);
+        in_data.set_api(api);
         in_data
     }
     ///
@@ -261,7 +256,7 @@ impl Campaigns {
     ) -> Option<CampaignsType> {
         let mut payload = HashMap::new();
         if filters.is_some() {
-            payload = filters.as_ref().unwrap().get_payload();
+            payload = filters.as_ref().unwrap().build_payload();
         }
         let response = self.api.get::<CampaignsType>("campaigns", payload);
         match response {
@@ -277,22 +272,26 @@ impl Campaigns {
     /// Función para recorrer todas las campañas exitentes. A diferencia de la
     /// anterior esta función te devuelve un iterador
     ///
-    pub fn iter(&self, filters: CampaignFilter) -> MalchimpIter<Self> {
+    pub fn iter(&self, filters: CampaignFilter) -> MalchimpIter<CampaignsBuilder> {
         if let Some(remote) = self.get_campaigns_from_remote(Some(&filters)) {
             return MalchimpIter {
-                builder: &self,
+                builder: CampaignsBuilder {},
                 data: RefCell::from(remote.campaigns),
                 cur_filters: filters.clone(),
                 cur_it: 0,
                 total_items: remote.total_items,
+                api: self.api.clone(),
+                endpoint: "campaigns".to_string(),
             };
         }
         MalchimpIter {
-            builder: &self,
+            builder: CampaignsBuilder {},
             data: RefCell::from(Vec::new()),
             cur_filters: filters.clone(),
             cur_it: 0,
             total_items: 0,
+            api: self.api.clone(),
+            endpoint: "campaigns".to_string(),
         }
     }
 }

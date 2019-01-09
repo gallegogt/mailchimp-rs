@@ -1,6 +1,7 @@
 use super::contact::ContactType;
 use super::link::LinkType;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
+use crate::iter::MailchimpCollection;
 
 // ============ Campaign Defaults	 ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -216,4 +217,25 @@ pub struct ListsType {
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
+}
+
+impl MailchimpCollection<ListType> for ListsType {
+    /// Total Items
+    fn get_total_items(&self) -> u32 {
+        self.total_items
+    }
+    /// Data
+    fn get_values(&self) -> Vec<ListType> {
+        self.lists.clone()
+    }
+}
+
+impl Default for ListsType {
+    fn default() -> Self {
+        ListsType {
+            lists: Vec::new(),
+            total_items: 0,
+            _links: Vec::new(),
+        }
+    }
 }

@@ -1,9 +1,9 @@
 use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
-use super::iter::{BuildIter, MalchimpIter};
+use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
 use super::types::{
     AutomationCampaignSettingsType, AutomationModifier, AutomationTriggerType,
-    AutomationWorkflowType, AutomationsType, RecipientType,
+    AutomationWorkflowType, CollectionAutomation, RecipientType,
 };
 use log::error;
 use std::cell::RefCell;
@@ -54,8 +54,8 @@ impl Default for AutomationsFilter {
     }
 }
 
-impl AutomationsFilter {
-    pub fn get_payload(&self) -> HashMap<String, String> {
+impl ResourceFilter for AutomationsFilter {
+    fn build_payload(&self) -> HashMap<String, String> {
         let mut payload = HashMap::new();
 
         if self.fields.is_some() {
@@ -118,25 +118,20 @@ pub struct Automations {
     api: MailchimpApi,
 }
 
-impl BuildIter for Automations {
+#[derive(Debug)]
+pub struct AutomationsBuilder {}
+
+impl BuildIter for AutomationsBuilder {
     type Item = AutomationWorkflowType;
     type FilterItem = AutomationsFilter;
+    type Collection = CollectionAutomation;
 
-    ///
-    /// Obtiene los datos remotos y devuelve un listado
-    ///
-    fn get_data_from_remote(&self, filter: &Self::FilterItem) -> Vec<Self::Item> {
-        if let Some(resp) = self.get_automations_from_remote(Some(filter)) {
-            return resp.automations;
-        }
-        Vec::new()
-    }
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
         let mut in_data = data.clone();
-        in_data.set_api(&self.api);
+        in_data.set_api(&api);
         in_data
     }
     ///
@@ -182,12 +177,12 @@ impl Automations {
     pub fn get_automations_from_remote(
         &self,
         filters: Option<&AutomationsFilter>,
-    ) -> Option<AutomationsType> {
+    ) -> Option<CollectionAutomation> {
         let mut payload = HashMap::new();
         if filters.is_some() {
-            payload = filters.as_ref().unwrap().get_payload();
+            payload = filters.as_ref().unwrap().build_payload();
         }
-        let response = self.api.get::<AutomationsType>("automations", payload);
+        let response = self.api.get::<CollectionAutomation>("automations", payload);
         match response {
             Ok(value) => Some(value),
             Err(e) => {
@@ -266,22 +261,26 @@ impl Automations {
     /// Función para recorrer todas las campañas exitentes. A diferencia de la
     /// anterior esta función te devuelve un iterador
     ///
-    pub fn iter(&self, filters: AutomationsFilter) -> MalchimpIter<Self> {
+    pub fn iter(&self, filters: AutomationsFilter) -> MalchimpIter<AutomationsBuilder> {
         if let Some(remote) = self.get_automations_from_remote(Some(&filters)) {
             return MalchimpIter {
-                builder: &self,
+                builder: AutomationsBuilder {},
                 data: RefCell::from(remote.automations),
                 cur_filters: filters.clone(),
                 cur_it: 0,
                 total_items: remote.total_items,
+                api: self.api.clone(),
+                endpoint: "automations".to_string(),
             };
         }
         MalchimpIter {
-            builder: &self,
+            builder: AutomationsBuilder {},
             data: RefCell::from(Vec::new()),
             cur_filters: filters.clone(),
             cur_it: 0,
             total_items: 0,
+            api: self.api.clone(),
+            endpoint: "automations".to_string(),
         }
     }
 }

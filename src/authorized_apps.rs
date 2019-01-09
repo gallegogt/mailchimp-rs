@@ -1,6 +1,6 @@
 use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
-use super::iter::{BuildIter, MalchimpIter};
+use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
 use crate::types::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType};
 use log::error;
 use std::cell::RefCell;
@@ -32,8 +32,8 @@ impl Default for AuthorizedFilter {
     }
 }
 
-impl AuthorizedFilter {
-    pub fn get_payload(&self) -> HashMap<String, String> {
+impl ResourceFilter for AuthorizedFilter {
+    fn build_payload(&self) -> HashMap<String, String> {
         let mut payload = HashMap::new();
 
         if self.fields.is_some() {
@@ -68,26 +68,20 @@ impl AuthorizedFilter {
 pub struct AuthorizedApps {
     api: MailchimpApi,
 }
+#[derive(Debug)]
+pub struct AuthorizedAppsBuilder {}
 
-impl BuildIter for AuthorizedApps {
+impl BuildIter for AuthorizedAppsBuilder {
     type Item = AuthorizedAppType;
     type FilterItem = AuthorizedFilter;
+    type Collection = AuthorizedAppsType;
 
-    ///
-    /// Obtiene los datos remotos y devuelve un listado
-    ///
-    fn get_data_from_remote(&self, filter: &Self::FilterItem) -> Vec<Self::Item> {
-        if let Some(resp) = self.get_authorized_apps_from_remote(Some(filter)) {
-            return resp.apps;
-        }
-        Vec::new()
-    }
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
         let mut in_data = data.clone();
-        in_data.set_api(&self.api);
+        in_data.set_api(api);
         in_data
     }
     ///
@@ -130,7 +124,7 @@ impl AuthorizedApps {
     ) -> Option<AuthorizedAppsType> {
         let mut payload = HashMap::new();
         if filters.is_some() {
-            payload = filters.as_ref().unwrap().get_payload();
+            payload = filters.as_ref().unwrap().build_payload();
         }
         let response = self
             .api
@@ -202,23 +196,27 @@ impl AuthorizedApps {
     /// Función para recorrer todas las campañas exitentes. A diferencia de la
     /// anterior esta función te devuelve un iterador
     ///
-    pub fn iter(&self, filters: AuthorizedFilter) -> MalchimpIter<Self> {
+    pub fn iter(&self, filters: AuthorizedFilter) -> MalchimpIter<AuthorizedAppsBuilder> {
         if let Some(remote) = self.get_authorized_apps_from_remote(Some(&filters)) {
             return MalchimpIter {
-                builder: &self,
+                builder: AuthorizedAppsBuilder {},
                 data: RefCell::from(remote.apps),
                 cur_filters: filters.clone(),
                 cur_it: 0,
                 total_items: remote.total_items,
+                api: self.api.clone(),
+                endpoint: "authorized-apps".to_string(),
             };
         }
 
         MalchimpIter {
-            builder: &self,
+            builder: AuthorizedAppsBuilder {},
             data: RefCell::from(Vec::new()),
             cur_filters: filters.clone(),
             cur_it: 0,
             total_items: 0,
+            api: self.api.clone(),
+            endpoint: "authorized-apps".to_string(),
         }
     }
 }
