@@ -5,6 +5,7 @@ use super::automation_campaign::{
 use super::campaign_content::{CampaignContentType, CampaignContentParam};
 use super::empty::EmptyType;
 use super::link::LinkType;
+use super::campaign_send_checklist::SendChecklistType;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
@@ -699,6 +700,34 @@ impl CampaignType {
         // PUT /campaigns/{campaign_id}/content
         let endpoint = self.get_base_endpoint() + "/content";
         self._api.put::<CampaignContentType, CampaignContentParam>(&endpoint, param)
+    }
+
+
+    // ======================== Send Checklist ===========
+    ///
+    /// Review the send checklist for a campaign, and resolve any issues before sending.
+    ///
+    /// Arguments:
+    ///     fields: A comma-separated list of fields to return. Reference parameters
+    ///         of sub-objects with dot notation.
+    ///     exclude_fields: A comma-separated list of fields to exclude. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///
+    pub fn send_checklist(
+        &self,
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+    ) -> MailchimpResult<SendChecklistType> {
+        // GET /campaigns/{campaign_id}/send-checklist
+        let endpoint = self.get_base_endpoint() + "/send-checklist";
+        let mut payload = HashMap::new();
+        if let Some(field) = fields {
+            payload.insert("fields".to_string(), field);
+        }
+        if let Some(ef) = exclude_fields {
+            payload.insert("exclude_fields".to_string(), ef);
+        }
+        self._api.get::<SendChecklistType>(endpoint.as_str(), payload)
     }
 
     ///
