@@ -520,12 +520,36 @@ pub struct EmailParam {
 }
 
 impl EmailParam {
-    fn new(test_emails: Vec<String>, send_type: String) -> Self {
+    pub fn new(test_emails: Vec<String>, send_type: String) -> Self {
         EmailParam {
             test_emails: test_emails,
             send_type: send_type,
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct UpdateCampaignParam {
+    /// List settings for the campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recipients: Option<RecipientType>,
+    /// The settings for your campaign, including subject, from name,
+    /// reply-to address, and more.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub settings: Option<CampaignSettingsType>,
+    /// The settings specific to A/B test campaigns.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub variate_settings: Option<VariateSettingsType>,
+    /// The tracking options for a campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tracking: Option<CampaignTrackingOptionsType>,
+    /// RSS options for a campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rss_opts: Option<RSSOptionsType>,
+    /// The preview for the campaign, rendered by social networks like
+    /// Facebook and Twitter. Learn more.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub social_card: Option<SocialCardType>,
 }
 
 impl CampaignType {
@@ -626,6 +650,16 @@ impl CampaignType {
             Ok(_) => Ok(true),
             Err(e) => Err(e),
         }
+    }
+
+    // ==== UPDATE ===========
+    ///
+    /// Remove a campaign from your Mailchimp account.
+    ///
+    pub fn update(&self, param: UpdateCampaignParam) -> MailchimpResult<CampaignType> {
+        // DELETE /campaigns/{campaign_id}
+        let endpoint = self.get_base_endpoint();
+        self._api.patch::<CampaignType, UpdateCampaignParam>(&endpoint, param)
     }
 
     ///
