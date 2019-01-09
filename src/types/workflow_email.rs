@@ -12,7 +12,6 @@ use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
 use crate::iter::{MalchimpIter, ResourceFilter};
-use std::cell::RefCell;
 use std::collections::HashMap;
 
 // ============ Workflow Email ==============
@@ -174,7 +173,7 @@ impl WorkflowEmailType {
         match response {
             Ok(collection) => MalchimpIter {
                 builder: AutomationEmailQueueBuilder {},
-                data: RefCell::from(collection.queue),
+                data: collection.queue,
                 cur_filters: filters.clone(),
                 cur_it: 0,
                 total_items: collection.total_items,
@@ -183,7 +182,7 @@ impl WorkflowEmailType {
             },
             Err(_) => MalchimpIter {
                 builder: AutomationEmailQueueBuilder {},
-                data: RefCell::from(Vec::new()),
+                data: Vec::new(),
                 cur_filters: filters.clone(),
                 cur_it: 0,
                 total_items: 0,
@@ -207,19 +206,24 @@ impl WorkflowEmailType {
         let mut queue_endpoint = self.get_endpoint().clone();
         queue_endpoint.push_str("/queue/");
         queue_endpoint.push_str(subscriber_hash);
-        self._api.get::<AutomationEmailQueueType>(&queue_endpoint, HashMap::new())
+        self._api
+            .get::<AutomationEmailQueueType>(&queue_endpoint, HashMap::new())
     }
 
     ///
     /// Add a subscriber to a workflow email
     ///
-    pub fn add_subscriber_to_workflow<'a>(&self, email_address: &'a str) -> MailchimpResult<AutomationEmailQueueType> {
+    pub fn add_subscriber_to_workflow<'a>(
+        &self,
+        email_address: &'a str,
+    ) -> MailchimpResult<AutomationEmailQueueType> {
         // POST /automations/{workflow_id}/emails/{workflow_email_id}/queue
         let mut queue_endpoint = self._endpoint.clone();
         queue_endpoint.push_str("/queue");
         let mut payload = HashMap::new();
         payload.insert("email_address".to_string(), email_address.to_string());
-        self._api.post::<AutomationEmailQueueType, HashMap<String, String>>(&queue_endpoint, payload)
+        self._api
+            .post::<AutomationEmailQueueType, HashMap<String, String>>(&queue_endpoint, payload)
     }
 
     ///
@@ -249,7 +253,7 @@ pub struct WorkflowEmailsType {
     pub emails: Vec<WorkflowEmailType>,
     /// Desc: The total number of items matching the query regardless of pagination.
     #[serde(default)]
-    pub total_items: u32,
+    pub total_items: u64,
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,

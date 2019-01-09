@@ -46,7 +46,10 @@ fn main() {
         Ok(campaign) => {
             println!("\nCampaign");
             println!("\tid    {:?}", campaign.id.as_ref().unwrap());
-            println!("\tCampaign Title   {:?}", campaign.settings.as_ref().unwrap().title);
+            println!(
+                "\tCampaign Title   {:?}",
+                campaign.settings.as_ref().unwrap().title
+            );
 
             match &campaign.get_content(None, None) {
                 Ok(content) => {
@@ -54,12 +57,11 @@ fn main() {
                     println!("Variate Contents: {:?}", content.variate_contents);
                     println!("Plain Text: {:?}", content.plain_text);
                     println!("HTML: {:?}", content.html);
-                },
+                }
                 Err(e) => {
                     println!("Content Error: {:?}", e);
                 }
             }
-
         }
         Err(e) => println!("{:?}", e),
     };

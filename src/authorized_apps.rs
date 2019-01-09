@@ -3,7 +3,6 @@ use super::internal::request::MailchimpResult;
 use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
 use crate::types::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType};
 use log::error;
-use std::cell::RefCell;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -200,7 +199,7 @@ impl AuthorizedApps {
         if let Some(remote) = self.get_authorized_apps_from_remote(Some(&filters)) {
             return MalchimpIter {
                 builder: AuthorizedAppsBuilder {},
-                data: RefCell::from(remote.apps),
+                data: remote.apps,
                 cur_filters: filters.clone(),
                 cur_it: 0,
                 total_items: remote.total_items,
@@ -211,7 +210,7 @@ impl AuthorizedApps {
 
         MalchimpIter {
             builder: AuthorizedAppsBuilder {},
-            data: RefCell::from(Vec::new()),
+            data: Vec::new(),
             cur_filters: filters.clone(),
             cur_it: 0,
             total_items: 0,

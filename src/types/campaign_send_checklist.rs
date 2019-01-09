@@ -6,7 +6,7 @@ use super::link::LinkType;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ChecklistItem {
     /// The item type. success warning error
-    #[serde(default, rename="type")]
+    #[serde(default, rename = "type")]
     pub item_type: String,
     /// The ID for the specific item.
     #[serde(default)]

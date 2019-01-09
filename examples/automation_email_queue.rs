@@ -5,7 +5,7 @@ use dotenv::dotenv;
 use std::env;
 
 use mailchimp::Automations;
-use mailchimp::{MailchimpApi, AutomationsFilter};
+use mailchimp::{AutomationsFilter, MailchimpApi};
 
 fn main() {
     // Inicializando el dotenv

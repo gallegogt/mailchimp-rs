@@ -2,14 +2,19 @@ use super::automation_campaign::{
     CampaignReportSummaryType, CampaignSettingsType, CampaignTrackingOptionsType, RecipientType,
     SocialCardType,
 };
-use super::campaign_content::{CampaignContentType, CampaignContentParam};
+use super::campaign_content::{CampaignContentParam, CampaignContentType};
+use super::campaign_feedback::{
+    CampaignFeedbackBuilder, CampaignFeedbackType, CollectionCampaignFeedback,
+};
+use super::campaign_send_checklist::SendChecklistType;
 use super::empty::EmptyType;
 use super::link::LinkType;
-use super::campaign_send_checklist::SendChecklistType;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
+use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
 use std::collections::HashMap;
+
 ///
 /// The days of the week to send a daily RSS Campaign.
 ///
@@ -446,7 +451,7 @@ pub struct CampaignsType {
     pub campaigns: Vec<CampaignType>,
     /// Desc: The total number of items matching the query regardless of pagination.
     #[serde(default)]
-    pub total_items: u32,
+    pub total_items: u64,
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
@@ -454,7 +459,7 @@ pub struct CampaignsType {
 
 impl MailchimpCollection<CampaignType> for CampaignsType {
     /// Total Items
-    fn get_total_items(&self) -> u32 {
+    fn get_total_items(&self) -> u64 {
         self.total_items
     }
     /// Data
@@ -690,18 +695,22 @@ impl CampaignType {
         if let Some(ef) = exclude_fields {
             payload.insert("exclude_fields".to_string(), ef);
         }
-        self._api.get::<CampaignContentType>(endpoint.as_str(), payload)
+        self._api
+            .get::<CampaignContentType>(endpoint.as_str(), payload)
     }
 
     ///
     /// Set the content for a campaign.
     ///
-    pub fn update_content(&self, param: CampaignContentParam) -> MailchimpResult<CampaignContentType> {
+    pub fn update_content(
+        &self,
+        param: CampaignContentParam,
+    ) -> MailchimpResult<CampaignContentType> {
         // PUT /campaigns/{campaign_id}/content
         let endpoint = self.get_base_endpoint() + "/content";
-        self._api.put::<CampaignContentType, CampaignContentParam>(&endpoint, param)
+        self._api
+            .put::<CampaignContentType, CampaignContentParam>(&endpoint, param)
     }
-
 
     // ======================== Send Checklist ===========
     ///
@@ -727,7 +736,94 @@ impl CampaignType {
         if let Some(ef) = exclude_fields {
             payload.insert("exclude_fields".to_string(), ef);
         }
-        self._api.get::<SendChecklistType>(endpoint.as_str(), payload)
+        self._api
+            .get::<SendChecklistType>(endpoint.as_str(), payload)
+    }
+    // ======================== Feedback ===========
+    ///
+    /// Get team feedback while you’re working together on a Mailchimp campaign.
+    ///
+    /// Arguments:
+    ///     fields: A comma-separated list of fields to return. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///     exclude_fields: A comma-separated list of fields to exclude.
+    ///         Reference parameters of sub-objects with dot notation.
+    ///
+    pub fn get_feedbacks(
+        &self,
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+    ) -> MalchimpIter<CampaignFeedbackBuilder> {
+        // GET /campaigns/{campaign_id}/feedback
+        let endpoint = self.get_base_endpoint() + "/feedback";
+        let mut filters = SimpleFilter::default();
+
+        if let Some(f) = fields {
+            filters.fields = Some(f.clone())
+        }
+        if let Some(ex) = exclude_fields {
+            filters.exclude_fields = Some(ex.clone())
+        }
+
+        let payload = filters.build_payload();
+        let response = self
+            ._api
+            .get::<CollectionCampaignFeedback>(&endpoint, payload);
+        match response {
+            Ok(collection) => MalchimpIter {
+                builder: CampaignFeedbackBuilder {
+                    endpoint: endpoint.clone(),
+                },
+                data: collection.feedback,
+                cur_filters: filters.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                println!("Feedback Iter {:?}", e);
+                MalchimpIter {
+                    builder: CampaignFeedbackBuilder {
+                        endpoint: endpoint.clone(),
+                    },
+                    data: Vec::new(),
+                    cur_filters: filters.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+    }
+
+    pub fn get_feedback_info<'a>(
+        &self,
+        feedback_id: &'a str,
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+    ) -> MailchimpResult<CampaignFeedbackType> {
+        // GET /campaigns/{campaign_id}/feedback/{feedback_id}
+        let mut endpoint = self.get_base_endpoint() + "/feedback/";
+        endpoint = endpoint + feedback_id;
+        let mut payload = HashMap::new();
+        if let Some(f) = fields {
+            payload.insert("fields".to_string(), f.clone());
+        }
+        if let Some(ex) = exclude_fields {
+            payload.insert("exclude_fields".to_string(), ex.clone());
+        }
+
+        match self._api.get::<CampaignFeedbackType>(&endpoint, payload) {
+            Ok(feedback) => {
+                let mut n_f = feedback;
+                n_f.set_api(&self._api);
+                n_f.set_endpoint(&endpoint);
+                Ok(n_f)
+            }
+            Err(e) => Err(e),
+        }
     }
 
     ///

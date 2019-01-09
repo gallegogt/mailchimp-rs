@@ -62,7 +62,7 @@ pub struct AuthorizedAppsType {
     pub apps: AuthorizedAppList,
     /// Desc: The total number of items matching the query regardless of pagination.
     #[serde(default)]
-    pub total_items: u32,
+    pub total_items: u64,
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
@@ -70,7 +70,7 @@ pub struct AuthorizedAppsType {
 
 impl MailchimpCollection<AuthorizedAppType> for AuthorizedAppsType {
     /// Total Items
-    fn get_total_items(&self) -> u32 {
+    fn get_total_items(&self) -> u64 {
         self.total_items
     }
     /// Data

@@ -23,7 +23,10 @@ fn main() {
     for w in r_campaigns.iter(CampaignFilter::default()) {
         count += 1;
         println!("\n Campaign {:}", count);
-        println!("\t Campaign Title   {:?}", w.settings.as_ref().unwrap().title);
+        println!(
+            "\t Campaign Title   {:?}",
+            w.settings.as_ref().unwrap().title
+        );
         println!("=============================================");
 
         for feedback in w.get_feedbacks(None, None) {
@@ -35,6 +38,5 @@ fn main() {
 
             println!("=============================================");
         }
-
     }
 }
