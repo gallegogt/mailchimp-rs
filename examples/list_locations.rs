@@ -1,8 +1,8 @@
 extern crate dotenv;
 extern crate mailchimp;
 use dotenv::dotenv;
-use std::env;
 use mailchimp::{ListFilter, Lists, MailchimpApi};
+use std::env;
 
 fn main() {
     // Inicializando el dotenv

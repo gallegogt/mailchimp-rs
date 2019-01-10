@@ -1,11 +1,11 @@
 use super::contact::ContactType;
 use super::link::LinkType;
-use crate::api::{MailchimpApi, MailchimpApiUpdate};
-use crate::iter::MailchimpCollection;
 use super::list_activity::{CollectionListActivity, ListActivityBuilder};
 use super::list_clients::{CollectionListClients, ListClientsBuilder};
 use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
-use crate::iter::{MalchimpIter, SimpleFilter, ResourceFilter};
+use crate::api::{MailchimpApi, MailchimpApiUpdate};
+use crate::iter::MailchimpCollection;
+use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
 use log::error;
 
 // ============ Campaign Defaults	 ==============
@@ -245,7 +245,6 @@ impl Default for ListsType {
     }
 }
 
-
 impl ListType {
     ///
     /// Get up to the previous 180 days of daily detailed aggregated activity
@@ -257,7 +256,11 @@ impl ListType {
     ///     exclude_fields: A comma-separated list of fields to exclude. Reference
     ///         parameters of sub-objects with dot notation.
     ///
-    pub fn get_activity(&self, fields: Option<String>, exclude_fields: Option<String>) -> MalchimpIter<ListActivityBuilder> {
+    pub fn get_activity(
+        &self,
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+    ) -> MalchimpIter<ListActivityBuilder> {
         let endpoint = self.get_base_endpoint() + "/activity";
         let mut filter_params = SimpleFilter::default();
 
@@ -269,7 +272,10 @@ impl ListType {
             filter_params.exclude_fields = Some(ex);
         }
 
-        match self._api.get::<CollectionListActivity>(&endpoint, filter_params.build_payload()) {
+        match self
+            ._api
+            .get::<CollectionListActivity>(&endpoint, filter_params.build_payload())
+        {
             Ok(collection) => MalchimpIter {
                 builder: ListActivityBuilder {},
                 data: collection.activity,
@@ -292,7 +298,6 @@ impl ListType {
                 }
             }
         }
-
     }
     ///
     /// Get a list of the top email clients based on user-agent strings.
@@ -303,7 +308,11 @@ impl ListType {
     ///     exclude_fields: A comma-separated list of fields to exclude. Reference
     ///         parameters of sub-objects with dot notation.
     ///
-    pub fn get_clients(&self, fields: Option<String>, exclude_fields: Option<String>) -> MalchimpIter<ListClientsBuilder> {
+    pub fn get_clients(
+        &self,
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+    ) -> MalchimpIter<ListClientsBuilder> {
         // GET /lists/{list_id}/clients
         let endpoint = self.get_base_endpoint() + "/clients";
         let mut filter_params = SimpleFilter::default();
@@ -316,7 +325,10 @@ impl ListType {
             filter_params.exclude_fields = Some(ex);
         }
 
-        match self._api.get::<CollectionListClients>(&endpoint, filter_params.build_payload()) {
+        match self
+            ._api
+            .get::<CollectionListClients>(&endpoint, filter_params.build_payload())
+        {
             Ok(collection) => MalchimpIter {
                 builder: ListClientsBuilder {},
                 data: collection.clients,
@@ -339,7 +351,6 @@ impl ListType {
                 }
             }
         }
-
     }
 
     ///
@@ -352,7 +363,11 @@ impl ListType {
     ///     exclude_fields: A comma-separated list of fields to exclude. Reference
     ///         parameters of sub-objects with dot notation.
     ///
-    pub fn get_locations(&self, fields: Option<String>, exclude_fields: Option<String>) -> MalchimpIter<ListLocationsBuilder> {
+    pub fn get_locations(
+        &self,
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+    ) -> MalchimpIter<ListLocationsBuilder> {
         // GET /lists/{list_id}/locations
         let endpoint = self.get_base_endpoint() + "/locations";
         let mut filter_params = SimpleFilter::default();
@@ -365,7 +380,10 @@ impl ListType {
             filter_params.exclude_fields = Some(ex);
         }
 
-        match self._api.get::<CollectionListLocations>(&endpoint, filter_params.build_payload()) {
+        match self
+            ._api
+            .get::<CollectionListLocations>(&endpoint, filter_params.build_payload())
+        {
             Ok(collection) => MalchimpIter {
                 builder: ListLocationsBuilder {},
                 data: collection.locations,
@@ -388,7 +406,6 @@ impl ListType {
                 }
             }
         }
-
     }
 
     ///
