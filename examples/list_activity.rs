@@ -26,7 +26,10 @@ fn main() {
         println!("\tStats   {:?}", w.stats.as_ref().unwrap());
         println!("=============================================");
 
-        for activity in w.get_activity(None, None) {
+        // Show last list activity symmary (today)
+        let mut iter_act = w.get_activity(None, None);
+        if let Some(activity) = iter_act.next() {
+        // for activity in w.get_activity(None, None) {
             println!("\nList Activity");
             println!("Day {:?}", activity.day);
             println!("Emails Sent {:?}", activity.emails_sent);
