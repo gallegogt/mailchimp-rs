@@ -1,14 +1,14 @@
 [package]
 name = "mailchimp"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Yolier Galan Tasse <gallegogt@gmail.com>"]
 edition = "2018"
-description = "Biblioteca de desarrollo para acceder al API de [Mailchimp](https://developer.mailchimp.com), utilizando como lenguaje de programación Rust"
+description = "Biblioteca de desarrollo con la que podrás acceder de forma fácil a la información de tu cuenta de [Mailchimp](https://mailchimp.com). [API Mailchimp](https://developer.mailchimp.com)"
 readme = "README.md"
 license-file = "LICENCE"
 repository = "https://github.com/gallegogt/mailchimp-rs.git"
 homepage = "https://github.com/gallegogt/mailchimp-rs"
-keywords = ["mailchimp", "API", "email", "automation"]
+keywords = ["mailchimp", "API", "email", "automation", "development", "HTTP", "client"]
 include = [
     "**/*.rs",
     "Cargo.toml",
