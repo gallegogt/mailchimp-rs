@@ -2,7 +2,7 @@ use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
 
-// ============ Workflow Email ==============
+// ============ List Activity ==============
 ///
 ///  Get up to the previous 180 days of daily detailed aggregated activity stats
 /// for a list, not including Automation activity.

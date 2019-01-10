@@ -3,6 +3,7 @@ use super::link::LinkType;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::iter::MailchimpCollection;
 use super::list_activity::{CollectionListActivity, ListActivityBuilder};
+use super::list_clients::{CollectionListClients, ListClientsBuilder};
 use crate::iter::{MalchimpIter, SimpleFilter, ResourceFilter};
 use log::error;
 
@@ -249,6 +250,12 @@ impl ListType {
     /// Get up to the previous 180 days of daily detailed aggregated activity
     /// stats for a list, not including Automation activity.
     ///
+    /// Arguments:
+    ///     fields: A comma-separated list of fields to return. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///     exclude_fields: A comma-separated list of fields to exclude. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///
     pub fn get_activity(&self, fields: Option<String>, exclude_fields: Option<String>) -> MalchimpIter<ListActivityBuilder> {
         let endpoint = self.get_base_endpoint() + "/activity";
         let mut filter_params = SimpleFilter::default();
@@ -275,6 +282,53 @@ impl ListType {
                 error!( target: "mailchimp",  "Get Activities: Response Error details: {:?}", e);
                 MalchimpIter {
                     builder: ListActivityBuilder {},
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+
+    }
+    ///
+    /// Get a list of the top email clients based on user-agent strings.
+    ///
+    /// Arguments:
+    ///     fields: A comma-separated list of fields to return. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///     exclude_fields: A comma-separated list of fields to exclude. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///
+    pub fn get_clients(&self, fields: Option<String>, exclude_fields: Option<String>) -> MalchimpIter<ListClientsBuilder> {
+        // GET /lists/{list_id}/clients
+        let endpoint = self.get_base_endpoint() + "/clients";
+        let mut filter_params = SimpleFilter::default();
+
+        if let Some(f) = fields {
+            filter_params.fields = Some(f);
+        }
+
+        if let Some(ex) = exclude_fields {
+            filter_params.exclude_fields = Some(ex);
+        }
+
+        match self._api.get::<CollectionListClients>(&endpoint, filter_params.build_payload()) {
+            Ok(collection) => MalchimpIter {
+                builder: ListClientsBuilder {},
+                data: collection.clients,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get Clients: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListClientsBuilder {},
                     data: Vec::new(),
                     cur_filters: filter_params.clone(),
                     cur_it: 0,
