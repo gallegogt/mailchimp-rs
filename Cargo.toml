@@ -8,7 +8,7 @@ readme = "README.md"
 license-file = "LICENCE"
 repository = "https://github.com/gallegogt/mailchimp-rs.git"
 homepage = "https://github.com/gallegogt/mailchimp-rs"
-keywords = ["mailchimp", "API", "email", "automation", "development", "HTTP", "client"]
+keywords = ["mailchimp", "http", "email", "automation", "api"]
 include = [
     "**/*.rs",
     "Cargo.toml",
