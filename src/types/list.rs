@@ -3,9 +3,12 @@ use super::link::LinkType;
 use super::list_activity::{CollectionListActivity, ListActivityBuilder};
 use super::list_clients::{CollectionListClients, ListClientsBuilder};
 use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
+use super::list_abuse_report::{CollectionListAbuseReport, ListAbuseReportBuilder, ListAbuseReportType};
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::iter::MailchimpCollection;
 use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
+use crate::internal::request::MailchimpResult;
+use std::collections::HashMap;
 use log::error;
 
 // ============ Campaign Defaults	 ==============
@@ -406,6 +409,92 @@ impl ListType {
                 }
             }
         }
+    }
+
+    ///
+    /// Get all abuse reports for a specific list.
+    ///
+    /// Arguments:
+    ///     fields: A comma-separated list of fields to return. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///     exclude_fields: A comma-separated list of fields to exclude. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///     offset: The number of records from a collection to skip.
+    ///         Iterating over large collections with this parameter can be slow.
+    ///         Default value is 0.
+    ///
+    pub fn get_abuse_reports(
+        &self,
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+        offset: Option<u64>
+    ) -> MalchimpIter<ListAbuseReportBuilder> {
+        // GET /lists/{list_id}/abuse-reports
+        let endpoint = self.get_base_endpoint() + "/abuse-reports";
+        let mut filter_params = SimpleFilter::default();
+
+        if let Some(f) = fields {
+            filter_params.fields = Some(f);
+        }
+
+        if let Some(ex) = exclude_fields {
+            filter_params.exclude_fields = Some(ex);
+        }
+        if let Some(ofs) = offset {
+            filter_params.offset = Some(ofs);
+        }
+
+        match self
+            ._api
+            .get::<CollectionListAbuseReport>(&endpoint, filter_params.build_payload())
+        {
+            Ok(collection) => MalchimpIter {
+                builder: ListAbuseReportBuilder {},
+                data: collection.abuse_reports,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get Locations: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListAbuseReportBuilder {},
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+    }
+
+    ///
+    /// Get details about a specific abuse report.
+    ///
+    /// Arguments:
+    ///     fields: A comma-separated list of fields to return. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///     exclude_fields: A comma-separated list of fields to exclude. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///     offset: The number of records from a collection to skip.
+    ///         Iterating over large collections with this parameter can be slow.
+    ///         Default value is 0.
+    ///
+    pub fn get_specific_abuse_reports(
+        &self,
+        report_id: String
+    ) ->  MailchimpResult<ListAbuseReportType> {
+        // GET /lists/{list_id}/abuse-reports/{report_id}
+        let endpoint = self.get_base_endpoint() + "/abuse-reports";
+        let mut params = HashMap::new();
+        params.insert("report_id".to_string(), report_id);
+
+        self._api
+            .get::<ListAbuseReportType>(&endpoint, params)
     }
 
     ///

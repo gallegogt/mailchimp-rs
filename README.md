@@ -113,7 +113,7 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
   * ✅ Get information about all lists
   * ✅ Get information about a specific list
 
-    * 🔘 **Abuse Reports**
+    * ✅ **Abuse Reports**
     * ✅ **Activity**
     * ✅ **Clients**
     * 🔘 **Growth History**
