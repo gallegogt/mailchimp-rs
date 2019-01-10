@@ -114,11 +114,11 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
   * ✅ Get information about a specific list
 
     * 🔘 **Abuse Reports**
-    * 🔘 **Activity**
-    * 🔘 **Clients**
+    * ✅ **Activity**
+    * ✅ **Clients**
     * 🔘 **Growth History**
     * 🔘 **Interest Categories**
-    * 🔘 **Locations**
+    * ✅ **Locations**
     * 🔘 **Members**
     * 🔘 **Merge Fields**
     * 🔘 **Segments**
