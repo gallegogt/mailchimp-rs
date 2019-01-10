@@ -16,6 +16,7 @@ mod list_activity;
 mod list_clients;
 mod list_locations;
 mod list_abuse_report;
+mod list_growth_history;
 mod workflow_email;
 
 pub use self::api_root::*;
@@ -36,4 +37,5 @@ pub use self::list_activity::*;
 pub use self::list_clients::*;
 pub use self::list_locations::*;
 pub use self::list_abuse_report::*;
+pub use self::list_growth_history::*;
 pub use self::workflow_email::*;

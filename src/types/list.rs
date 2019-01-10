@@ -1,15 +1,21 @@
 use super::contact::ContactType;
 use super::link::LinkType;
+use super::list_abuse_report::{
+    CollectionListAbuseReport, ListAbuseReportBuilder, ListAbuseReportType,
+};
 use super::list_activity::{CollectionListActivity, ListActivityBuilder};
 use super::list_clients::{CollectionListClients, ListClientsBuilder};
+use super::list_growth_history::{
+    CollectionListGrowthHistory, ListGrowthHistoryBuilder, ListGrowthHistoryFilter,
+    ListGrowthHistoryType,
+};
 use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
-use super::list_abuse_report::{CollectionListAbuseReport, ListAbuseReportBuilder, ListAbuseReportType};
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
+use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
 use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
-use crate::internal::request::MailchimpResult;
-use std::collections::HashMap;
 use log::error;
+use std::collections::HashMap;
 
 // ============ Campaign Defaults	 ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -427,7 +433,7 @@ impl ListType {
         &self,
         fields: Option<String>,
         exclude_fields: Option<String>,
-        offset: Option<u64>
+        offset: Option<u64>,
     ) -> MalchimpIter<ListAbuseReportBuilder> {
         // GET /lists/{list_id}/abuse-reports
         let endpoint = self.get_base_endpoint() + "/abuse-reports";
@@ -458,7 +464,7 @@ impl ListType {
                 endpoint: endpoint.clone(),
             },
             Err(e) => {
-                error!( target: "mailchimp",  "Get Locations: Response Error details: {:?}", e);
+                error!( target: "mailchimp",  "Get Abuse Reports: Response Error details: {:?}", e);
                 MalchimpIter {
                     builder: ListAbuseReportBuilder {},
                     data: Vec::new(),
@@ -476,25 +482,93 @@ impl ListType {
     /// Get details about a specific abuse report.
     ///
     /// Arguments:
+    ///     report_id: Abuse Report Id
+    ///
+    pub fn get_specific_abuse_report<'a>(
+        &self,
+        report_id: &'a str,
+    ) -> MailchimpResult<ListAbuseReportType> {
+        // GET /lists/{list_id}/abuse-reports/{report_id}
+        let mut endpoint = self.get_base_endpoint() + "/abuse-reports/";
+        endpoint.push_str(report_id);
+
+        self._api.get::<ListAbuseReportType>(&endpoint, HashMap::new())
+    }
+
+    ///
+    /// Get a month-by-month summary of a specific list’s growth activity.
+    ///
+    /// Arguments:
     ///     fields: A comma-separated list of fields to return. Reference
     ///         parameters of sub-objects with dot notation.
     ///     exclude_fields: A comma-separated list of fields to exclude. Reference
     ///         parameters of sub-objects with dot notation.
-    ///     offset: The number of records from a collection to skip.
-    ///         Iterating over large collections with this parameter can be slow.
-    ///         Default value is 0.
+    ///     sort_dir: Determines the order direction for sorted results.
     ///
-    pub fn get_specific_abuse_reports(
+    pub fn get_growth_history(
         &self,
-        report_id: String
-    ) ->  MailchimpResult<ListAbuseReportType> {
-        // GET /lists/{list_id}/abuse-reports/{report_id}
-        let endpoint = self.get_base_endpoint() + "/abuse-reports";
-        let mut params = HashMap::new();
-        params.insert("report_id".to_string(), report_id);
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+        sort_dir: Option<String>,
+    ) -> MalchimpIter<ListGrowthHistoryBuilder> {
+        // GET /lists/{list_id}/growth-history
+        let endpoint = self.get_base_endpoint() + "/growth-history";
+        let mut filter_params = ListGrowthHistoryFilter::default();
 
-        self._api
-            .get::<ListAbuseReportType>(&endpoint, params)
+        if let Some(f) = fields {
+            filter_params.fields = Some(f);
+        }
+
+        if let Some(ex) = exclude_fields {
+            filter_params.exclude_fields = Some(ex);
+        }
+        if let Some(ofs) = sort_dir {
+            filter_params.sort_dir = Some(ofs);
+        }
+
+        match self
+            ._api
+            .get::<CollectionListGrowthHistory>(&endpoint, filter_params.build_payload())
+        {
+            Ok(collection) => MalchimpIter {
+                builder: ListGrowthHistoryBuilder {},
+                data: collection.history,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get Grow History: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListGrowthHistoryBuilder {},
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+    }
+
+    ///
+    /// Get a summary of a specific list’s growth activity for a specific month and year.
+    ///
+    /// Arguments:
+    ///     month: A specific month of list growth history.
+    ///
+    pub fn get_growth_history_info<'a>(
+        &self,
+        month: &'a str,
+    ) -> MailchimpResult<ListGrowthHistoryType> {
+        // GET /lists/{list_id}/growth-history/{month}
+        let mut endpoint = self.get_base_endpoint() + "/growth-history/";
+        endpoint.push_str(month);
+
+        self._api.get::<ListGrowthHistoryType>(&endpoint, HashMap::new())
     }
 
     ///

@@ -24,13 +24,12 @@ fn main() {
         println!("\tName    {:?}", w.name.as_ref().unwrap());
         println!("=============================================");
 
-        for ar in w.get_abuse_reports(None, None, None) {
-            println!("\nAbuse Report:");
-            println!("\tID: {:?}", ar.id);
-            println!("\tEmail Address: {:?}", ar.email_address);
-            println!("\tMerge Fields: {:?}", ar.merge_fields);
-            println!("\tVip: {:?}", ar.vip);
-            println!("\tDate: {:?}", ar.date);
+        for ar in w.get_growth_history(None, None, None) {
+            println!("\nGrow History:");
+            println!("\tMonth: {:?}", ar.month);
+            println!("\tExisting: {:?}", ar.existing);
+            println!("\tImports: {:?}", ar.imports);
+            println!("\tOpt-ins: {:?}", ar.optins);
         }
     }
 }
