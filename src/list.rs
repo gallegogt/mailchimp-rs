@@ -3,7 +3,6 @@ use super::internal::request::MailchimpResult;
 use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
 use super::types::{ListType, ListsType};
 use log::error;
-use std::cell::RefCell;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -266,7 +265,7 @@ impl Lists {
         if let Some(remote) = self.get_campaigns_from_remote(Some(&filters)) {
             return MalchimpIter {
                 builder: ListsBuilder {},
-                data: RefCell::from(remote.lists),
+                data: remote.lists,
                 cur_filters: filters.clone(),
                 cur_it: 0,
                 total_items: remote.total_items,
@@ -276,7 +275,7 @@ impl Lists {
         }
         MalchimpIter {
             builder: ListsBuilder {},
-            data: RefCell::from(Vec::new()),
+            data: Vec::new(),
             cur_filters: filters.clone(),
             cur_it: 0,
             total_items: 0,

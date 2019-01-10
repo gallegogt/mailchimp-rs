@@ -35,7 +35,7 @@ pub struct CollectionAutomationSubscriber {
     pub subscribers: Vec<AutomationSubscriberType>,
     /// The total number of items matching the query regardless of pagination.
     #[serde(default)]
-    pub total_items: u32,
+    pub total_items: u64,
     /// A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
@@ -43,7 +43,7 @@ pub struct CollectionAutomationSubscriber {
 
 impl MailchimpCollection<AutomationSubscriberType> for CollectionAutomationSubscriber {
     /// Total Items
-    fn get_total_items(&self) -> u32 {
+    fn get_total_items(&self) -> u64 {
         self.total_items
     }
 

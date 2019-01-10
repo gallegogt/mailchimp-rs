@@ -209,4 +209,32 @@ where
             }
         }
     }
+    ///
+    ///
+    /// Argumentos
+    ///     endpoint: Endpoint hacia donde se van a enviar los datos
+    ///     payload: Dato a enviar
+    ///
+    ///
+    pub fn put_edge<'a, T, P>(&self, endpoint: &'a str, payload: P) -> MailchimpResult<T>
+    where
+        T: DeserializeOwned,
+        P: Serialize,
+    {
+        let api_url = self.build_url(endpoint, &HashMap::new());
+        let headers = self.build_headers();
+        let mut result = self
+            .req
+            .put::<P>(api_url, headers, payload, &self.basic_auth)?;
+        if result.len() == 0 {
+            result = "{}".to_string();
+        }
+        match serde_json::from_str(&result) {
+            Ok(sr) => Ok(sr),
+            Err(e) => {
+                println!("Post Edge {:?}", e);
+                Err(MailchimpErrorType::default())
+            }
+        }
+    }
 }

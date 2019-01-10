@@ -73,6 +73,23 @@ pub trait HttpReq {
     where
         P: Serialize;
     ///
+    /// Función para Actualizar algún recurso en el servidor
+    ///
+    ///  Argumentos:
+    ///     url: Url
+    ///     headers: Headers
+    ///     payload: Datos a enviar a la URL especificada
+    ///
+    fn put<P>(
+        &self,
+        url: Url,
+        headers: HeaderMap,
+        payload: P,
+        basic_auth: &Option<BasicAuth>,
+    ) -> MailchimpResult<String>
+    where
+        P: Serialize;
+    ///
     /// Función para eliminar algun recursos en el servidor
     ///
     ///  Argumentos:
@@ -180,6 +197,32 @@ impl HttpReq for MailchimpRequest {
         };
         let result = builder.headers(headers).json(&payload).send();
         self.process_response(result, "PATCH")
+    }
+    ///
+    ///  Argumentos:
+    ///     url: Url
+    ///     headers: HeaderMap
+    ///     payload: Datos a enviar a la URL especificada
+    ///
+    fn put<P>(
+        &self,
+        url: Url,
+        headers: HeaderMap,
+        payload: P,
+        basic_auth: &Option<BasicAuth>,
+    ) -> MailchimpResult<String>
+    where
+        P: Serialize,
+    {
+        let builder = match basic_auth {
+            Some(auth) => self
+                .client
+                .patch(url)
+                .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
+            None => self.client.post(url),
+        };
+        let result = builder.headers(headers).json(&payload).send();
+        self.process_response(result, "PUT")
     }
     ///
     ///  Argumentos:

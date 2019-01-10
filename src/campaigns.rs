@@ -3,7 +3,6 @@ use super::internal::request::MailchimpResult;
 use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
 use super::types::{CampaignType, CampaignsType};
 use log::error;
-use std::cell::RefCell;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -250,10 +249,7 @@ impl Campaigns {
     ///         folder_id: The unique folder id.
     ///         list_id: The unique id for the list.
     ///
-    pub fn get_campaigns_from_remote(
-        &self,
-        filters: Option<&CampaignFilter>,
-    ) -> Option<CampaignsType> {
+    pub fn get_campaigns(&self, filters: Option<&CampaignFilter>) -> Option<CampaignsType> {
         let mut payload = HashMap::new();
         if filters.is_some() {
             payload = filters.as_ref().unwrap().build_payload();
@@ -273,10 +269,10 @@ impl Campaigns {
     /// anterior esta función te devuelve un iterador
     ///
     pub fn iter(&self, filters: CampaignFilter) -> MalchimpIter<CampaignsBuilder> {
-        if let Some(remote) = self.get_campaigns_from_remote(Some(&filters)) {
+        if let Some(remote) = self.get_campaigns(Some(&filters)) {
             return MalchimpIter {
                 builder: CampaignsBuilder {},
-                data: RefCell::from(remote.campaigns),
+                data: remote.campaigns,
                 cur_filters: filters.clone(),
                 cur_it: 0,
                 total_items: remote.total_items,
@@ -286,7 +282,7 @@ impl Campaigns {
         }
         MalchimpIter {
             builder: CampaignsBuilder {},
-            data: RefCell::from(Vec::new()),
+            data: Vec::new(),
             cur_filters: filters.clone(),
             cur_it: 0,
             total_items: 0,

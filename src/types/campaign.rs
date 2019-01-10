@@ -2,9 +2,18 @@ use super::automation_campaign::{
     CampaignReportSummaryType, CampaignSettingsType, CampaignTrackingOptionsType, RecipientType,
     SocialCardType,
 };
+use super::campaign_content::{CampaignContentParam, CampaignContentType};
+use super::campaign_feedback::{
+    CampaignFeedbackBuilder, CampaignFeedbackType, CollectionCampaignFeedback,
+};
+use super::campaign_send_checklist::SendChecklistType;
+use super::empty::EmptyType;
 use super::link::LinkType;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
+use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
+use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
+use std::collections::HashMap;
 
 ///
 /// The days of the week to send a daily RSS Campaign.
@@ -442,7 +451,7 @@ pub struct CampaignsType {
     pub campaigns: Vec<CampaignType>,
     /// Desc: The total number of items matching the query regardless of pagination.
     #[serde(default)]
-    pub total_items: u32,
+    pub total_items: u64,
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
@@ -450,7 +459,7 @@ pub struct CampaignsType {
 
 impl MailchimpCollection<CampaignType> for CampaignsType {
     /// Total Items
-    fn get_total_items(&self) -> u32 {
+    fn get_total_items(&self) -> u64 {
         self.total_items
     }
     /// Data
@@ -466,5 +475,361 @@ impl Default for CampaignsType {
             total_items: 0,
             _links: Vec::new(),
         }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ScheduleBatchDelivery {
+    /// The delay, in minutes, between batches.
+    #[serde(default)]
+    pub batch_delay: u64,
+    /// The number of batches for the campaign send.
+    #[serde(default)]
+    pub batch_count: u64,
+}
+
+impl Default for ScheduleBatchDelivery {
+    fn default() -> Self {
+        ScheduleBatchDelivery {
+            batch_delay: 0,
+            batch_count: 0,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ScheduleParam {
+    /// The UTC date and time to schedule the campaign for delivery in ISO 8601 format.
+    /// Campaigns may only be scheduled to send on the quarter-hour (:00, :15, :30, :45).
+    #[serde(default)]
+    pub schedule_time: String,
+    /// Choose whether the campaign should use Timewarp when sending. Campaigns
+    /// scheduled with Timewarp are localized based on the recipients’ time zones.
+    /// For example, a Timewarp campaign with a schedule_time of 13:00 will be sent
+    /// to each recipient at 1:00pm in their local time. Cannot be set to true for
+    /// campaigns using Batch Delivery.
+    #[serde(default)]
+    pub timewarp: bool,
+    /// Choose whether the campaign should use Batch Delivery. Cannot be set
+    /// to true for campaigns using Timewarp.
+    #[serde(default)]
+    pub batch_delivery: Option<ScheduleBatchDelivery>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct EmailParam {
+    /// An array of email addresses to send the test email to.
+    #[serde(default)]
+    pub test_emails: Vec<String>,
+    /// Choose the type of test email to send.  html or plaintext
+    #[serde(default)]
+    pub send_type: String,
+}
+
+impl EmailParam {
+    pub fn new(test_emails: Vec<String>, send_type: String) -> Self {
+        EmailParam {
+            test_emails: test_emails,
+            send_type: send_type,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct UpdateCampaignParam {
+    /// List settings for the campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recipients: Option<RecipientType>,
+    /// The settings for your campaign, including subject, from name,
+    /// reply-to address, and more.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub settings: Option<CampaignSettingsType>,
+    /// The settings specific to A/B test campaigns.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub variate_settings: Option<VariateSettingsType>,
+    /// The tracking options for a campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tracking: Option<CampaignTrackingOptionsType>,
+    /// RSS options for a campaign.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rss_opts: Option<RSSOptionsType>,
+    /// The preview for the campaign, rendered by social networks like
+    /// Facebook and Twitter. Learn more.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub social_card: Option<SocialCardType>,
+}
+
+impl CampaignType {
+    // ==== Actions ===========
+    ///
+    ///  Cancel a campaign
+    ///
+    pub fn cancel_campaign(&self) -> MailchimpResult<EmptyType> {
+        // POST /campaigns/{campaign_id}/actions/cancel-send
+        let endpoint = self.get_base_endpoint() + "/actions/cancel-send";
+        self._api
+            .post::<EmptyType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+    ///
+    ///  Resend a campaign
+    ///
+    pub fn resend_campaign(&self) -> MailchimpResult<CampaignType> {
+        // POST /campaigns/{campaign_id}/actions/create-resend
+        let endpoint = self.get_base_endpoint() + "/actions/create-resend";
+        self._api
+            .post::<CampaignType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+    ///
+    /// Pause an RSS-Driven campaign
+    ///
+    pub fn pause_rss_driven_campaign(&self) -> MailchimpResult<EmptyType> {
+        // POST /campaigns/{campaign_id}/actions/pause
+        let endpoint = self.get_base_endpoint() + "/actions/pause";
+        self._api
+            .post::<EmptyType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+    ///
+    /// Replicate a campaign in saved or send status.
+    ///
+    pub fn replicate_campaign(&self) -> MailchimpResult<CampaignType> {
+        // POST /campaigns/{campaign_id}/actions/replicate
+        let endpoint = self.get_base_endpoint() + "/actions/replicate";
+        self._api
+            .post::<CampaignType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+    ///
+    /// Resume an RSS-Driven campaign.
+    ///
+    pub fn resume_rss_driven_campaign(&self) -> MailchimpResult<EmptyType> {
+        // POST /campaigns/{campaign_id}/actions/resume
+        let endpoint = self.get_base_endpoint() + "/actions/resume";
+        self._api
+            .post::<EmptyType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+    ///
+    /// Schedule a campaign for delivery. If you’re using Multivariate Campaigns to
+    /// test send times or sending RSS Campaigns, use the send action instead.
+    ///
+    pub fn schedule_campaign(&self, param: ScheduleParam) -> MailchimpResult<EmptyType> {
+        // POST /campaigns/{campaign_id}/actions/schedule
+        let endpoint = self.get_base_endpoint() + "/actions/schedule";
+        self._api.post::<EmptyType, ScheduleParam>(&endpoint, param)
+    }
+
+    ///
+    /// Send a Mailchimp campaign. For RSS Campaigns, the campaign will send
+    /// according to its schedule. All other campaigns will send immediately.
+    ///
+    pub fn send_campaign(&self) -> MailchimpResult<EmptyType> {
+        // POST  /campaigns/{campaign_id}/actions/send
+        let endpoint = self.get_base_endpoint() + "/actions/send";
+        self._api
+            .post::<EmptyType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+
+    ///
+    /// Send a test email.
+    ///
+    pub fn send_test_email(&self, param: EmailParam) -> MailchimpResult<EmptyType> {
+        // POST /campaigns/{campaign_id}/actions/test
+        let endpoint = self.get_base_endpoint() + "/actions/test";
+        self._api.post::<EmptyType, EmailParam>(&endpoint, param)
+    }
+
+    ///
+    /// Unschedule a scheduled campaign that hasn’t started sending.
+    ///
+    pub fn unschedule_campaign(&self) -> MailchimpResult<EmptyType> {
+        // POST  POST /campaigns/{campaign_id}/actions/unschedule
+        let endpoint = self.get_base_endpoint() + "/actions/unschedule";
+        self._api
+            .post::<EmptyType, HashMap<String, String>>(&endpoint, HashMap::new())
+    }
+
+    // ==== DELETE ===========
+    ///
+    /// Remove a campaign from your Mailchimp account.
+    ///
+    pub fn delete(&self) -> MailchimpResult<bool> {
+        // DELETE /campaigns/{campaign_id}
+        let endpoint = self.get_base_endpoint();
+        match self._api.delete::<EmptyType>(&endpoint, HashMap::new()) {
+            Ok(_) => Ok(true),
+            Err(e) => Err(e),
+        }
+    }
+
+    // ==== UPDATE ===========
+    ///
+    /// Remove a campaign from your Mailchimp account.
+    ///
+    pub fn update(&self, param: UpdateCampaignParam) -> MailchimpResult<CampaignType> {
+        // DELETE /campaigns/{campaign_id}
+        let endpoint = self.get_base_endpoint();
+        self._api
+            .patch::<CampaignType, UpdateCampaignParam>(&endpoint, param)
+    }
+
+    // ======================== Content ===========
+
+    ///
+    /// Get the the HTML and plain-text content for a campaign.
+    ///
+    /// Arguments:
+    ///     fields: A comma-separated list of fields to return. Reference parameters
+    ///         of sub-objects with dot notation.
+    ///     exclude_fields: A comma-separated list of fields to exclude. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///
+    pub fn get_content(
+        &self,
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+    ) -> MailchimpResult<CampaignContentType> {
+        // GET /campaigns/{campaign_id}/content
+        let endpoint = self.get_base_endpoint() + "/content";
+        let mut payload = HashMap::new();
+        if let Some(field) = fields {
+            payload.insert("fields".to_string(), field);
+        }
+        if let Some(ef) = exclude_fields {
+            payload.insert("exclude_fields".to_string(), ef);
+        }
+        self._api
+            .get::<CampaignContentType>(endpoint.as_str(), payload)
+    }
+
+    ///
+    /// Set the content for a campaign.
+    ///
+    pub fn update_content(
+        &self,
+        param: CampaignContentParam,
+    ) -> MailchimpResult<CampaignContentType> {
+        // PUT /campaigns/{campaign_id}/content
+        let endpoint = self.get_base_endpoint() + "/content";
+        self._api
+            .put::<CampaignContentType, CampaignContentParam>(&endpoint, param)
+    }
+
+    // ======================== Send Checklist ===========
+    ///
+    /// Review the send checklist for a campaign, and resolve any issues before sending.
+    ///
+    /// Arguments:
+    ///     fields: A comma-separated list of fields to return. Reference parameters
+    ///         of sub-objects with dot notation.
+    ///     exclude_fields: A comma-separated list of fields to exclude. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///
+    pub fn send_checklist(
+        &self,
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+    ) -> MailchimpResult<SendChecklistType> {
+        // GET /campaigns/{campaign_id}/send-checklist
+        let endpoint = self.get_base_endpoint() + "/send-checklist";
+        let mut payload = HashMap::new();
+        if let Some(field) = fields {
+            payload.insert("fields".to_string(), field);
+        }
+        if let Some(ef) = exclude_fields {
+            payload.insert("exclude_fields".to_string(), ef);
+        }
+        self._api
+            .get::<SendChecklistType>(endpoint.as_str(), payload)
+    }
+    // ======================== Feedback ===========
+    ///
+    /// Get team feedback while you’re working together on a Mailchimp campaign.
+    ///
+    /// Arguments:
+    ///     fields: A comma-separated list of fields to return. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///     exclude_fields: A comma-separated list of fields to exclude.
+    ///         Reference parameters of sub-objects with dot notation.
+    ///
+    pub fn get_feedbacks(
+        &self,
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+    ) -> MalchimpIter<CampaignFeedbackBuilder> {
+        // GET /campaigns/{campaign_id}/feedback
+        let endpoint = self.get_base_endpoint() + "/feedback";
+        let mut filters = SimpleFilter::default();
+
+        if let Some(f) = fields {
+            filters.fields = Some(f.clone())
+        }
+        if let Some(ex) = exclude_fields {
+            filters.exclude_fields = Some(ex.clone())
+        }
+
+        let payload = filters.build_payload();
+        let response = self
+            ._api
+            .get::<CollectionCampaignFeedback>(&endpoint, payload);
+        match response {
+            Ok(collection) => MalchimpIter {
+                builder: CampaignFeedbackBuilder {
+                    endpoint: endpoint.clone(),
+                },
+                data: collection.feedback,
+                cur_filters: filters.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                println!("Feedback Iter {:?}", e);
+                MalchimpIter {
+                    builder: CampaignFeedbackBuilder {
+                        endpoint: endpoint.clone(),
+                    },
+                    data: Vec::new(),
+                    cur_filters: filters.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+    }
+
+    pub fn get_feedback_info<'a>(
+        &self,
+        feedback_id: &'a str,
+        fields: Option<String>,
+        exclude_fields: Option<String>,
+    ) -> MailchimpResult<CampaignFeedbackType> {
+        // GET /campaigns/{campaign_id}/feedback/{feedback_id}
+        let mut endpoint = self.get_base_endpoint() + "/feedback/";
+        endpoint = endpoint + feedback_id;
+        let mut payload = HashMap::new();
+        if let Some(f) = fields {
+            payload.insert("fields".to_string(), f.clone());
+        }
+        if let Some(ex) = exclude_fields {
+            payload.insert("exclude_fields".to_string(), ex.clone());
+        }
+
+        match self._api.get::<CampaignFeedbackType>(&endpoint, payload) {
+            Ok(feedback) => {
+                let mut n_f = feedback;
+                n_f.set_api(&self._api);
+                n_f.set_endpoint(&endpoint);
+                Ok(n_f)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    ///
+    /// Return the endpoint path
+    ///
+    fn get_base_endpoint(&self) -> String {
+        String::from("campaigns/") + &self.id.as_ref().unwrap()
     }
 }

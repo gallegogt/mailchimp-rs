@@ -127,24 +127,24 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
     * 🔘 **Locations**
 
 ### Campaigns
-  * 🔘 Create a new campaign
+  * ✅ Create a new campaign
   * ✅ Get all campaigns
   * ✅ Get information about a specific campaign
-  * 🔘 Update the settings for a campaign
-  * 🔘 Delete a campaign
-  * 🔘 Cancel a campaign
-  * 🔘 Resend a campaign
-  * 🔘 Pause an RSS-Driven campaign
-  * 🔘 Replicate a campaign
-  * 🔘 Resume an RSS-Driven campaign
-  * 🔘 Schedule a campaign
-  * 🔘 Send a campaign
-  * 🔘 Send a test email
-  * 🔘 Unschedule a campaign
+  * ✅ Update the settings for a campaign
+  * ✅ Delete a campaign
+  * ✅ Cancel a campaign
+  * ✅ Resend a campaign
+  * ✅ Pause an RSS-Driven campaign
+  * ✅ Replicate a campaign
+  * ✅ Resume an RSS-Driven campaign
+  * ✅ Schedule a campaign
+  * ✅ Send a campaign
+  * ✅ Send a test email
+  * ✅ Unschedule a campaign
 
-  * 🔘 **Content**
-  * 🔘 **Feedback**
-  * 🔘 **Send Checklist**
+  * ✅ **Content**
+  * ✅  **Feedback**
+  * ✅  **Send Checklist**
 
 ### 🔘 Ping
 ### 🔘 Reporting

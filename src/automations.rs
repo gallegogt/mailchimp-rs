@@ -6,7 +6,6 @@ use super::types::{
     AutomationWorkflowType, CollectionAutomation, RecipientType,
 };
 use log::error;
-use std::cell::RefCell;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -265,7 +264,7 @@ impl Automations {
         if let Some(remote) = self.get_automations_from_remote(Some(&filters)) {
             return MalchimpIter {
                 builder: AutomationsBuilder {},
-                data: RefCell::from(remote.automations),
+                data: remote.automations,
                 cur_filters: filters.clone(),
                 cur_it: 0,
                 total_items: remote.total_items,
@@ -275,7 +274,7 @@ impl Automations {
         }
         MalchimpIter {
             builder: AutomationsBuilder {},
-            data: RefCell::from(Vec::new()),
+            data: Vec::new(),
             cur_filters: filters.clone(),
             cur_it: 0,
             total_items: 0,

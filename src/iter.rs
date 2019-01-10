@@ -1,14 +1,12 @@
 use crate::api::MailchimpApi;
 use log::error;
 use serde::de::DeserializeOwned;
-use std::cell::RefCell;
 use std::collections::HashMap;
 
 // ===================== FILTER ==========
 pub trait ResourceFilter {
     fn build_payload(&self) -> HashMap<String, String>;
 }
-
 
 #[derive(Debug, Clone)]
 pub struct SimpleFilter {
@@ -68,12 +66,11 @@ impl ResourceFilter for SimpleFilter {
 // ===================== Collection ==========
 pub trait MailchimpCollection<T> {
     /// Total Items
-    fn get_total_items(&self) -> u32;
+    fn get_total_items(&self) -> u64;
 
     /// Data
     fn get_values(&self) -> Vec<T>;
 }
-
 
 // ===================== BuildIter ==========
 pub trait BuildIter {
@@ -102,10 +99,10 @@ where
     B::FilterItem: ResourceFilter,
 {
     pub builder: B,
-    pub data: RefCell<Vec<B::Item>>,
+    pub data: Vec<B::Item>,
     pub cur_filters: B::FilterItem,
-    pub cur_it: usize,
-    pub total_items: u32,
+    pub cur_it: u64,
+    pub total_items: u64,
     // Mailchimp API
     pub api: MailchimpApi,
     // Endpoint
@@ -121,19 +118,26 @@ where
     type Item = B::Item;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut in_data = self.data.borrow_mut();
-        if self.cur_it < (self.total_items as usize) && (self.cur_it == in_data.len() - 2) {
+        let mut data_len = self.data.len();
+        // FIX: 'attempt to subtract with overflow' error
+        if let Some(_) = data_len.checked_sub(2) {
+            data_len = data_len - 2;
+        } else {
+            data_len = 0;
+        }
+
+        if self.cur_it < self.total_items && ((self.cur_it as usize) == data_len) {
             let new_filter = self.builder.update_filter_offset(&self.cur_filters);
             let cl = self.get_collection(&new_filter);
             self.cur_filters = new_filter;
 
             for r in cl.get_values() {
-                in_data.push(r);
+                self.data.push(r);
             }
         }
 
-        if self.cur_it < in_data.len() {
-            let data = &in_data[self.cur_it];
+        if (self.cur_it as usize) < self.data.len() {
+            let data = &self.data[self.cur_it as usize];
             self.cur_it += 1;
             return Some(self.builder.update_item(data, &self.api));
         }
@@ -151,8 +155,7 @@ where
     ///
     /// get_collection
     ///
-    pub fn get_collection(&self, filters: &B::FilterItem) -> B::Collection
-    {
+    pub fn get_collection(&self, filters: &B::FilterItem) -> B::Collection {
         let payload = filters.build_payload();
         let response = self.api.get::<B::Collection>(&self.endpoint, payload);
         match response {

@@ -5,12 +5,11 @@ use super::ecommerce::ECommerceReportType;
 use super::empty::EmptyType;
 use super::link::LinkType;
 use super::workflow_email::{WorkflowEmailType, WorkflowEmailsType};
-use crate::iter::{MalchimpIter, SimpleFilter, ResourceFilter};
-use std::cell::RefCell;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
+use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
 
 use std::collections::HashMap;
 
@@ -721,9 +720,9 @@ impl AutomationWorkflowType {
             ._api
             .get::<CollectionAutomationSubscriber>(endpoint.as_str(), filters.build_payload());
         match response {
-            Ok(collection) =>  MalchimpIter {
+            Ok(collection) => MalchimpIter {
                 builder: AutomationSubscriberBuilder {},
-                data: RefCell::from(collection.subscribers),
+                data: collection.subscribers,
                 cur_filters: filters.clone(),
                 cur_it: 0,
                 total_items: collection.total_items,
@@ -732,7 +731,7 @@ impl AutomationWorkflowType {
             },
             Err(_) => MalchimpIter {
                 builder: AutomationSubscriberBuilder {},
-                data: RefCell::from(Vec::new()),
+                data: Vec::new(),
                 cur_filters: filters.clone(),
                 cur_it: 0,
                 total_items: 0,
@@ -751,13 +750,17 @@ impl AutomationWorkflowType {
     /// Arguments:
     ///     email_address: The list member’s email address.
     ///
-    pub fn add_subscriber_to_workflow<'a>(&self, email_address: &'a str) -> MailchimpResult<AutomationSubscriberType> {
+    pub fn add_subscriber_to_workflow<'a>(
+        &self,
+        email_address: &'a str,
+    ) -> MailchimpResult<AutomationSubscriberType> {
         // POST /automations/{workflow_id}/removed-subscribers
         let mut queue_endpoint = self.get_base_endpoint() + "/removed-subscribers";
         queue_endpoint.push_str("/queue");
         let mut payload = HashMap::new();
         payload.insert("email_address".to_string(), email_address.to_string());
-        self._api.post::<AutomationSubscriberType, HashMap<String, String>>(&queue_endpoint, payload)
+        self._api
+            .post::<AutomationSubscriberType, HashMap<String, String>>(&queue_endpoint, payload)
     }
 
     // ============== Private Functions ==============
@@ -778,7 +781,7 @@ pub struct CollectionAutomation {
     pub automations: Vec<AutomationWorkflowType>,
     /// Desc: The total number of items matching the query regardless of pagination.
     #[serde(default)]
-    pub total_items: u32,
+    pub total_items: u64,
     /// Desc: A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
@@ -786,7 +789,7 @@ pub struct CollectionAutomation {
 
 impl MailchimpCollection<AutomationWorkflowType> for CollectionAutomation {
     /// Total Items
-    fn get_total_items(&self) -> u32 {
+    fn get_total_items(&self) -> u64 {
         self.total_items
     }
 
