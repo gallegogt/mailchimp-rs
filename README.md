@@ -143,8 +143,8 @@ A continuación te presento un listado donde iré actualizando a la medida de lo
   * ✅ Unschedule a campaign
 
   * ✅ **Content**
-  * 🔘 **Feedback**
-  * 🔘 **Send Checklist**
+  * ✅  **Feedback**
+  * ✅  **Send Checklist**
 
 ### 🔘 Ping
 ### 🔘 Reporting

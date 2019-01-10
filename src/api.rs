@@ -69,7 +69,7 @@ impl MailchimpApi {
     /// extern crate mailchimp;
     /// use std::collections::HashMap;
     /// use mailchimp::MailchimpApi;
-    /// use mailchimp::AuthorizedAppsType;
+    /// use mailchimp::types::AuthorizedAppsType;
     /// fn main() {
     ///     let api = MailchimpApi::new("aac1e319006883125e18a89e529b5abb73de4c81-usX");
     ///     let data = api.post::<AuthorizedAppsType, HashMap<String, String>>("authorized-apps", HashMap::new());
@@ -98,7 +98,7 @@ impl MailchimpApi {
     ///
     /// Función para actualizar los recursos en el servidor
     ///
-    /// ```
+    ///
     /// #Argumentos
     ///     `endpoint`: Cadena de texto con el endpoint de la API al que se requiere acceder, no debe comenzar por "/"
     ///     `payload`: Dato a enviar al servidor
@@ -113,7 +113,7 @@ impl MailchimpApi {
     ///
     /// Función para actualizar los recursos en el servidor
     ///
-    /// ```
+    ///
     /// #Argumentos
     ///     `endpoint`: Cadena de texto con el endpoint de la API al que se requiere acceder, no debe comenzar por "/"
     ///     `payload`: Dato a enviar al servidor
@@ -132,7 +132,7 @@ impl MailchimpApi {
     /// extern crate mailchimp;
     /// use std::collections::HashMap;
     /// use mailchimp::MailchimpApi;
-    /// use mailchimp::AuthorizedAppType;
+    /// use mailchimp::types::AuthorizedAppType;
     ///
     /// fn main() {
     ///     let api = MailchimpApi::new("aac1e319006883125e18a89e529b5abb73de4c81-usX");
@@ -169,7 +169,7 @@ impl MailchimpApi {
     /// extern crate mailchimp;
     /// use std::collections::HashMap;
     /// use mailchimp::MailchimpApi;
-    /// use mailchimp::AuthorizedAppType;
+    /// use mailchimp::types::AuthorizedAppType;
     ///
     /// fn main() {
     ///     let api = MailchimpApi::new("aac1e319006883125e18a89e529b5abb73de4c81-usX");
