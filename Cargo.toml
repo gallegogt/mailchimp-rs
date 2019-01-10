@@ -1,6 +1,6 @@
 [package]
 name = "mailchimp"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Yolier Galan Tasse <gallegogt@gmail.com>"]
 edition = "2018"
 description = "Biblioteca de desarrollo para acceder al API de [Mailchimp](https://developer.mailchimp.com), utilizando como lenguaje de programación Rust"
