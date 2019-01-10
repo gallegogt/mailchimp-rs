@@ -2,26 +2,33 @@ use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
 
-// ============ List Clients ==============
+// ============ List Locations ==============
 ///
-/// Get information about the most popular email clients for subscribers in a specific Mailchimp list.
+/// Get the locations (countries) that the list’s subscribers have been tagged to based
+/// on geocoding their IP address.
 ///
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ListClientType {
-    /// The date for the activity summary.
+pub struct ListLocationType {
+    /// The name of the country.
     #[serde(default)]
-    pub client: String,
-    /// The total number of emails sent on the date for the activity summary
+    pub country: String,
+    /// The ISO 3166 2 digit country code.
     #[serde(default)]
-    pub members: u64,
+    pub cc: String,
+    /// The percent of subscribers in the country.
+    #[serde(default)]
+    pub percent: f32,
+    /// The total number of subscribers in the country.
+    #[serde(default)]
+    pub total: u64,
 }
 
-//
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct CollectionListClients {
+pub struct CollectionListLocations {
     /// Recent list activity.
     #[serde(default)]
-    pub clients: Vec<ListClientType>,
+    pub locations: Vec<ListLocationType>,
     /// The unique id for the list.
     #[serde(default)]
     pub list_id: String,
@@ -33,23 +40,23 @@ pub struct CollectionListClients {
     pub _links: Vec<LinkType>,
 }
 
-impl MailchimpCollection<ListClientType> for CollectionListClients {
+impl MailchimpCollection<ListLocationType> for CollectionListLocations {
     /// Total Items
     fn get_total_items(&self) -> u64 {
         self.total_items
     }
 
     /// Data
-    fn get_values(&self) -> Vec<ListClientType> {
-        self.clients.clone()
+    fn get_values(&self) -> Vec<ListLocationType> {
+        self.locations.clone()
     }
 }
 
-impl Default for CollectionListClients {
+impl Default for CollectionListLocations {
     fn default() -> Self {
-        CollectionListClients {
+        CollectionListLocations {
             list_id: String::new(),
-            clients: Vec::new(),
+            locations: Vec::new(),
             total_items: 0,
             _links: Vec::new(),
         }
@@ -59,12 +66,12 @@ impl Default for CollectionListClients {
 /// ================================= ITER =====================
 
 #[derive(Debug)]
-pub struct ListClientsBuilder {}
+pub struct ListLocationsBuilder {}
 
-impl BuildIter for ListClientsBuilder {
-    type Item = ListClientType;
+impl BuildIter for ListLocationsBuilder {
+    type Item = ListLocationType;
     type FilterItem = SimpleFilter;
-    type Collection = CollectionListClients;
+    type Collection = CollectionListLocations;
 
     ///
     /// Crea un recurso a partir del dato pasado por parámetro

@@ -14,6 +14,7 @@ mod link;
 mod list;
 mod list_activity;
 mod list_clients;
+mod list_locations;
 mod workflow_email;
 
 pub use self::api_root::*;
@@ -32,4 +33,5 @@ pub use self::link::LinkType;
 pub use self::list::*;
 pub use self::list_activity::*;
 pub use self::list_clients::*;
+pub use self::list_locations::*;
 pub use self::workflow_email::*;

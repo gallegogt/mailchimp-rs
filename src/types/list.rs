@@ -4,6 +4,7 @@ use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::iter::MailchimpCollection;
 use super::list_activity::{CollectionListActivity, ListActivityBuilder};
 use super::list_clients::{CollectionListClients, ListClientsBuilder};
+use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
 use crate::iter::{MalchimpIter, SimpleFilter, ResourceFilter};
 use log::error;
 
@@ -329,6 +330,55 @@ impl ListType {
                 error!( target: "mailchimp",  "Get Clients: Response Error details: {:?}", e);
                 MalchimpIter {
                     builder: ListClientsBuilder {},
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+
+    }
+
+    ///
+    /// Get the locations (countries) that the list’s subscribers have been tagged to
+    /// based on geocoding their IP address.
+    ///
+    /// Arguments:
+    ///     fields: A comma-separated list of fields to return. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///     exclude_fields: A comma-separated list of fields to exclude. Reference
+    ///         parameters of sub-objects with dot notation.
+    ///
+    pub fn get_locations(&self, fields: Option<String>, exclude_fields: Option<String>) -> MalchimpIter<ListLocationsBuilder> {
+        // GET /lists/{list_id}/locations
+        let endpoint = self.get_base_endpoint() + "/locations";
+        let mut filter_params = SimpleFilter::default();
+
+        if let Some(f) = fields {
+            filter_params.fields = Some(f);
+        }
+
+        if let Some(ex) = exclude_fields {
+            filter_params.exclude_fields = Some(ex);
+        }
+
+        match self._api.get::<CollectionListLocations>(&endpoint, filter_params.build_payload()) {
+            Ok(collection) => MalchimpIter {
+                builder: ListLocationsBuilder {},
+                data: collection.locations,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get Locations: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListLocationsBuilder {},
                     data: Vec::new(),
                     cur_filters: filter_params.clone(),
                     cur_it: 0,

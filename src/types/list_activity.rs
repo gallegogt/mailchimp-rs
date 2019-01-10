@@ -46,7 +46,7 @@ pub struct ListActivityType {
     pub _links: Vec<LinkType>,
 }
 
-/// GET /automations/{workflow_id}/emails/{workflow_email_id}/queue
+//
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CollectionListActivity {
     /// Recent list activity.
