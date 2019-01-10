@@ -119,7 +119,7 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         let mut data_len = self.data.len();
-
+        // FIX: 'attempt to subtract with overflow' error
         if let Some(_) = data_len.checked_sub(2) {
             data_len = data_len - 2;
         } else {
