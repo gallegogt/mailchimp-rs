@@ -155,7 +155,10 @@ impl ResourceFilter for CampaignFilter {
 }
 
 ///
-/// campaigns
+/// Implement Mailchimp Campaigns Endpoint
+///
+/// Campaigns are how you send emails to your Mailchimp list. Use the Campaigns
+/// API calls to manage campaigns in your Mailchimp account.
 ///
 #[derive(Debug, Clone)]
 pub struct Campaigns {

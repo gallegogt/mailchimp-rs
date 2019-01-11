@@ -110,7 +110,11 @@ impl ResourceFilter for AutomationsFilter {
 }
 
 ///
-/// campaigns
+/// Implement Mailchimp Automations Endpoint
+///
+/// Mailchimp’s free Automation feature lets you build a series of
+/// emails that send to subscribers when triggered by a specific date, activity,
+/// or event. Use the API to manage Automation workflows, emails, and queues
 ///
 #[derive(Debug, Clone)]
 pub struct Automations {
@@ -126,7 +130,7 @@ impl BuildIter for AutomationsBuilder {
     type Collection = CollectionAutomation;
 
     ///
-    /// Crea un recurso a partir del dato pasado por parámetro
+    /// Create new resource, with the api instance updated
     ///
     fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
         let mut in_data = data.clone();
@@ -134,7 +138,7 @@ impl BuildIter for AutomationsBuilder {
         in_data
     }
     ///
-    /// Actualiza el offset
+    /// Update filter params
     ///
     fn update_filter_offset(&self, filter: &Self::FilterItem) -> Self::FilterItem {
         let mut f = filter.clone();

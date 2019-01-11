@@ -1,3 +1,16 @@
+///
+/// Dependencies:
+///
+/// # This library is meant to be used on development or testing environments
+/// # in which setting environment variables is not practical.
+/// dotenv = "^0.13"
+///
+/// Requirements:
+///
+/// To run this example you need to create a archive named ``.env`` in the root of the directory with the following info
+/// MAILCHIMP_API_KEY=<API KEY>
+///
+
 extern crate dotenv;
 extern crate mailchimp;
 
@@ -10,37 +23,37 @@ use mailchimp::{Automations, AutomationsFilter};
 use std::collections::HashMap;
 
 fn main() {
-    // Inicializando el dotenv
+    // Init dotenv
     dotenv().ok();
-    // Obteniendo las variables de entornos con las credenciales de
-    // mailchimp
+    // Filter the env vars to get the Mailchimp Credential
     let mut env_mailchimp = env::vars().filter(|e| e.0.to_string().contains("MAILCHIMP_"));
     let apk = env_mailchimp.next().unwrap().1;
-    // Inicializando el API, con las credenciales
+    // Init API
     let api = MailchimpApi::new(&apk);
 
-    // Ejemplo de como obtener todas la automatizaciones
+    // Create instance of Automations
     let automations = Automations::new(api);
     let mut last_automation_id = String::from("");
 
+    // Iterate through the existing Automations
     for w in automations.iter(AutomationsFilter::default()) {
         let settings = w.settings.as_ref().unwrap();
         last_automation_id = w.id.as_ref().unwrap().to_string();
-        println!("Automatizacion");
+        println!("Automation");
         println!("ID                {:?}", w.id);
-        println!("Título            {:?}", settings.title);
-        println!("Emails Enviados   {:?}", w.emails_sent);
-        println!("Resumen           {:?}", w.report_summary);
-        println!("Fecha Inicio      {:?}", w.start_time);
-        println!("Fecha de creacion {:?}", w.create_time);
-        println!("Estado            {:?}", w.status);
+        println!("Title             {:?}", settings.title);
+        println!("Emails Sent       {:?}", w.emails_sent);
+        println!("Report Summary    {:?}", w.report_summary);
+        println!("Start Time        {:?}", w.start_time);
+        println!("Create Time       {:?}", w.create_time);
+        println!("Status            {:?}", w.status);
         println!("Tracking          {:?}", w.tracking);
-        println!("Disparadores      {:?}", w.trigger_settings);
+        println!("Trigger Settings  {:?}", w.trigger_settings);
         println!("Recipients        {:?}", w.recipients);
         println!("=============================================")
     }
 
-    // Ejemplo de como obtener una automatización en especifiv¡co
+    // Example that show you, how to get specific automations by ID
     println!("\n\n");
     let workflow = automations
         .get_automation_workflow_info(last_automation_id.as_str(), HashMap::new())
@@ -50,7 +63,7 @@ fn main() {
         last_automation_id, workflow.settings
     );
 
-    // Ejemplo de filtrado, en este caso es dfiltrado por el estado con valor "enviando"
+    // Example of Filtered by status
     println!("\n\n");
     let mut filter = HashMap::new();
     filter.insert("status".to_string(), "sending".to_string());
@@ -69,34 +82,35 @@ fn main() {
         let settings = w.settings.as_ref().unwrap();
         println!("Automatizacion");
         println!("ID                {:?}", w.id);
-        println!("Título            {:?}", settings.title);
-        println!("Emails Enviados   {:?}", w.emails_sent);
-        println!("Resumen           {:?}", w.report_summary);
-        println!("Fecha Inicio      {:?}", w.start_time);
-        println!("Fecha de creacion {:?}", w.create_time);
-        println!("Estado            {:?}", w.status);
+        println!("Title             {:?}", settings.title);
+        println!("Emails Sent       {:?}", w.emails_sent);
+        println!("Report Summary    {:?}", w.report_summary);
+        println!("Start Time        {:?}", w.start_time);
+        println!("Create Time       {:?}", w.create_time);
+        println!("Status            {:?}", w.status);
         println!("Tracking          {:?}", w.tracking);
-        println!("Disparadores      {:?}", w.trigger_settings);
+        println!("Trigger Settings  {:?}", w.trigger_settings);
         println!("Recipients        {:?}", w.recipients);
         println!("=============================================")
     }
 
     // ==================== Workflow Emails ========== ====
+    // Example of get Workflow Emails
     let emails_resp = workflow.get_workflow_emails();
 
     match emails_resp {
         Ok(workflow_emails) => {
             for e in workflow_emails {
                 println!("\nWorkflow Emails");
-                println!("ID   {:?}", e.id);
-                println!("Emails Enviados   {:?}", e.emails_sent.as_ref().unwrap());
-                println!("Fecha Inicio      {:?}", e.start_time.as_ref().unwrap());
-                println!("Fecha de creacion {:?}", e.create_time.as_ref().unwrap());
+                println!("ID             {:?}", e.id);
+                println!("Emails Sent    {:?}", e.emails_sent.as_ref().unwrap());
+                println!("Start Time     {:?}", e.start_time.as_ref().unwrap());
+                println!("Create time    {:?}", e.create_time.as_ref().unwrap());
                 println!(
                     "Recipients        {:?}",
                     e.recipients.as_ref().unwrap_or(&RecipientType::default())
                 );
-                println!("Resumen           {:?}", e.report_summary.as_ref().unwrap());
+                println!("Report Summary           {:?}", e.report_summary.as_ref().unwrap());
             }
         }
         Err(e) => println!("{:?}", e),
@@ -108,19 +122,19 @@ fn main() {
     match we_info {
         Ok(we) => {
             println!("\nWorkflow Emails");
-            println!("ID   {:?}", we.id.unwrap_or("".to_string()));
+            println!("ID                {:?}", we.id.unwrap_or("".to_string()));
             println!(
-                "Emails Enviados   {:?}",
+                "Emails Sent            {:?}",
                 we.emails_sent.as_ref().unwrap_or(&0)
             );
-            println!("Fecha Inicio      {:?}", we.start_time.as_ref().unwrap());
-            println!("Fecha de creacion {:?}", we.create_time.as_ref().unwrap());
+            println!("Start Time      {:?}", we.start_time.as_ref().unwrap());
+            println!("Create Time {:?}", we.create_time.as_ref().unwrap());
             println!("Recipients        {:?}", we.recipients.as_ref().unwrap());
             println!(
-                "Resumen           {:?}",
+                "Report Summary           {:?}",
                 we.report_summary.as_ref().unwrap()
             );
         }
-        Err(e) => println!("we_info {:?}", e),
+        Err(e) => println!("Workflow Email Info Error {:?}", e),
     }
 }

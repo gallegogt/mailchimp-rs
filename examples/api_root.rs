@@ -1,3 +1,16 @@
+///
+/// Dependencies:
+///
+/// # This library is meant to be used on development or testing environments
+/// # in which setting environment variables is not practical.
+/// dotenv = "^0.13"
+///
+/// Requirements:
+///
+/// To run this example you need to create a archive named ``.env`` in the root of the directory with the following info
+/// MAILCHIMP_API_KEY=<API KEY>
+///
+///
 extern crate dotenv;
 extern crate mailchimp;
 
@@ -8,30 +21,32 @@ use mailchimp::{ApiRoot, MailchimpApi};
 use std::collections::HashMap;
 
 fn main() {
-    // Inicializando el dotenv
+    // Init dotenv
     dotenv().ok();
-    // Obteniendo las variables de entornos con las credenciales de
-    // mailchimp
-    let mut env_mailchimp = env::vars().filter(|e| e.0.to_string().contains("MAILCHIMP_"));
+    // Filter the env vars to obtain the Mailchimp Credential
+    let mut env_mailchimp = env::vars().filter(|e| e.0.to_string().contains("MAILCHIMP_API_KEY"));
     let apk = env_mailchimp.next().unwrap().1;
-    // Inicializando el API, con las credenciales
+
+    // Init API Instance
     let api = MailchimpApi::new(&apk);
+    // Create a instance of API Root, to get the info about the current account
     let api_root = ApiRoot::new(api);
-    // Ejemplo de como obtener todas la automatizaciones
+
+    // Get the info about the current account
     let info = api_root.get_info(HashMap::new());
 
     match info {
         Ok(account) => {
-            println!("Información de la cuenta");
-            println!("Nombre de la Cuenta   {:?}", account.account_name);
-            println!("Email                 {:?}", account.email);
-            println!("Nombre                {:?}", account.first_name);
-            println!("Role                  {:?}", account.role);
-            println!("Fecha de creaciónn    {:?}", account.member_since);
-            println!("Timezone              {:?}", account.account_timezone);
-            println!("Ruburo                {:?}", account.account_industry);
-            println!("Total de subcriptores {:?}", account.total_subscribers);
-            println!("Estadisticas          {:?}", account.industry_stats);
+            println!("Account Info");
+            println!("Account Name      {:?}", account.account_name);
+            println!("Email             {:?}", account.email);
+            println!("First Name        {:?}", account.first_name);
+            println!("Role              {:?}", account.role);
+            println!("Member Since      {:?}", account.member_since);
+            println!("Account Timezone  {:?}", account.account_timezone);
+            println!("Account Industry  {:?}", account.account_industry);
+            println!("Total Subscribers {:?}", account.total_subscribers);
+            println!("Industry Stats    {:?}", account.industry_stats);
             println!("=============================================")
         }
         Err(e) => println!("{:?}", e),

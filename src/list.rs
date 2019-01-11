@@ -151,7 +151,10 @@ impl ResourceFilter for ListFilter {
 }
 
 ///
-/// Lists
+/// Implement Mailchimp Lists Endpoint
+///
+/// A Mailchimp list is a powerful and flexible tool that helps you manage your
+/// contacts. Learn how to get started with lists in Mailchimp.
 ///
 #[derive(Debug, Clone)]
 pub struct Lists {

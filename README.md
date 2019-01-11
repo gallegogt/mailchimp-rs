@@ -1,80 +1,73 @@
-# Mailchimp API
+# Mailchimp API Implementation
 
-### Biblioteca de desarrollo para acceder al API de [Mailchimp](https://developer.mailchimp.com), utilizando como lenguaje de programación Rust
+### Library for the development of applications that require the use of the [Mailchimp](https://developer.mailchimp.com) API, using the Rust programming language
 
-NOTA: Biblioteca en desarrollo, en la sección "**Estado de implementación**" te muestro que he implementado y que no
+NOTA: NOTE: The library is in development, in the section "**Implementation Status**" I show you that I have implemented and that not.
 ---
 
-### ✅ Ejemplo de como puedes extraer todas las automatizaciones
+### What can you do with the library?
 
-A continuación te muestro un ejemplo de código para que puedas extraer todas las automatizaciones creadas en tu Mailchimp
+  - [x] ✅ Get the general information about your Mailchimp Account
+      * Total Subscribers
+      * Industry Stats
+      * Account Industry
+      * ...
+  - [x] ✅ Get all your Mailchimp Automations, and information of each of them
+  - [x] ✅ Get all your Mailchimp Campaigns, and information of each of them
+  - [x] ✅ Get all your Mailchimp Lists, and information of each of them
+  - [x] ✅ And more...
 
-Para este ejemplo uso las siguientes dependencias:
+
+### ✅ Example of how you can extract all the automations
+
+Dependencies:
 
 ```toml
 [dependencies]
-dotenv = "^0.13"
 mailchimp = "0.1"
 ```
 
-También he creado un archivo .env con las credenciales para el acceso a mailchimp. A continuación te pongo un ejemplo del archivo .env
-
-```
-MAILCHIMP_API_KEY="<API_KEY>"
-```
-
-Finalmente el código de ejemplo para visualizar las automatizaciones creadas en tu mailchimp
+Rust Code:
 
 ```rust
-  extern crate dotenv;
   extern crate mailchimp;
-
-  use dotenv::dotenv;
-  use std::env;
-
   use mailchimp::MailchimpApi;
   use mailchimp::{Automations, AutomationsFilter};
   use std::collections::HashMap;
 
   fn main() {
-      // Inicializando el dotenv
-      dotenv().ok();
-      // Obteniendo las variables de entornos con las credenciales de
-      // mailchimp
-      let mut env_mailchimp = env::vars().filter(|e| e.0.to_string().contains("MAILCHIMP_"));
-      // Inicializando el API, con las credenciales
-      let apk = env_mailchimp.next().unwrap().1;
-      // Inicializando el API, con las credenciales
-      let api = MailchimpApi::new(&apk);
+      // Init the API instance with the API KEY
+      let api = MailchimpApi::new("<API_KEY>");
 
-      // Ejemplo de como obtener todas la automatizaciones
+      // Create instance of Automations
       let automations = Automations::new(api);
-      let mut last_automation_id = String::from("");
 
+      // Now you can go through all the automations and display information on
+      // each of the automations.
       for w in automations.iter(AutomationsFilter::default()) {
-          let settings = w.get_settings().as_ref().unwrap();
-          last_automation_id = w.get_id().as_ref().unwrap().to_string();
-          println!("Automatizacion");
-          println!("ID                {:?}", w.get_id());
-          println!("Título            {:?}", settings.title);
-          println!("Emails Enviados   {:?}", w.get_emails_sent());
-          println!("Resumen           {:?}", w.get_report_summary());
-          println!("Fecha Inicio      {:?}", w.get_start_time());
-          println!("Fecha de creacion {:?}", w.get_create_time());
-          println!("Estado            {:?}", w.get_status());
-          println!("Tracking          {:?}", w.get_tracking());
-          println!("Disparadores      {:?}", w.get_trigger_settings());
-          println!("Recipients        {:?}", w.get_recipients());
+          let settings = w.settings.as_ref().unwrap();
+          last_automation_id = w.id.as_ref().unwrap().to_string();
+          println!("Automation");
+          println!("ID                {:?}", w.id);
+          println!("Title             {:?}", settings.title);
+          println!("Emails Sent       {:?}", w.emails_sent);
+          println!("Report Summary    {:?}", w.report_summary);
+          println!("Start Time        {:?}", w.start_time);
+          println!("Create Time       {:?}", w.create_time);
+          println!("Status            {:?}", w.status);
+          println!("Tracking          {:?}", w.tracking);
+          println!("Trigger Settings  {:?}", w.trigger_settings);
+          println!("Recipients        {:?}", w.recipients);
           println!("=============================================")
       }
   }
 ```
 
-###Puedes seguir viendo mas ejemplos en la carpeta examples
+### More examples in ``examples/*``
 
-# Estado de la implementación
+# Status of Development
 
-A continuación te presento un listado donde iré actualizando a la medida de lo posible las diferentes los endpoints soportados por la biblioteca
+Below I present a list where I will be updating to the extent possible the different endpoints supported by the library
 
 ### Authorized Apps
   * ✅ Link your application

@@ -1,3 +1,24 @@
+///
+/// Example used to share statistics from a specific Mailchimp account through MQTT and be monitored by Grafana
+///
+/// Requirements:
+///     You need to have some MQTT Broker active, to send the information through it
+///
+/// Create archive named ``.env`` in the root of the directory with the following info and run the example
+/// MAILCHIMP_API_KEY=<API KEY>
+/// MQTT_USER=<MQTT_USER>
+/// MQTT_PASSWORD=<MQTT_PASSWORD>
+/// MQTT_HOST=<MQTT_HOST>
+///
+/// Dependencies
+///
+/// # This library is meant to be used on development or testing environments
+/// # in which setting environment variables is not practical.
+/// dotenv = "^0.13"
+/// # Eclipse Paho MQTT Rust Client Library
+/// paho-mqtt = {version="^0.5", default-features=false}
+///
+
 extern crate dotenv;
 extern crate mailchimp;
 extern crate paho_mqtt as mqtt;
@@ -356,9 +377,9 @@ fn disconnect(cli: &mqtt::Client) {
 }
 
 fn main() {
-    // Inicializando el dotenv
+    // Init dotenv
     dotenv().ok();
-    // Obteniendo las variables de entornos con las credenciales de
+    // Filter the env vars to get the Mailchimp Credential
     // mailchimp
     let mut env_mailchimp = env::vars().filter(|e| e.0.to_string().contains("MAILCHIMP_"));
     let apk = env_mailchimp.next().unwrap().1;
@@ -384,7 +405,7 @@ fn main() {
         mqtt_settings.1.as_str(),
     );
 
-    // Inicializando el API, con las credenciales
+    // Init API
     let api = MailchimpApi::new(&apk);
     // ========== Mailchimp Account Stats ========
     let api_root = ApiRoot::new(api.clone());

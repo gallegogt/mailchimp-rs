@@ -3,6 +3,12 @@ use super::internal::request::MailchimpResult;
 use super::types::ApiRootType;
 use std::collections::HashMap;
 
+///
+/// Implement Mailchimp API Root Endpoint
+///
+/// The API root resource links to all other resources available in the API.
+/// Calling the root directory also returns details about the Mailchimp user account.
+///
 #[derive(Debug, Clone)]
 pub struct ApiRoot {
     api: MailchimpApi,

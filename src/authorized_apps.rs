@@ -61,7 +61,9 @@ impl ResourceFilter for AuthorizedFilter {
 }
 
 ///
-/// campaigns
+/// Implement Mailchimp Authorized Apps Endpoint
+///
+/// Manage registered, connected apps for your Mailchimp account with the Authorized Apps endpoints.
 ///
 #[derive(Debug, Clone)]
 pub struct AuthorizedApps {
@@ -76,7 +78,7 @@ impl BuildIter for AuthorizedAppsBuilder {
     type Collection = AuthorizedAppsType;
 
     ///
-    /// Crea un recurso a partir del dato pasado por parámetro
+    /// Create new resource, with the api instance updated
     ///
     fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
         let mut in_data = data.clone();
@@ -84,7 +86,7 @@ impl BuildIter for AuthorizedAppsBuilder {
         in_data
     }
     ///
-    /// Actualiza el offset
+    /// Update Offset
     ///
     fn update_filter_offset(&self, filter: &Self::FilterItem) -> Self::FilterItem {
         let mut f = filter.clone();
@@ -95,7 +97,7 @@ impl BuildIter for AuthorizedAppsBuilder {
 
 impl AuthorizedApps {
     ///
-    /// Argumentos:
+    /// Arguments:
     ///     api: MailchimpApi
     ///
     pub fn new(api: MailchimpApi) -> Self {
@@ -103,19 +105,18 @@ impl AuthorizedApps {
     }
 
     ///
-    /// Devuelve información de las listas creadas
+    /// Get a list of an account’s registered, connected applications.
     ///
     ///
-    /// Devuelve una lista de las aplicaciones conectadas y registradas de una cuenta.
-    ///
-    /// Argumentos:
-    ///     filters: Filtros que requieras aplicar a la hora de obtener las aplicaciones
-    ///         fields: Una lista de campos separados por comas para devolver.
-    ///             Parámetros de referencia de subobjetos con notación de puntos.
-    ///         exclude_fields: Una lista de campos separados por comas para excluir.
-    ///            Parámetros de referencia de subobjetos con notación de puntos.
-    ///         count: Cantidad de registros a devolver
-    ///         offset: El número de registros de una colección a omitir. Por defecto es 0
+    /// Arguments:
+    ///     filters: Filters
+    ///         fields: A comma-separated list of fields to return. Reference parameters of
+    ///                 sub-objects with dot notation.
+    ///         exclude_fields: A comma-separated list of fields to exclude.
+    ///                Reference parameters of sub-objects with dot notation.
+    ///         count: The number of records to return.
+    ///         offset: The number of records from a collection to skip. Iterating over large
+    ///             collections with this parameter can be slow. Default value is 0.
     ///
     pub fn get_authorized_apps_from_remote(
         &self,
@@ -138,10 +139,9 @@ impl AuthorizedApps {
     }
 
     ///
-    /// Obtiene las credenciales basadas en OAuth2 para asociar las llamadas a
-    /// la API con su aplicación.
+    /// Retrieve OAuth2-based credentials to associate API calls with your application.
     ///
-    /// Argumentos:
+    /// Arguments:
     ///     client_id: Id o nombre de usuario único para la autorización
     ///     client_secret: Contraseña del cliente para la autorización
     ///
@@ -166,15 +166,15 @@ impl AuthorizedApps {
 
     ///
     ///
-    /// Devuelve una lista de las aplicaciones conectadas y registradas de una cuenta.
+    /// Get information about a specific authorized app
     ///
-    /// Argumentos:
+    /// Arguments:
     ///     app_id: identificador de la aplicación autorizada
     ///     filters: Filtros que requieras aplicar a la hora de obtener las aplicaciones
-    ///         fields: Una lista de campos separados por comas para devolver.
-    ///             Parámetros de referencia de subobjetos con notación de puntos.
-    ///         exclude_fields: Una lista de campos separados por comas para excluir.
-    ///            Parámetros de referencia de subobjetos con notación de puntos.
+    ///         fields: A comma-separated list of fields to return. Reference
+    ///             parameters of sub-objects with dot notation.
+    ///         exclude_fields: A comma-separated list of fields to exclude.
+    ///             Reference parameters of sub-objects with dot notation.
     ///
     pub fn get_authorized_app_info<'a>(
         &self,
@@ -192,8 +192,7 @@ impl AuthorizedApps {
     }
 
     ///
-    /// Función para recorrer todas las campañas exitentes. A diferencia de la
-    /// anterior esta función te devuelve un iterador
+    /// Returns a iterator to access all applications
     ///
     pub fn iter(&self, filters: AuthorizedFilter) -> MalchimpIter<AuthorizedAppsBuilder> {
         if let Some(remote) = self.get_authorized_apps_from_remote(Some(&filters)) {
