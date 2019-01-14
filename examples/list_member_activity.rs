@@ -42,30 +42,25 @@ fn main() {
 
         // Get list members
         let mut m_iter = l.get_members(None);
-        let mut email_address = "".to_string();
 
         // select one element of the list
         if let Some(c) = m_iter.next() {
-            email_address = c.email_address.clone();
             println!("\nMember:");
-            println!("\tEmail Address       {:?}", email_address);
+            println!("\tEmail Address       {:?}", c.email_address);
             println!("\tUnique Email Id     {:?}", c.unique_email_id);
             println!("\tEmail Type          {:?}", c.email_type);
-        }
 
-        let digest = md5::compute(email_address);
-        let digest_str = format!("{:x}", digest);
-
-        // Show all activity for one member list
-        for ma in l.get_member_activity(&digest_str) {
-            println!("\nActivity for {:?}: ", &digest_str);
-            println!("\nAction: {:?}", ma.action);
-            println!("\nTimestamp: {:?}", ma.timestamp);
-            println!("\nUrl: {:?}", ma.url);
-            println!("\nActivity Type: {:?}", ma.activity_type);
-            println!("\nCampaign ID: {:?}", ma.campaign_id);
-            println!("\nTitle: {:?}", ma.title);
-            println!("\nParent Campaign: {:?}", ma.parent_campaign);
+            // Show all activity for one member list
+            for ma in c.get_activity() {
+                println!("\nActivity for {:?}: ", c.id);
+                println!("\nAction: {:?}", ma.action);
+                println!("\nTimestamp: {:?}", ma.timestamp);
+                println!("\nUrl: {:?}", ma.url);
+                println!("\nActivity Type: {:?}", ma.activity_type);
+                println!("\nCampaign ID: {:?}", ma.campaign_id);
+                println!("\nTitle: {:?}", ma.title);
+                println!("\nParent Campaign: {:?}", ma.parent_campaign);
+            }
         }
     }
 }

@@ -42,27 +42,21 @@ fn main() {
 
         // Get list members
         let mut m_iter = l.get_members(None);
-        let mut email_address = "".to_string();
-
         // select one element of the list
         if let Some(c) = m_iter.next() {
-            email_address = c.email_address.clone();
             println!("\nMember:");
-            println!("\tEmail Address       {:?}", email_address);
+            println!("\tEmail Address       {:?}", c.email_address);
             println!("\tUnique Email Id     {:?}", c.unique_email_id);
             println!("\tEmail Type          {:?}", c.email_type);
-        }
 
-        let digest = md5::compute(email_address);
-        let digest_str = format!("{:x}", digest);
-
-        // Show all goals for one member list
-        for ma in l.get_member_goals(&digest_str) {
-            println!("\nGoal for {:?}: ", &digest_str);
-            println!("\nGoald ID: {:?}", ma.goal_id);
-            println!("\nEvent: {:?}", ma.event);
-            println!("\nUrl: {:?}", ma.last_visited_at);
-            println!("\nData: {:?}", ma.data);
+            // Show all goals for one member list
+            for ma in c.get_goals() {
+                println!("\nGoal for {:?}: ", c.id);
+                println!("\nGoald ID: {:?}", ma.goal_id);
+                println!("\nEvent: {:?}", ma.event);
+                println!("\nUrl: {:?}", ma.last_visited_at);
+                println!("\nData: {:?}", ma.data);
+            }
         }
     }
 }

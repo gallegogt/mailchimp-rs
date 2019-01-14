@@ -10,8 +10,6 @@ use super::list_growth_history::{
     ListGrowthHistoryType,
 };
 use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
-use super::list_member_activity::{CollectionListMemberActivity, ListMemberActivityBuilder};
-use super::list_member_goals::{CollectionListMemberGoal, ListMemberGoalBuilder};
 use super::list_members::{
     CollectionListMembers, ListMember, ListMemberParams, ListMembersBuilder, ListMembersFilter,
 };
@@ -674,94 +672,6 @@ impl ListType {
 
         self._api
             .put::<ListMember, ListMemberParams>(&endpoint, param)
-    }
-
-    ///
-    /// Get details about subscribers’ recent activity.
-    ///
-    /// Arguments:
-    ///     subscriber_hash: The MD5 hash of the lowercase version of the list member’s email address.
-    ///
-    pub fn get_member_activity<'a>(
-        &self,
-        subscriber_hash: &'a str,
-    ) -> MalchimpIter<ListMemberActivityBuilder> {
-        // GET /lists/{list_id}/members/{subscriber_hash}/activity
-        let mut endpoint = self.get_base_endpoint() + "/members/";
-        endpoint.push_str(subscriber_hash);
-        endpoint.push_str("/activity");
-        let filter_params = SimpleFilter::default();
-
-        match self
-            ._api
-            .get::<CollectionListMemberActivity>(&endpoint, filter_params.build_payload())
-        {
-            Ok(collection) => MalchimpIter {
-                builder: ListMemberActivityBuilder {},
-                data: collection.activity,
-                cur_filters: filter_params.clone(),
-                cur_it: 0,
-                total_items: collection.total_items,
-                api: self._api.clone(),
-                endpoint: endpoint.clone(),
-            },
-            Err(e) => {
-                error!( target: "mailchimp",  "Get List Members: Response Error details: {:?}", e);
-                MalchimpIter {
-                    builder: ListMemberActivityBuilder {},
-                    data: Vec::new(),
-                    cur_filters: filter_params.clone(),
-                    cur_it: 0,
-                    total_items: 0,
-                    api: self._api.clone(),
-                    endpoint: endpoint.clone(),
-                }
-            }
-        }
-    }
-
-    ///
-    /// Get information about recent goal events for a specific list member.
-    ///
-    /// Arguments:
-    ///     subscriber_hash: The MD5 hash of the lowercase version of the list member’s email address.
-    ///
-    pub fn get_member_goals<'a>(
-        &self,
-        subscriber_hash: &'a str,
-    ) -> MalchimpIter<ListMemberGoalBuilder> {
-        // GET  /lists/{list_id}/members/{subscriber_hash}/goals
-        let mut endpoint = self.get_base_endpoint() + "/members/";
-        endpoint.push_str(subscriber_hash);
-        endpoint.push_str("/goals");
-        let filter_params = SimpleFilter::default();
-
-        match self
-            ._api
-            .get::<CollectionListMemberGoal>(&endpoint, filter_params.build_payload())
-        {
-            Ok(collection) => MalchimpIter {
-                builder: ListMemberGoalBuilder {},
-                data: collection.goals,
-                cur_filters: filter_params.clone(),
-                cur_it: 0,
-                total_items: collection.total_items,
-                api: self._api.clone(),
-                endpoint: endpoint.clone(),
-            },
-            Err(e) => {
-                error!( target: "mailchimp",  "Get List Members: Response Error details: {:?}", e);
-                MalchimpIter {
-                    builder: ListMemberGoalBuilder {},
-                    data: Vec::new(),
-                    cur_filters: filter_params.clone(),
-                    cur_it: 0,
-                    total_items: 0,
-                    api: self._api.clone(),
-                    endpoint: endpoint.clone(),
-                }
-            }
-        }
     }
 
     ///
