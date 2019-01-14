@@ -195,6 +195,9 @@ pub struct ListMember {
     /// The tags applied to this member.
     #[serde(default)]
     pub tags: Vec<String>,
+    /// IP address the subscriber signed up from.
+    #[serde(default)]
+    pub ip_signup: Vec<String>,
     /// The list id.
     #[serde(default)]
     pub list_id: String,
@@ -553,12 +556,24 @@ impl BuildIter for ListMembersBuilder {
     }
 }
 
-/// =================== ========
+///
+/// ListMemberParams
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ListMemberParams {
     /// Email address for a subscriber.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub email_address: Option<String>,
+    /// Subscriber’s status. This value is required only if the email address is not
+    /// already present on the list.
+    /// Possible Values:
+    ///     * subscribed
+    ///     * unsubscribed
+    ///     * cleaned
+    ///     * pending
+    ///     * transactional
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status_if_new: Option<String>,
     /// Type of email this member asked to get (‘html’ or ‘text’).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub email_type: Option<String>,
@@ -599,5 +614,5 @@ pub struct ListMemberParams {
     pub ip_opt: Option<String>,
     /// The date and time the subscribe confirmed their opt-in status in ISO 8601 format.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub timestamp_opt: Option<String>,
+    pub timestamp_opt: Option<String>
 }

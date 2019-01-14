@@ -649,6 +649,21 @@ impl ListType {
     }
 
     ///
+    /// Add or update a list member
+    ///
+    /// Arguments:
+    ///     subscriber_hash: The MD5 hash of the lowercase version of the list member’s email address.
+    ///     param: Member fields to update o create
+    ///
+    pub fn add_update_member<'a>(&self, subscriber_hash: &'a str, param: ListMemberParams) -> MailchimpResult<ListMember> {
+        // PUT /lists/{list_id}/members/{subscriber_hash}
+        let mut endpoint = self.get_base_endpoint() + "/members/";
+        endpoint.push_str(subscriber_hash);
+
+        self._api.put::<ListMember, ListMemberParams>(&endpoint, param)
+    }
+
+    ///
     /// Get Endpoint
     ///
     fn get_base_endpoint(&self) -> String {
