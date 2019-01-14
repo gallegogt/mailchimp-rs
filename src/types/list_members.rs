@@ -6,6 +6,7 @@ use crate::iter::{MalchimpIter, BuildIter, MailchimpCollection, ResourceFilter, 
 use std::collections::HashMap;
 use super::list_member_activity::{CollectionListMemberActivity, ListMemberActivityBuilder};
 use super::list_member_goals::{CollectionListMemberGoal, ListMemberGoalBuilder};
+use super::list_member_tags::{CollectionListMemberTag, ListMemberTagBuilder, ListMemberTagParam, ListMemberTagType};
 
 use log::error;
 
@@ -276,8 +277,10 @@ impl ListMember {
     /// Get resource endpoint
     ///
     ///
-    pub fn get_base_endpoint(&self) -> &String {
-        &self._endpoint
+    pub fn get_base_endpoint(&self) -> String {
+        let mut endpoint = self._endpoint.clone() + "/";
+        endpoint.push_str(&self.id);
+        endpoint
     }
 
 
@@ -288,8 +291,7 @@ impl ListMember {
         &self
     ) -> MalchimpIter<ListMemberActivityBuilder> {
         // GET /lists/{list_id}/members/{subscriber_hash}/activity
-        let mut endpoint = self.get_base_endpoint().to_string() + "/";
-        endpoint.push_str(&self.id);
+        let mut endpoint = self.get_base_endpoint();
         endpoint.push_str("/activity");
         let filter_params = SimpleFilter::default();
 
@@ -361,6 +363,64 @@ impl ListMember {
                     endpoint: endpoint.clone(),
                 }
             }
+        }
+    }
+    ///
+    /// Get the tags on a list member.
+    ///
+    pub fn get_tags(
+        &self,
+    ) -> MalchimpIter<ListMemberTagBuilder> {
+        // GET /lists/{list_id}/members/{subscriber_hash}/tags
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/tags");
+        let filter_params = SimpleFilter::default();
+
+        match self
+            ._api
+            .get::<CollectionListMemberTag>(&endpoint, filter_params.build_payload())
+        {
+            Ok(collection) => MalchimpIter {
+                builder: ListMemberTagBuilder {},
+                data: collection.tags,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get List Members: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListMemberTagBuilder {},
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+    }
+
+    ///
+    /// Post the tags on a list member.
+    ///
+    /// Add or remove tags from a list member. If a tag that does not exist is passed in
+    /// and set as ‘active’, a new tag will be created.
+    ///
+    pub fn post_tag(&self, tags: Vec<ListMemberTagType>) -> Option<MailchimpErrorType> {
+        // POST /lists/{list_id}/members/{subscriber_hash}/tags
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/tags");
+        let param = ListMemberTagParam {
+            tags: tags
+        };
+
+        match self._api.post::<EmptyType, ListMemberTagParam>(&endpoint, param) {
+            Ok(_) => None,
+            Err(e) => Some(e)
         }
     }
 

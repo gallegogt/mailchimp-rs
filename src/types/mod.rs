@@ -19,6 +19,7 @@ mod list_growth_history;
 mod list_locations;
 mod list_member_activity;
 mod list_member_goals;
+mod list_member_tags;
 mod list_members;
 mod workflow_email;
 
@@ -43,5 +44,6 @@ pub use self::list_growth_history::*;
 pub use self::list_locations::*;
 pub use self::list_member_activity::*;
 pub use self::list_member_goals::*;
+pub use self::list_member_tags::*;
 pub use self::list_members::*;
 pub use self::workflow_email::*;
