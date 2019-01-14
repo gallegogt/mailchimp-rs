@@ -1,9 +1,9 @@
+use super::empty::EmptyType;
 use super::link::LinkType;
 use crate::api::MailchimpApi;
+use crate::internal::error_type::MailchimpErrorType;
 use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
 use std::collections::HashMap;
-use super::empty::EmptyType;
-use crate::internal::error_type::MailchimpErrorType;
 
 ///
 /// The most recent Note added about this member.
@@ -48,7 +48,7 @@ pub struct ListMarketingPermision {
     pub text: String,
     /// If the subscriber has opted-in to the marketing permission.
     #[serde(default)]
-    pub enabled: bool
+    pub enabled: bool,
 }
 
 impl Default for ListMarketingPermision {
@@ -211,7 +211,6 @@ pub struct ListMember {
     /// Endpoint Base for the instance
     #[serde(skip)]
     _endpoint: String,
-
 }
 
 impl ListMember {
@@ -321,7 +320,6 @@ impl Default for CollectionListMembers {
 }
 
 /// ================================= ITER =====================
-
 
 #[derive(Debug, Clone)]
 pub struct ListMembersFilter {
@@ -614,5 +612,5 @@ pub struct ListMemberParams {
     pub ip_opt: Option<String>,
     /// The date and time the subscribe confirmed their opt-in status in ISO 8601 format.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub timestamp_opt: Option<String>
+    pub timestamp_opt: Option<String>,
 }

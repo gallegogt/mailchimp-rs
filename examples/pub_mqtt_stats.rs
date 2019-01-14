@@ -18,7 +18,6 @@
 /// # Eclipse Paho MQTT Rust Client Library
 /// paho-mqtt = {version="^0.5", default-features=false}
 ///
-
 extern crate dotenv;
 extern crate mailchimp;
 extern crate paho_mqtt as mqtt;

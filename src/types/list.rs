@@ -10,8 +10,10 @@ use super::list_growth_history::{
     ListGrowthHistoryType,
 };
 use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
-use super::list_members::{CollectionListMembers, ListMembersBuilder, ListMembersFilter, ListMember, ListMemberParams};
 use super::list_member_activity::{CollectionListMemberActivity, ListMemberActivityBuilder};
+use super::list_members::{
+    CollectionListMembers, ListMember, ListMemberParams, ListMembersBuilder, ListMembersFilter,
+};
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
@@ -494,7 +496,8 @@ impl ListType {
         let mut endpoint = self.get_base_endpoint() + "/abuse-reports/";
         endpoint.push_str(report_id);
 
-        self._api.get::<ListAbuseReportType>(&endpoint, HashMap::new())
+        self._api
+            .get::<ListAbuseReportType>(&endpoint, HashMap::new())
     }
 
     ///
@@ -570,7 +573,8 @@ impl ListType {
         let mut endpoint = self.get_base_endpoint() + "/growth-history/";
         endpoint.push_str(month);
 
-        self._api.get::<ListGrowthHistoryType>(&endpoint, HashMap::new())
+        self._api
+            .get::<ListGrowthHistoryType>(&endpoint, HashMap::new())
     }
 
     ///
@@ -596,7 +600,9 @@ impl ListType {
             .get::<CollectionListMembers>(&endpoint, filter_params.build_payload())
         {
             Ok(collection) => MalchimpIter {
-                builder: ListMembersBuilder {endpoint: endpoint.clone()},
+                builder: ListMembersBuilder {
+                    endpoint: endpoint.clone(),
+                },
                 data: collection.members,
                 cur_filters: filter_params.clone(),
                 cur_it: 0,
@@ -607,7 +613,9 @@ impl ListType {
             Err(e) => {
                 error!( target: "mailchimp",  "Get List Members: Response Error details: {:?}", e);
                 MalchimpIter {
-                    builder: ListMembersBuilder {endpoint: endpoint.clone()},
+                    builder: ListMembersBuilder {
+                        endpoint: endpoint.clone(),
+                    },
                     data: Vec::new(),
                     cur_filters: filter_params.clone(),
                     cur_it: 0,
@@ -626,10 +634,7 @@ impl ListType {
     /// Arguments:
     ///     subscriber_hash: The MD5 hash of the lowercase version of the list member’s email address.
     ///
-    pub fn get_member_info<'a>(
-        &self,
-        subscriber_hash: &'a str,
-    ) -> MailchimpResult<ListMember> {
+    pub fn get_member_info<'a>(&self, subscriber_hash: &'a str) -> MailchimpResult<ListMember> {
         // GET /lists/{list_id}/members/{subscriber_hash}
         let mut endpoint = self.get_base_endpoint() + "/members/";
         endpoint.push_str(subscriber_hash);
@@ -646,7 +651,8 @@ impl ListType {
     pub fn add_new_member(&self, param: ListMemberParams) -> MailchimpResult<ListMember> {
         // POST /lists/{list_id}/members
         let endpoint = self.get_base_endpoint() + "/members";
-        self._api.post::<ListMember, ListMemberParams>(&endpoint, param)
+        self._api
+            .post::<ListMember, ListMemberParams>(&endpoint, param)
     }
 
     ///
@@ -656,12 +662,17 @@ impl ListType {
     ///     subscriber_hash: The MD5 hash of the lowercase version of the list member’s email address.
     ///     param: Member fields to update o create
     ///
-    pub fn add_update_member<'a>(&self, subscriber_hash: &'a str, param: ListMemberParams) -> MailchimpResult<ListMember> {
+    pub fn add_update_member<'a>(
+        &self,
+        subscriber_hash: &'a str,
+        param: ListMemberParams,
+    ) -> MailchimpResult<ListMember> {
         // PUT /lists/{list_id}/members/{subscriber_hash}
         let mut endpoint = self.get_base_endpoint() + "/members/";
         endpoint.push_str(subscriber_hash);
 
-        self._api.put::<ListMember, ListMemberParams>(&endpoint, param)
+        self._api
+            .put::<ListMember, ListMemberParams>(&endpoint, param)
     }
 
     ///
@@ -685,7 +696,7 @@ impl ListType {
             .get::<CollectionListMemberActivity>(&endpoint, filter_params.build_payload())
         {
             Ok(collection) => MalchimpIter {
-                builder: ListMemberActivityBuilder{},
+                builder: ListMemberActivityBuilder {},
                 data: collection.activity,
                 cur_filters: filter_params.clone(),
                 cur_it: 0,
@@ -696,7 +707,7 @@ impl ListType {
             Err(e) => {
                 error!( target: "mailchimp",  "Get List Members: Response Error details: {:?}", e);
                 MalchimpIter {
-                    builder: ListMemberActivityBuilder{},
+                    builder: ListMemberActivityBuilder {},
                     data: Vec::new(),
                     cur_filters: filter_params.clone(),
                     cur_it: 0,

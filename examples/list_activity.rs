@@ -10,7 +10,6 @@
 /// To run this example you need to create a archive named ``.env`` in the root of the directory with the following info
 /// MAILCHIMP_API_KEY=<API KEY>
 ///
-
 extern crate dotenv;
 extern crate mailchimp;
 use dotenv::dotenv;
@@ -42,7 +41,7 @@ fn main() {
         // Show last list activity symmary (today)
         let mut iter_act = w.get_activity(None, None);
         if let Some(activity) = iter_act.next() {
-        // for activity in w.get_activity(None, None) {
+            // for activity in w.get_activity(None, None) {
             println!("\nList Activity");
             println!("Day {:?}", activity.day);
             println!("Emails Sent {:?}", activity.emails_sent);

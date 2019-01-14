@@ -70,7 +70,6 @@ impl Default for CollectionListGrowthHistory {
 
 /// ================================= ITER =====================
 
-
 #[derive(Debug, Clone)]
 pub struct ListGrowthHistoryFilter {
     /// A comma-separated list of fields to return. Reference
@@ -98,7 +97,7 @@ impl Default for ListGrowthHistoryFilter {
             count: Some(50),
             offset: Some(0),
             sort_field: None,
-            sort_dir: None
+            sort_dir: None,
         }
     }
 }
@@ -143,8 +142,6 @@ impl ResourceFilter for ListGrowthHistoryFilter {
         payload
     }
 }
-
-
 
 #[derive(Debug)]
 pub struct ListGrowthHistoryBuilder {}

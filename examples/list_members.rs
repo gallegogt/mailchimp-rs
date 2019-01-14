@@ -10,7 +10,6 @@
 /// To run this example you need to create a archive named ``.env`` in the root of the directory with the following info
 /// MAILCHIMP_API_KEY=<API KEY>
 ///
-
 extern crate dotenv;
 extern crate mailchimp;
 use dotenv::dotenv;
@@ -40,7 +39,7 @@ fn main() {
         println!("=============================================");
 
         let mut m_iter = l.get_members(None);
-        if let Some(c) = m_iter.next()  {
+        if let Some(c) = m_iter.next() {
             println!("\nMember:");
             println!("\tEmail Address       {:?}", c.email_address);
             println!("\tUnique Email Id     {:?}", c.unique_email_id);

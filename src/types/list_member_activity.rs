@@ -17,7 +17,7 @@ pub struct ListMemberActivity {
     #[serde(default)]
     pub url: String,
     /// The type of campaign that was sent.
-    #[serde(default, rename="type")]
+    #[serde(default, rename = "type")]
     pub activity_type: String,
     /// The web-based ID for the campaign.
     #[serde(default)]

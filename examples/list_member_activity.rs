@@ -10,7 +10,6 @@
 /// To run this example you need to create a archive named ``.env`` in the root of the directory with the following info
 /// MAILCHIMP_API_KEY=<API KEY>
 ///
-
 extern crate dotenv;
 extern crate mailchimp;
 extern crate md5;
@@ -46,7 +45,7 @@ fn main() {
         let mut email_address = "".to_string();
 
         // select one element of the list
-        if let Some(c) = m_iter.next()  {
+        if let Some(c) = m_iter.next() {
             email_address = c.email_address.clone();
             println!("\nMember:");
             println!("\tEmail Address       {:?}", email_address);
