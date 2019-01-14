@@ -10,7 +10,7 @@ use super::list_growth_history::{
     ListGrowthHistoryType,
 };
 use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
-use super::list_members::{CollectionListMembers, ListMembersBuilder, ListMembersFilter, ListMember};
+use super::list_members::{CollectionListMembers, ListMembersBuilder, ListMembersFilter, ListMember, ListMemberParams};
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
@@ -634,6 +634,18 @@ impl ListType {
         endpoint.push_str(subscriber_hash);
 
         self._api.get::<ListMember>(&endpoint, HashMap::new())
+    }
+
+    ///
+    /// Add a new member to the list.
+    ///
+    /// Arguments:
+    ///     param: New member fields
+    ///
+    pub fn add_new_member(&self, param: ListMemberParams) -> MailchimpResult<ListMember> {
+        // POST /lists/{list_id}/members
+        let endpoint = self.get_base_endpoint() + "/members";
+        self._api.post::<ListMember, ListMemberParams>(&endpoint, param)
     }
 
     ///

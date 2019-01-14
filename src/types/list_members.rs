@@ -156,9 +156,6 @@ pub struct ListMember {
     /// Open and click rates for this subscriber.
     #[serde(default)]
     pub stats: SubscriberStats,
-    /// IP address the subscriber signed up from.
-    #[serde(default)]
-    pub ip_signup: String,
     /// The date and time the subscriber signed up for the list in ISO 8601 format.
     #[serde(default)]
     pub timestamp_signup: String,
@@ -554,4 +551,53 @@ impl BuildIter for ListMembersBuilder {
         f.offset = Some(f.count.unwrap() + f.offset.unwrap());
         f
     }
+}
+
+/// =================== ========
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ListMemberParams {
+    /// Email address for a subscriber.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub email_address: Option<String>,
+    /// Type of email this member asked to get (‘html’ or ‘text’).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub email_type: Option<String>,
+    /// Subscriber’s current status.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
+    /// An individual merge var and value for a member.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merge_fields: Option<HashMap<String, String>>,
+    /// The key of this object’s properties is the ID of the interest in question.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub interests: Option<HashMap<String, String>>,
+    /// If set/detected, the subscriber’s language.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub language: Option<String>,
+    /// VIP status for subscriber.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vip: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location: Option<SubscriberLocation>,
+    /// The marketing permissions for the subscriber.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub marketing_permissions: Option<Vec<ListMarketingPermision>>,
+    /// The number of tags applied to this member.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tags_count: Option<u64>,
+    /// The tags applied to this member.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<String>>,
+    /// IP address the subscriber signed up from.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ip_signup: Option<String>,
+    /// The date and time the subscriber signed up for the list in ISO 8601 format.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub timestamp_signup: Option<String>,
+    /// The IP address the subscriber used to confirm their opt-in status.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ip_opt: Option<String>,
+    /// The date and time the subscribe confirmed their opt-in status in ISO 8601 format.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub timestamp_opt: Option<String>,
 }
