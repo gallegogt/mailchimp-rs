@@ -79,7 +79,6 @@ pub struct WorkflowEmailType {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub _links: Option<Vec<LinkType>>,
 
-    /// ============ CAMPOS NO SERIALIZABLES ========
     /// Mailchimp APi
     #[serde(skip)]
     _api: MailchimpApi,

@@ -10,6 +10,7 @@ use super::list_growth_history::{
     ListGrowthHistoryType,
 };
 use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
+use super::list_members::{CollectionListMembers, ListMembersBuilder, ListMembersFilter, ListMember};
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
@@ -569,6 +570,70 @@ impl ListType {
         endpoint.push_str(month);
 
         self._api.get::<ListGrowthHistoryType>(&endpoint, HashMap::new())
+    }
+
+    ///
+    /// Get information about members in a list
+    ///
+    /// Arguments:
+    ///     filter: Params to filter the response
+    ///
+    pub fn get_members(
+        &self,
+        filter: Option<ListMembersFilter>,
+    ) -> MalchimpIter<ListMembersBuilder> {
+        // GET /lists/{list_id}/members
+        let endpoint = self.get_base_endpoint() + "/members";
+        let filter_params = if let Some(f) = filter {
+            f
+        } else {
+            ListMembersFilter::default()
+        };
+
+        match self
+            ._api
+            .get::<CollectionListMembers>(&endpoint, filter_params.build_payload())
+        {
+            Ok(collection) => MalchimpIter {
+                builder: ListMembersBuilder {endpoint: endpoint.clone()},
+                data: collection.members,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get List Members: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListMembersBuilder {endpoint: endpoint.clone()},
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+    }
+
+    ///
+    /// Get information about a specific list member, including a currently subscribed,
+    /// unsubscribed, or bounced member.
+    ///
+    /// Arguments:
+    ///     subscriber_hash: The MD5 hash of the lowercase version of the list member’s email address.
+    ///
+    pub fn get_member_info<'a>(
+        &self,
+        subscriber_hash: &'a str,
+    ) -> MailchimpResult<ListMember> {
+        // GET /lists/{list_id}/members/{subscriber_hash}
+        let mut endpoint = self.get_base_endpoint() + "/members/";
+        endpoint.push_str(subscriber_hash);
+
+        self._api.get::<ListMember>(&endpoint, HashMap::new())
     }
 
     ///
