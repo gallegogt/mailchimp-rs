@@ -30,6 +30,8 @@ doc = true
 dotenv = "^0.13"
 # Eclipse Paho MQTT Rust Client Library
 paho-mqtt = {version="^0.5", default-features=false}
+# MD5
+md5 = "0.6.1"
 
 [dependencies]
 # The core APIs, including the Serialize and Deserialize traits. Always

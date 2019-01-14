@@ -18,6 +18,7 @@ mod list_locations;
 mod list_abuse_report;
 mod list_growth_history;
 mod list_members;
+mod list_member_activity;
 mod workflow_email;
 
 pub use self::api_root::*;
@@ -40,4 +41,5 @@ pub use self::list_locations::*;
 pub use self::list_abuse_report::*;
 pub use self::list_growth_history::*;
 pub use self::list_members::*;
+pub use self::list_member_activity::*;
 pub use self::workflow_email::*;

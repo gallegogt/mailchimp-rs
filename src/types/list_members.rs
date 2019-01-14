@@ -197,7 +197,7 @@ pub struct ListMember {
     pub tags: Vec<String>,
     /// IP address the subscriber signed up from.
     #[serde(default)]
-    pub ip_signup: Vec<String>,
+    pub ip_signup: String,
     /// The list id.
     #[serde(default)]
     pub list_id: String,
