@@ -97,7 +97,7 @@ impl ListMemberNote {
 }
 
 ///
-/// Response for endpoint  GET /lists/{list_id}/members/{subscriber_hash}/activity
+/// Response for endpoint
 ///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CollectionListMemberNote {

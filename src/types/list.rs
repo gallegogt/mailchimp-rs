@@ -9,6 +9,10 @@ use super::list_growth_history::{
     CollectionListGrowthHistory, ListGrowthHistoryBuilder, ListGrowthHistoryFilter,
     ListGrowthHistoryType,
 };
+use super::list_interest_categories::{
+    CollectionListInterestCategories, InterestCategoryParam, ListInterestCategory,
+    ListInterestCategoryBuilder, ListInterestCategoryFilter,
+};
 use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
 use super::list_members::{
     CollectionListMembers, ListMember, ListMemberParams, ListMembersBuilder, ListMembersFilter,
@@ -672,6 +676,95 @@ impl ListType {
 
         self._api
             .put::<ListMember, ListMemberParams>(&endpoint, param)
+    }
+
+    ///
+    /// Get information about a list’s interest categories.
+    ///
+    /// Arguments:
+    ///     filters
+    ///
+    pub fn get_interest_categories(
+        &self,
+        filters: Option<ListInterestCategoryFilter>,
+    ) -> MalchimpIter<ListInterestCategoryBuilder> {
+        // GET /lists/{list_id}/interest-categories
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/interest-categories");
+
+        let filter_params = if let Some(f) = filters {
+            f
+        } else {
+            ListInterestCategoryFilter::default()
+        };
+
+        match self
+            ._api
+            .get::<CollectionListInterestCategories>(&endpoint, filter_params.build_payload())
+        {
+            Ok(collection) => MalchimpIter {
+                builder: ListInterestCategoryBuilder {
+                    endpoint: endpoint.clone(),
+                },
+                data: collection.categories,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get List Members: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListInterestCategoryBuilder {
+                        endpoint: endpoint.clone(),
+                    },
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+    }
+
+    ///
+    /// Get information about a specific interest category
+    ///
+    /// Argument:
+    ///     interest_category_id: A unique id for the interest category.
+    ///
+    pub fn get_specific_note<'a>(
+        &self,
+        interest_category_id: &'a str,
+    ) -> MailchimpResult<ListInterestCategory> {
+        // GET /lists/{list_id}/interest-categories/{interest_category_id}
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/interest-categories/");
+        endpoint.push_str(interest_category_id);
+
+        self._api
+            .get::<ListInterestCategory>(&endpoint, HashMap::new())
+    }
+
+    ///
+    /// Create a new interest category
+    ///
+    /// Argument:
+    ///     note: The content of the note. Note length is limited to 1,000 characters.
+    ///
+    pub fn create_interest_category<'a>(
+        &self,
+        param: InterestCategoryParam,
+    ) -> MailchimpResult<ListInterestCategory> {
+        // POST /lists/{list_id}/interest-categories
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/interest-categories");
+
+        self._api
+            .post::<ListInterestCategory, InterestCategoryParam>(&endpoint, param)
     }
 
     ///
