@@ -1,12 +1,16 @@
 use super::empty::EmptyType;
 use super::link::LinkType;
-use crate::api::MailchimpApi;
-use crate::internal::error_type::MailchimpErrorType;
-use crate::iter::{MalchimpIter, BuildIter, MailchimpCollection, ResourceFilter, SimpleFilter};
-use std::collections::HashMap;
 use super::list_member_activity::{CollectionListMemberActivity, ListMemberActivityBuilder};
 use super::list_member_goals::{CollectionListMemberGoal, ListMemberGoalBuilder};
-use super::list_member_tags::{CollectionListMemberTag, ListMemberTagBuilder, ListMemberTagParam, ListMemberTagType};
+use super::list_member_notes::{CollectionListMemberNote, ListMemberNote, ListMemberNoteBuilder};
+use super::list_member_tags::{
+    CollectionListMemberTag, ListMemberTagBuilder, ListMemberTagParam, ListMemberTagType,
+};
+use crate::api::MailchimpApi;
+use crate::internal::error_type::MailchimpErrorType;
+use crate::internal::request::MailchimpResult;
+use crate::iter::{BuildIter, MailchimpCollection, MalchimpIter, ResourceFilter, SimpleFilter};
+use std::collections::HashMap;
 
 use log::error;
 
@@ -283,13 +287,10 @@ impl ListMember {
         endpoint
     }
 
-
     ///
     /// Get details about subscribers’ recent activity.
     ///
-    pub fn get_activity(
-        &self
-    ) -> MalchimpIter<ListMemberActivityBuilder> {
+    pub fn get_activity(&self) -> MalchimpIter<ListMemberActivityBuilder> {
         // GET /lists/{list_id}/members/{subscriber_hash}/activity
         let mut endpoint = self.get_base_endpoint();
         endpoint.push_str("/activity");
@@ -329,9 +330,7 @@ impl ListMember {
     /// Arguments:
     ///     subscriber_hash: The MD5 hash of the lowercase version of the list member’s email address.
     ///
-    pub fn get_goals(
-        &self,
-    ) -> MalchimpIter<ListMemberGoalBuilder> {
+    pub fn get_goals(&self) -> MalchimpIter<ListMemberGoalBuilder> {
         // GET  /lists/{list_id}/members/{subscriber_hash}/goals
         let mut endpoint = self.get_base_endpoint().to_string() + "/";
         endpoint.push_str(&self.id);
@@ -368,9 +367,7 @@ impl ListMember {
     ///
     /// Get the tags on a list member.
     ///
-    pub fn get_tags(
-        &self,
-    ) -> MalchimpIter<ListMemberTagBuilder> {
+    pub fn get_tags(&self) -> MalchimpIter<ListMemberTagBuilder> {
         // GET /lists/{list_id}/members/{subscriber_hash}/tags
         let mut endpoint = self.get_base_endpoint();
         endpoint.push_str("/tags");
@@ -414,16 +411,96 @@ impl ListMember {
         // POST /lists/{list_id}/members/{subscriber_hash}/tags
         let mut endpoint = self.get_base_endpoint();
         endpoint.push_str("/tags");
-        let param = ListMemberTagParam {
-            tags: tags
-        };
+        let param = ListMemberTagParam { tags: tags };
 
-        match self._api.post::<EmptyType, ListMemberTagParam>(&endpoint, param) {
+        match self
+            ._api
+            .post::<EmptyType, ListMemberTagParam>(&endpoint, param)
+        {
             Ok(_) => None,
-            Err(e) => Some(e)
+            Err(e) => Some(e),
         }
     }
 
+    ///
+    /// Get recent notes for a specific list member
+    ///
+    /// Arguments:
+    ///     filters
+    ///
+    pub fn get_notes(&self, filters: Option<SimpleFilter>) -> MalchimpIter<ListMemberNoteBuilder> {
+        // GET /lists/{list_id}/members/{subscriber_hash}/notes
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/notes");
+
+        let filter_params = if let Some(f) = filters {
+            f
+        } else {
+            SimpleFilter::default()
+        };
+
+        match self
+            ._api
+            .get::<CollectionListMemberNote>(&endpoint, filter_params.build_payload())
+        {
+            Ok(collection) => MalchimpIter {
+                builder: ListMemberNoteBuilder {
+                    endpoint: endpoint.clone(),
+                },
+                data: collection.notes,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get List Members: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListMemberNoteBuilder {
+                        endpoint: endpoint.clone(),
+                    },
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+    }
+
+    ///
+    /// Get details about subscribers’ recent activity.
+    ///
+    /// Argument:
+    ///     note_id: The id for the note.
+    ///
+    pub fn get_specific_note<'a>(&self, note_id: &'a str) -> MailchimpResult<ListMemberNote> {
+        // GET /lists/{list_id}/members/{subscriber_hash}/notes/{note_id}
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/notes/");
+        endpoint.push_str(note_id);
+
+        self._api.get::<ListMemberNote>(&endpoint, HashMap::new())
+    }
+
+    ///
+    /// Add a new note for a specific subscriber.
+    ///
+    /// Argument:
+    ///     note: The content of the note. Note length is limited to 1,000 characters.
+    ///
+    pub fn create_note<'a>(&self, note: &'a str) -> MailchimpResult<ListMemberNote> {
+        // POST /lists/{list_id}/members/{subscriber_hash}/notes
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/notes");
+        let mut payload = HashMap::new();
+        payload.insert("note".to_string(), note.to_string());
+        self._api
+            .post::<ListMemberNote, HashMap<String, String>>(&endpoint, payload)
+    }
 }
 
 ///

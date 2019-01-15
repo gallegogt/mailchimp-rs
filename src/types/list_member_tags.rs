@@ -70,7 +70,6 @@ impl BuildIter for ListMemberTagBuilder {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ListMemberTagType {
     /// The name of the tag.
