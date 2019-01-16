@@ -109,15 +109,15 @@ Below I present a list where I will be updating to the extent possible the diffe
     * ✅ **Abuse Reports**
     * ✅ **Activity**
     * ✅ **Clients**
-    * 🔘 **Growth History**
-    * 🔘 **Interest Categories**
+    * ✅ **Growth History**
+    * ✅ **Interest Categories**
     * ✅ **Locations**
-    * 🔘 **Members**
+    * ✅ **Members**
     * 🔘 **Merge Fields**
     * 🔘 **Segments**
-    * 🔘 **Signup Forms**
+    * ✅ **Signup Forms**
     * 🔘 **Webhooks**
-    * 🔘 **Locations**
+    * ✅ **Locations**
 
 ### Campaigns
   * ✅ Create a new campaign
