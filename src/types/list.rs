@@ -17,6 +17,7 @@ use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
 use super::list_members::{
     CollectionListMembers, ListMember, ListMemberParams, ListMembersBuilder, ListMembersFilter,
 };
+use super::list_signup_forms::{CollectionListSignupForm, ListSignupFormBuilder, ListSignupForm};
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
@@ -753,7 +754,7 @@ impl ListType {
     /// Create a new interest category
     ///
     /// Argument:
-    ///     note: The content of the note. Note length is limited to 1,000 characters.
+    ///     param: Content for Interest Category
     ///
     pub fn create_interest_category<'a>(
         &self,
@@ -765,6 +766,72 @@ impl ListType {
 
         self._api
             .post::<ListInterestCategory, InterestCategoryParam>(&endpoint, param)
+    }
+    ///
+    /// Customize the signup form settings for a specific list
+    ///
+    /// Argument:
+    ///     form: Signup Form content
+    ///
+    pub fn create_signup_form<'a>(
+        &self,
+        form: ListSignupForm ,
+    ) -> MailchimpResult<ListSignupForm> {
+        // POST /lists/{list_id}/signup-forms
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/signup-forms");
+        self._api
+            .post::<ListSignupForm, ListSignupForm>(&endpoint, form)
+    }
+
+    ///
+    /// Get signup forms for a specific list
+    ///
+    /// Arguments:
+    ///     filters
+    ///
+    pub fn get_signup_forms(
+        &self,
+        filters: Option<SimpleFilter>,
+    ) -> MalchimpIter<ListSignupFormBuilder> {
+        // GET /lists/{list_id}/signup-forms
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/signup-forms");
+
+        let filter_params = if let Some(f) = filters {
+            f
+        } else {
+            SimpleFilter::default()
+        };
+
+        match self
+            ._api
+            .get::<CollectionListSignupForm>(&endpoint, filter_params.build_payload())
+        {
+            Ok(collection) => MalchimpIter {
+                builder: ListSignupFormBuilder {
+                },
+                data: collection.signup_forms,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get List Members: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListSignupFormBuilder {
+                    },
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
     }
 
     ///

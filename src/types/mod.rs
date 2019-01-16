@@ -24,6 +24,7 @@ mod list_member_notes;
 mod list_member_tags;
 mod list_members;
 mod list_interests;
+mod list_signup_forms;
 mod workflow_email;
 
 pub use self::api_root::*;
@@ -53,3 +54,4 @@ pub use self::list_member_tags::*;
 pub use self::list_members::*;
 pub use self::workflow_email::*;
 pub use self::list_interests::*;
+pub use self::list_signup_forms::*;
