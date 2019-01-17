@@ -104,10 +104,7 @@ impl ListInterest {
     /// Arguments:
     ///     param: Values tu update
     ///
-    pub fn update<'a>(
-        &self,
-        param: InterestParam,
-    ) -> MailchimpResult<ListInterest> {
+    pub fn update<'a>(&self, param: InterestParam) -> MailchimpResult<ListInterest> {
         // PATCH /lists/{list_id}/interest-categories/{interest_category_id}/interests/{interest_id}
         let endpoint = self.get_base_endpoint();
         self._api

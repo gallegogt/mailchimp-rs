@@ -1,9 +1,11 @@
 use super::contact::ContactType;
+use super::empty::EmptyType;
 use super::link::LinkType;
 use super::list_abuse_report::{
     CollectionListAbuseReport, ListAbuseReportBuilder, ListAbuseReportType,
 };
 use super::list_activity::{CollectionListActivity, ListActivityBuilder};
+use super::list_batch_members::{ListBatchParam, ListBatchResponse};
 use super::list_clients::{CollectionListClients, ListClientsBuilder};
 use super::list_growth_history::{
     CollectionListGrowthHistory, ListGrowthHistoryBuilder, ListGrowthHistoryFilter,
@@ -17,8 +19,9 @@ use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
 use super::list_members::{
     CollectionListMembers, ListMember, ListMemberParams, ListMembersBuilder, ListMembersFilter,
 };
-use super::list_signup_forms::{CollectionListSignupForm, ListSignupFormBuilder, ListSignupForm};
+use super::list_signup_forms::{CollectionListSignupForm, ListSignupForm, ListSignupFormBuilder};
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
+use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
 use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
@@ -263,6 +266,15 @@ impl Default for ListsType {
 }
 
 impl ListType {
+    ///
+    /// Batch subscribe or unsubscribe list members.
+    ///
+    pub fn batch_list_members(&self, param: ListBatchParam) -> MailchimpResult<ListBatchResponse> {
+        // POST /lists/{list_id}
+        let endpoint = self.get_base_endpoint();
+        self._api
+            .post::<ListBatchResponse, ListBatchParam>(&endpoint, param)
+    }
     ///
     /// Get up to the previous 180 days of daily detailed aggregated activity
     /// stats for a list, not including Automation activity.
@@ -773,10 +785,7 @@ impl ListType {
     /// Argument:
     ///     form: Signup Form content
     ///
-    pub fn create_signup_form<'a>(
-        &self,
-        form: ListSignupForm ,
-    ) -> MailchimpResult<ListSignupForm> {
+    pub fn create_signup_form<'a>(&self, form: ListSignupForm) -> MailchimpResult<ListSignupForm> {
         // POST /lists/{list_id}/signup-forms
         let mut endpoint = self.get_base_endpoint();
         endpoint.push_str("/signup-forms");
@@ -809,8 +818,7 @@ impl ListType {
             .get::<CollectionListSignupForm>(&endpoint, filter_params.build_payload())
         {
             Ok(collection) => MalchimpIter {
-                builder: ListSignupFormBuilder {
-                },
+                builder: ListSignupFormBuilder {},
                 data: collection.signup_forms,
                 cur_filters: filter_params.clone(),
                 cur_it: 0,
@@ -821,8 +829,7 @@ impl ListType {
             Err(e) => {
                 error!( target: "mailchimp",  "Get List Members: Response Error details: {:?}", e);
                 MalchimpIter {
-                    builder: ListSignupFormBuilder {
-                    },
+                    builder: ListSignupFormBuilder {},
                     data: Vec::new(),
                     cur_filters: filter_params.clone(),
                     cur_it: 0,
@@ -835,9 +842,70 @@ impl ListType {
     }
 
     ///
+    /// Delete a list from your Mailchimp account. If you delete a list,
+    /// you’ll lose the list history—including subscriber activity, unsubscribes,
+    /// complaints, and bounces. You’ll also lose subscribers’ email addresses,
+    /// unless you exported and backed up your list.
+    ///
+    pub fn delete(&self) -> Option<MailchimpErrorType> {
+        // DELETE /lists/{list_id}
+        let endpoint = self.get_base_endpoint();
+        match self
+            ._api
+            .post::<EmptyType, HashMap<String, String>>(endpoint.as_str(), HashMap::new())
+        {
+            Ok(_) => None,
+            Err(e) => Some(e),
+        }
+    }
+
+    ///
     /// Get Endpoint
     ///
     fn get_base_endpoint(&self) -> String {
         String::from("lists/") + self.id.as_ref().unwrap().as_str()
     }
+}
+
+///
+/// List param for new List
+///
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ListParam {
+    /// The name of the list.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Contact information displayed in campaign footers to comply with international spam laws.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub contact: Option<ContactType>,
+    /// The permission reminder for the list.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub permission_reminder: Option<String>,
+    /// Whether campaigns for this list use the Archive Bar in archives by default.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub use_archive_bar: Option<bool>,
+    /// Default values for campaigns created for this list.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub campaign_defaults: Option<CampaignDefaultsType>,
+    /// The email address to send subscribe notifications to.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notify_on_subscribe: Option<String>,
+    /// The email address to send unsubscribe notifications to.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notify_on_unsubscribe: Option<String>,
+    /// Whether the list supports multiple formats for emails. When set to true,
+    /// subscribers can choose whether they want to receive HTML or plain-text
+    /// emails. When set to false, subscribers will receive HTML emails,
+    ///  with a plain-text alternative backup.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub email_type_option: Option<bool>,
+    /// Whether this list is public or private.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub visibility: Option<String>,
+    /// Whether or not to require the subscriber to confirm subscription via email.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub double_optin: Option<bool>,
+    /// Whether or not the list has marketing permissions (eg. GDPR) enabled.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub marketing_permissions: Option<bool>,
 }

@@ -1,7 +1,7 @@
 use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
 use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
-use super::types::{ListType, ListsType};
+use super::types::{ListParam, ListType, ListsType};
 use log::error;
 use std::collections::HashMap;
 
@@ -193,6 +193,14 @@ impl Lists {
     ///
     pub fn new(api: MailchimpApi) -> Self {
         Lists { api: api }
+    }
+
+    ///
+    /// Create a new list in your Mailchimp account.
+    ///
+    pub fn create_list(&self, param: ListParam) -> MailchimpResult<ListType> {
+        let endpoint = "lists";
+        self.api.post::<ListType, ListParam>(endpoint, param)
     }
 
     ///

@@ -1,12 +1,14 @@
 use super::empty::EmptyType;
 use super::link::LinkType;
+use super::list_interests::{
+    CollectionListInterest, InterestParam, ListInterest, ListInterestBuilder,
+};
 use crate::api::MailchimpApi;
 use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
-use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter, SimpleFilter, MalchimpIter};
-use std::collections::HashMap;
-use super::list_interests::{CollectionListInterest, ListInterestBuilder, ListInterest, InterestParam};
+use crate::iter::{BuildIter, MailchimpCollection, MalchimpIter, ResourceFilter, SimpleFilter};
 use log::error;
+use std::collections::HashMap;
 
 ///
 /// Interest Categories
@@ -178,10 +180,7 @@ impl ListInterestCategory {
     /// Argument:
     ///     note: The content of the note. Note length is limited to 1,000 characters.
     ///
-    pub fn create_interest<'a>(
-        &self,
-        param: InterestParam,
-    ) -> MailchimpResult<ListInterest> {
+    pub fn create_interest<'a>(&self, param: InterestParam) -> MailchimpResult<ListInterest> {
         // GET /lists/{list_id}/interest-categories/{interest_category_id}/interests/{interest_id}
         let mut endpoint = self.get_base_endpoint();
         endpoint.push_str("/interest-categories");
