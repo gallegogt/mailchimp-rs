@@ -860,6 +860,15 @@ impl ListType {
     }
 
     ///
+    /// Update the settings for a specific list.
+    ///
+    pub fn update(&self, param: ListParam) -> MailchimpResult<ListType> {
+        // PATCH /lists/{list_id}
+        self._api
+            .patch::<ListType, ListParam>(self.get_base_endpoint().as_str(), param)
+    }
+
+    ///
     /// Get Endpoint
     ///
     fn get_base_endpoint(&self) -> String {

@@ -199,8 +199,7 @@ impl Lists {
     /// Create a new list in your Mailchimp account.
     ///
     pub fn create_list(&self, param: ListParam) -> MailchimpResult<ListType> {
-        let endpoint = "lists";
-        self.api.post::<ListType, ListParam>(endpoint, param)
+        self.api.post::<ListType, ListParam>("lists", param)
     }
 
     ///
