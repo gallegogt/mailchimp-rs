@@ -2,11 +2,13 @@ use super::empty::EmptyType;
 use super::link::LinkType;
 use super::list_batch_members::ListBatchErrors;
 use super::list_members::ListMember;
+use super::list_segment_members::{CollectionListSegmentMembers, ListSegmentMembersBuilder};
 use super::list_segment_options::SegmentOptionsType;
 use crate::api::MailchimpApi;
 use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
-use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
+use crate::iter::{BuildIter, MailchimpCollection, MalchimpIter, ResourceFilter, SimpleFilter};
+use log::error;
 use std::collections::HashMap;
 
 ///
@@ -347,6 +349,100 @@ impl ListSegment {
     }
 
     ///
+    /// Get information about all members in a list segment
+    ///
+    pub fn get_members_informations(
+        &self,
+        filter: Option<SimpleFilter>,
+    ) -> MalchimpIter<ListSegmentMembersBuilder> {
+        // GET /lists/{list_id}/segments/{segment_id}/members
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/members");
+        println!("{}", endpoint);
+        let filter_params = if let Some(f) = filter {
+            f
+        } else {
+            SimpleFilter::default()
+        };
+
+        match self
+            ._api
+            .get::<CollectionListSegmentMembers>(&endpoint, filter_params.build_payload())
+        {
+            Ok(collection) => MalchimpIter {
+                builder: ListSegmentMembersBuilder {
+                    endpoint: endpoint.clone(),
+                },
+                data: collection.members,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get Information_members: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListSegmentMembersBuilder {
+                        endpoint: endpoint.clone(),
+                    },
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+    }
+
+    ///
+    /// Remove a member from the specified static segment
+    ///
+    /// Arguments:
+    ///    subscriber_hash: The MD5 hash of the lowercase version of the list member’s email address.
+    ///
+    pub fn remove_member<'a>(&self, subscriber_hash: &'a str) -> Option<MailchimpErrorType> {
+        // DELETE /lists/{list_id}/segments/{segment_id}/members/{subscriber_hash}
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/members/");
+        endpoint.push_str(subscriber_hash);
+
+        match self._api.delete::<EmptyType>(&endpoint, HashMap::new()) {
+            Ok(_) => None,
+            Err(e) => Some(e),
+        }
+    }
+
+    ///
+    /// Add a member to a static segment.
+    ///
+    /// Arguments:
+    ///    email_address: Email address for a subscriber.
+    ///
+    pub fn add_member<'a>(&self, email_address: &'a str) -> MailchimpResult<ListMember> {
+        // POST /lists/{list_id}/segments/{segment_id}/members
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/members");
+        let mut payload = HashMap::new();
+        payload.insert("email_address".to_string(), email_address.to_string());
+
+        match self
+            ._api
+            .post::<ListMember, HashMap<String, String>>(&endpoint, payload)
+        {
+            Ok(data) => {
+                let mut n_data = data.clone();
+                n_data.set_api(&self._api);
+                n_data.set_endpoint(&endpoint);
+                Ok(data)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    ///
     /// Set API
     ///
     pub fn set_api(&mut self, n_api: &MailchimpApi) {
@@ -363,7 +459,7 @@ impl ListSegment {
     ///
     fn get_base_endpoint(&self) -> String {
         let mut endpoint = self._endpoint.clone();
-        endpoint.push_str(format!("{}", &self.id).as_str());
+        endpoint.push_str(format!("/{}", &self.id).as_str());
         endpoint
     }
 }

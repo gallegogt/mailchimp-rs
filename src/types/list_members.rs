@@ -263,7 +263,7 @@ impl ListMember {
     /**
      * Update API
      */
-    fn set_api(&mut self, n_api: &MailchimpApi) {
+    pub fn set_api(&mut self, n_api: &MailchimpApi) {
         self._api = n_api.clone()
     }
 

@@ -43,6 +43,14 @@ fn main() {
             println!("\tCreated At     {:?}", c.created_at);
             println!("\tOptions        {:?}", c.options);
             println!("\tType           {:?}", c.s_type);
+
+            for si in c.get_members_informations(None) {
+                println!("\nMember:");
+                println!("\tEmail Address       {:?}", si.email_address);
+                println!("\tUnique Email Id     {:?}", si.unique_email_id);
+                println!("\tEmail Type          {:?}", si.email_type);
+                println!("\tStatus              {:?}", si.status);
+            }
         }
     }
 }
