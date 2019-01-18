@@ -19,6 +19,10 @@ use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
 use super::list_members::{
     CollectionListMembers, ListMember, ListMemberParams, ListMembersBuilder, ListMembersFilter,
 };
+use super::list_merge_fields::{
+    CollectionListMergeField, ListMergeField, ListMergeFieldBuilder, ListMergeFieldFilter,
+    ListMergeFieldParam,
+};
 use super::list_segments::{
     CollectionListSegment, ListSegment, ListSegmentBuilder, ListSegmentFilter,
 };
@@ -278,6 +282,7 @@ impl ListType {
         self._api
             .post::<ListBatchResponse, ListBatchParam>(&endpoint, param)
     }
+
     ///
     /// Get up to the previous 180 days of daily detailed aggregated activity
     /// stats for a list, not including Automation activity.
@@ -329,6 +334,100 @@ impl ListType {
                     endpoint: endpoint.clone(),
                 }
             }
+        }
+    }
+
+    ///
+    /// Get a list of all merge fields (formerly merge vars) for a list.
+    ///
+    pub fn get_merge_fields(
+        &self,
+        filter: Option<ListMergeFieldFilter>,
+    ) -> MalchimpIter<ListMergeFieldBuilder> {
+        // GET /lists/{list_id}/merge-fields
+        let endpoint = self.get_base_endpoint() + "/merge-fields";
+        let mut filter_params = ListMergeFieldFilter::default();
+
+        if let Some(f) = filter {
+            filter_params = f;
+        }
+
+        match self
+            ._api
+            .get::<CollectionListMergeField>(&endpoint, filter_params.build_payload())
+        {
+            Ok(collection) => MalchimpIter {
+                builder: ListMergeFieldBuilder {
+                    endpoint: endpoint.clone(),
+                },
+                data: collection.merge_fields,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get Activities: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListMergeFieldBuilder {
+                        endpoint: endpoint.clone(),
+                    },
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+    }
+
+    ///
+    /// Get information about a specific merge field in a list.
+    ///
+    pub fn get_specific_merge_field<'a>(
+        &self,
+        merge_id: &'a str,
+    ) -> MailchimpResult<ListMergeField> {
+        // GET /lists/{list_id}/merge-fields/{merge_id}
+        let endpoint = self.get_base_endpoint() + "/merge-fields/";
+
+        match self
+            ._api
+            .get::<ListMergeField>(&(endpoint.clone() + merge_id), HashMap::new())
+        {
+            Ok(data) => {
+                let mut n_data = data.clone();
+                n_data.set_api(&self._api);
+                n_data.set_endpoint(&endpoint.clone());
+                Ok(data)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    ///
+    /// Add a new merge field
+    ///
+    pub fn create_merge_field(
+        &self,
+        param: ListMergeFieldParam,
+    ) -> MailchimpResult<ListMergeField> {
+        // POST /lists/{list_id}/merge-fields
+        let endpoint = self.get_base_endpoint() + "/merge-fields";
+        match self
+            ._api
+            .post::<ListMergeField, ListMergeFieldParam>(&endpoint, param)
+        {
+            Ok(data) => {
+                let mut n_data = data.clone();
+                n_data.set_api(&self._api);
+                n_data.set_endpoint(&endpoint);
+                Ok(n_data)
+            }
+            Err(e) => Err(e),
         }
     }
     ///

@@ -101,8 +101,8 @@ Below I present a list where I will be updating to the extent possible the diffe
 
 
 ### List
-  * 🔘 Create a new list
-  * 🔘 Batch sub/unsub list members
+  * ✅ Create a new list
+  * ✅ Batch sub/unsub list members
   * ✅ Get information about all lists
   * ✅ Get information about a specific list
 
@@ -113,8 +113,8 @@ Below I present a list where I will be updating to the extent possible the diffe
     * ✅ **Interest Categories**
     * ✅ **Locations**
     * ✅ **Members**
-    * 🔘 **Merge Fields**
-    * 🔘 **Segments**
+    * ✅ **Merge Fields**
+    * ✅ **Segments**
     * ✅ **Signup Forms**
     * 🔘 **Webhooks**
     * ✅ **Locations**
