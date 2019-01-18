@@ -27,6 +27,9 @@ use super::list_segments::{
     CollectionListSegment, ListSegment, ListSegmentBuilder, ListSegmentFilter,
 };
 use super::list_signup_forms::{CollectionListSignupForm, ListSignupForm, ListSignupFormBuilder};
+use super::list_webhooks::{
+    CollectionListWebhooks, ListWebhooks, ListWebhooksBuilder, ListWebhooksParam,
+};
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
@@ -420,6 +423,91 @@ impl ListType {
         match self
             ._api
             .post::<ListMergeField, ListMergeFieldParam>(&endpoint, param)
+        {
+            Ok(data) => {
+                let mut n_data = data.clone();
+                n_data.set_api(&self._api);
+                n_data.set_endpoint(&endpoint);
+                Ok(n_data)
+            }
+            Err(e) => Err(e),
+        }
+    }
+    ///
+    /// Get information about all webhooks for a specific list
+    ///
+    pub fn get_webhooks(&self, filter: Option<SimpleFilter>) -> MalchimpIter<ListWebhooksBuilder> {
+        // GET /lists/{list_id}/webhooks
+        let endpoint = self.get_base_endpoint() + "/webhooks";
+        let mut filter_params = SimpleFilter::default();
+        println!("{}", &endpoint);
+
+        if let Some(f) = filter {
+            filter_params = f;
+        }
+
+        match self
+            ._api
+            .get::<CollectionListWebhooks>(&endpoint, filter_params.build_payload())
+        {
+            Ok(collection) => MalchimpIter {
+                builder: ListWebhooksBuilder {
+                    endpoint: endpoint.clone(),
+                },
+                data: collection.webhooks,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get Activities: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListWebhooksBuilder {
+                        endpoint: endpoint.clone(),
+                    },
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+    }
+
+    ///
+    /// Get information about a specific webhook.
+    ///
+    pub fn get_specific_webhook<'a>(&self, webkook_id: &'a str) -> MailchimpResult<ListWebhooks> {
+        // GET /lists/{list_id}/webhooks/{webhook_id}
+        let endpoint = self.get_base_endpoint() + "/webhooks/";
+
+        match self
+            ._api
+            .get::<ListWebhooks>(&(endpoint.clone() + webkook_id), HashMap::new())
+        {
+            Ok(data) => {
+                let mut n_data = data.clone();
+                n_data.set_api(&self._api);
+                n_data.set_endpoint(&endpoint.clone());
+                Ok(data)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    ///
+    /// Create a new webhook for a specific list.
+    ///
+    pub fn create_webhook(&self, param: ListWebhooksParam) -> MailchimpResult<ListWebhooks> {
+        // POST /lists/{list_id}/webhooks
+        let endpoint = self.get_base_endpoint() + "/webhooks";
+        match self
+            ._api
+            .post::<ListWebhooks, ListWebhooksParam>(&endpoint, param)
         {
             Ok(data) => {
                 let mut n_data = data.clone();

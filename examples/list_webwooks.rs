@@ -35,15 +35,12 @@ fn main() {
         println!("\tName    {:?}", l.name.as_ref().unwrap());
         println!("=============================================");
 
-        for c in l.get_merge_fields(None) {
-            println!("\nMerge Field:");
-            println!("\t Name               {:?}", c.name);
-            println!("\t Type               {:?}", c.mf_type);
-            println!("\t Default Value      {:?}", c.default_value);
-            println!("\t Public             {:?}", c.public);
-            println!("\t Display Order      {:?}", c.display_order);
-            println!("\t Options            {:?}", c.options);
-            println!("\t Help Text          {:?}", c.help_text);
+        for c in l.get_webhooks(None) {
+            println!("\nWebhooks:");
+            println!("\t URL      {:?}", c.url);
+            println!("\t Events   {:?}", c.events);
+            println!("\t Sources  {:?}", c.sources);
+            println!("\t List ID  {:?}", c.list_id);
         }
     }
 }
