@@ -25,6 +25,8 @@ mod list_member_goals;
 mod list_member_notes;
 mod list_member_tags;
 mod list_members;
+mod list_segment_options;
+mod list_segments;
 mod list_signup_forms;
 mod workflow_email;
 
@@ -55,5 +57,7 @@ pub use self::list_member_goals::*;
 pub use self::list_member_notes::*;
 pub use self::list_member_tags::*;
 pub use self::list_members::*;
+pub use self::list_segment_options::*;
+pub use self::list_segments::*;
 pub use self::list_signup_forms::*;
 pub use self::workflow_email::*;

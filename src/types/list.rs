@@ -19,6 +19,9 @@ use super::list_locations::{CollectionListLocations, ListLocationsBuilder};
 use super::list_members::{
     CollectionListMembers, ListMember, ListMemberParams, ListMembersBuilder, ListMembersFilter,
 };
+use super::list_segments::{
+    CollectionListSegment, ListSegment, ListSegmentBuilder, ListSegmentFilter,
+};
 use super::list_signup_forms::{CollectionListSignupForm, ListSignupForm, ListSignupFormBuilder};
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::error_type::MailchimpErrorType;
@@ -838,6 +841,74 @@ impl ListType {
                     endpoint: endpoint.clone(),
                 }
             }
+        }
+    }
+
+    ///
+    /// Get information about all available segments for a specific list.
+    ///
+    pub fn get_segments(
+        &self,
+        filters: Option<ListSegmentFilter>,
+    ) -> MalchimpIter<ListSegmentBuilder> {
+        // GET /lists/{list_id}/segments
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/segments");
+
+        let filter_params = if let Some(f) = filters {
+            f
+        } else {
+            ListSegmentFilter::default()
+        };
+
+        match self
+            ._api
+            .get::<CollectionListSegment>(&endpoint, filter_params.build_payload())
+        {
+            Ok(collection) => MalchimpIter {
+                builder: ListSegmentBuilder {
+                    endpoint: endpoint.clone(),
+                },
+                data: collection.segments,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.clone(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get List Segments: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: ListSegmentBuilder {
+                        endpoint: endpoint.clone(),
+                    },
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.clone(),
+                }
+            }
+        }
+    }
+
+    pub fn get_specific_segment<'a>(&self, segment_id: &'a str) -> MailchimpResult<ListSegment> {
+        // GET /lists/{list_id}/segments/{segment_id}
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/segments/");
+
+        match self
+            ._api
+            .get::<ListSegment>(&(endpoint.clone() + segment_id), HashMap::new())
+        {
+            Ok(data) => {
+                let mut n_data = data;
+                n_data.set_api(&self._api);
+                n_data.set_endpoint(&endpoint.clone());
+                Ok(n_data)
+            }
+            Err(e) => Err(e),
         }
     }
 
