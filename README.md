@@ -116,7 +116,7 @@ Below I present a list where I will be updating to the extent possible the diffe
     * ✅ **Merge Fields**
     * ✅ **Segments**
     * ✅ **Signup Forms**
-    * 🔘 **Webhooks**
+    * ✅ **Webhooks**
     * ✅ **Locations**
 
 ### Campaigns
