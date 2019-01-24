@@ -31,6 +31,7 @@ mod list_segment_options;
 mod list_segments;
 mod list_signup_forms;
 mod list_webhooks;
+mod ping;
 mod workflow_email;
 
 pub use self::api_root::*;
@@ -66,4 +67,5 @@ pub use self::list_segment_options::*;
 pub use self::list_segments::*;
 pub use self::list_signup_forms::*;
 pub use self::list_webhooks::*;
+pub use self::ping::*;
 pub use self::workflow_email::*;

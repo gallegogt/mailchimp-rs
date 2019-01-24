@@ -14,11 +14,8 @@ extern crate dotenv;
 extern crate mailchimp;
 
 use dotenv::dotenv;
-use std::env;
-
-use mailchimp::types::AuthorizedAppsType;
 use mailchimp::MailchimpApi;
-use std::collections::HashMap;
+use std::env;
 
 fn main() {
     // Init dotenv
@@ -28,15 +25,11 @@ fn main() {
     let apk = env_mailchimp.next().unwrap().1;
     // Init API Instance
     let api = MailchimpApi::new(&apk);
-    // Make the request to the endpoint /authorized-apps en Mailchimp
-    let data = api.get::<AuthorizedAppsType>("authorized-apps", HashMap::new());
-
-    match data {
-        Ok(resp) => {
-            // Iterate through response
-            for app in resp.apps.iter() {
-                println!("{:?}", app)
-            }
+    // Ping
+    let ping_rs = api.ping();
+    match ping_rs {
+        Ok(value) => {
+            println!("Ping ... {:?}", value);
         }
         Err(e) => println!("Error Title: {:?} \ndetail {:?}", e.title, e.detail),
     }

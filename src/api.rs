@@ -1,6 +1,7 @@
 use crate::internal::api::Api;
 use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpRequest;
+use crate::types::Ping;
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
 use std::collections::HashMap;
@@ -198,6 +199,13 @@ impl MailchimpApi {
         T: DeserializeOwned,
     {
         self.i_api.delete_edge(endpoint, payload)
+    }
+
+    ///
+    /// A health check for the API that won’t return any account-specific information.
+    ///
+    pub fn ping(&self) -> Result<Ping, MailchimpErrorType> {
+        self.get::<Ping>("ping", HashMap::new())
     }
 }
 
