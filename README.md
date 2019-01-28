@@ -139,14 +139,21 @@ Below I present a list where I will be updating to the extent possible the diffe
   * ✅  **Feedback**
   * ✅  **Send Checklist**
 
-### 🔘 Ping
+### ✅ Ping
+### 🔘 Conversations
+  * ✅ Get a list of conversations
+  * ✅ Get information about a conversation
+  * ✅ **Messages**
+    * ✅ Post a new conversation message
+    * 🔘 Get conversation messages
+    * 🔘 Get a specific conversation message
+
 ### 🔘 Reporting
 ### 🔘 Reports
 
 ### 🔘 Campaign Folders
 ### 🔘 Batch Operations
 ### 🔘 Connected Sites
-### 🔘 Conversations
 ### 🔘 Batch Webhooks
 ### 🔘 E-commerce Stores
 ### 🔘 Facebook Ads
