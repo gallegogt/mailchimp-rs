@@ -3,6 +3,7 @@
 ///
 use super::link::LinkType;
 use crate::api::MailchimpApi;
+use crate::internal::request::MailchimpResult;
 use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
 use std::collections::HashMap;
 
@@ -80,10 +81,60 @@ pub struct Conversation {
     /// A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
+
+    /// Mailchimp API
+    #[serde(skip)]
+    _api: MailchimpApi,
+    /// Endpoint Base for the instance
+    #[serde(skip)]
+    _endpoint: String,
 }
 
 ///
+/// ParamMessage
 ///
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ParamMessage {
+    /// A label representing the email of the sender of this message
+    #[serde(default)]
+    pub from_email: String,
+    /// The subject of this message.
+    #[serde(default)]
+    pub subject: String,
+    /// The plain-text content of the message.
+    #[serde(default)]
+    pub message: String,
+    /// Whether this message has been marked as read.
+    #[serde(default)]
+    pub read: bool,
+}
+
+impl Conversation {
+    ///
+    /// Post a new message to a conversation.
+    ///
+    pub fn create_message(&self, message: ParamMessage) -> MailchimpResult<Message> {
+        // POST /conversations/{conversation_id}/messages
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/messages");
+        self._api.post::<Message, ParamMessage>(&endpoint, message)
+    }
+
+    pub fn set_api(&mut self, n_api: &MailchimpApi) {
+        self._api = n_api.clone();
+    }
+
+    pub fn set_endpoint<'a>(&mut self, n_endpoint: &'a str) {
+        self._endpoint = n_endpoint.to_string();
+    }
+
+    fn get_base_endpoint(&self) -> String {
+        return self._endpoint.clone();
+    }
+}
+
+///
+/// CollectionConversations
 ///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CollectionConversations {
@@ -207,7 +258,9 @@ impl ResourceFilter for ConversationsFilter {
 /// Conversation Builder
 ///
 #[derive(Debug)]
-pub struct ConversationBuilder {}
+pub struct ConversationBuilder {
+    pub endpoint: String,
+}
 
 impl BuildIter for ConversationBuilder {
     type Item = Conversation;
@@ -217,8 +270,10 @@ impl BuildIter for ConversationBuilder {
     ///
     /// Return a new data updated
     ///
-    fn update_item(&self, data: &Self::Item, _: &MailchimpApi) -> Self::Item {
-        let in_data = data.clone();
+    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
+        let mut in_data = data.clone();
+        in_data.set_api(&api);
+        in_data.set_endpoint(&self.endpoint);
         in_data
     }
     ///
