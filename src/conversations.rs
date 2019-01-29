@@ -47,9 +47,7 @@ impl Conversations {
             .get::<CollectionConversations>(&endpoint, filter_params.build_payload())
         {
             Ok(collection) => MalchimpIter {
-                builder: ConversationBuilder {
-                    endpoint: endpoint.to_string(),
-                },
+                builder: ConversationBuilder {},
                 data: collection.conversations,
                 cur_filters: filter_params.clone(),
                 cur_it: 0,
@@ -60,9 +58,7 @@ impl Conversations {
             Err(e) => {
                 error!( target: "mailchimp",  "Get Activities: Response Error details: {:?}", e);
                 MalchimpIter {
-                    builder: ConversationBuilder {
-                        endpoint: endpoint.to_string(),
-                    },
+                    builder: ConversationBuilder {},
                     data: Vec::new(),
                     cur_filters: filter_params.clone(),
                     cur_it: 0,

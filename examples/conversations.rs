@@ -45,7 +45,14 @@ fn main() {
     }
 
     match conv.get_conversation(&conversation_id) {
-        Ok(cv) => print!("\nConversation Info:\n{:?}", cv),
+        Ok(cv) => {
+            print!("\nConversation Info: {:?}", cv.id);
+
+            for cm_it in cv.get_conversation_messages(None) {
+                println!("\tFrom Email       {:?}", cm_it.from_email);
+                println!("\tFrom Label     {:?}", cm_it.from_label);
+            }
+        },
         Err(e) => print!("Get conversation Info Error {:?}", e),
     };
 }

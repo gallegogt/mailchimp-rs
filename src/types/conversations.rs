@@ -4,46 +4,10 @@
 use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::internal::request::MailchimpResult;
-use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
+use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter, MalchimpIter};
 use std::collections::HashMap;
-
-///
-/// The most recent message in the conversation.
-///
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Message {
-    /// A label representing the sender of this message.
-    #[serde(default)]
-    pub from_label: String,
-    /// A label representing the email of the sender of this message.
-    #[serde(default)]
-    pub from_email: String,
-    /// The subject of this message.
-    #[serde(default)]
-    pub subject: String,
-    /// The plain-text content of the message.
-    #[serde(default)]
-    pub message: String,
-    /// Whether this message has been marked as read.
-    #[serde(default)]
-    pub read: bool,
-    /// The date and time the message was either sent or received in ISO 8601 format.
-    #[serde(default)]
-    pub timestamp: String,
-}
-
-impl Default for Message {
-    fn default() -> Self {
-        Message {
-            from_label: "".to_string(),
-            from_email: "".to_string(),
-            subject: "".to_string(),
-            message: "".to_string(),
-            read: true,
-            timestamp: "".to_string(),
-        }
-    }
-}
+use super::conversation_messages::{ConversationMessage, MessagesFilter, CollectionConversationMessages, MessagesBuider};
+use log::error;
 
 ///
 /// Conversation tracking is a paid feature that lets you view subscribers’
@@ -77,7 +41,7 @@ pub struct Conversation {
     pub subject: String,
     /// The most recent message in the conversation.
     #[serde(default)]
-    pub last_message: Message,
+    pub last_message: ConversationMessage,
     /// A list of link types and descriptions for the API schema documents.
     #[serde(default)]
     pub _links: Vec<LinkType>,
@@ -85,9 +49,6 @@ pub struct Conversation {
     /// Mailchimp API
     #[serde(skip)]
     _api: MailchimpApi,
-    /// Endpoint Base for the instance
-    #[serde(skip)]
-    _endpoint: String,
 }
 
 ///
@@ -113,23 +74,79 @@ impl Conversation {
     ///
     /// Post a new message to a conversation.
     ///
-    pub fn create_message(&self, message: ParamMessage) -> MailchimpResult<Message> {
+    pub fn create_message(&self, message: ParamMessage) -> MailchimpResult<ConversationMessage> {
         // POST /conversations/{conversation_id}/messages
         let mut endpoint = self.get_base_endpoint();
         endpoint.push_str("/messages");
-        self._api.post::<Message, ParamMessage>(&endpoint, message)
+        self._api.post::<ConversationMessage, ParamMessage>(&endpoint, message)
+    }
+
+    ///
+    /// Get conversation messages
+    ///
+    pub fn get_conversation_messages(
+        &self,
+        filter: Option<MessagesFilter>,
+    ) -> MalchimpIter<MessagesBuider> {
+        // GET  /conversations/{conversation_id}/messages
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/messages");
+
+        let mut filter_params = MessagesFilter::default();
+
+        if let Some(f) = filter {
+            filter_params = f;
+        }
+
+        match self
+            ._api
+            .get::<CollectionConversationMessages>(&endpoint, filter_params.build_payload())
+        {
+            Ok(collection) => MalchimpIter {
+                builder: MessagesBuider {},
+                data: collection.conversation_messages,
+                cur_filters: filter_params.clone(),
+                cur_it: 0,
+                total_items: collection.total_items,
+                api: self._api.clone(),
+                endpoint: endpoint.to_string(),
+            },
+            Err(e) => {
+                error!( target: "mailchimp",  "Get Activities: Response Error details: {:?}", e);
+                MalchimpIter {
+                    builder: MessagesBuider {},
+                    data: Vec::new(),
+                    cur_filters: filter_params.clone(),
+                    cur_it: 0,
+                    total_items: 0,
+                    api: self._api.clone(),
+                    endpoint: endpoint.to_string(),
+                }
+            }
+        }
+    }
+
+    ///
+    /// Get a specific conversation message
+    ///
+    pub fn get_conversation_message<'a>(&self, message_id: &'a str) -> MailchimpResult<ConversationMessage> {
+        let mut endpoint = self.get_base_endpoint();
+        endpoint.push_str("/messages/");
+        endpoint.push_str(message_id);
+
+        let mut payload = HashMap::new();
+        payload.insert("message_id".to_string(), message_id.to_string());
+        self._api.get::<ConversationMessage>(&endpoint, payload)
     }
 
     pub fn set_api(&mut self, n_api: &MailchimpApi) {
         self._api = n_api.clone();
     }
 
-    pub fn set_endpoint<'a>(&mut self, n_endpoint: &'a str) {
-        self._endpoint = n_endpoint.to_string();
-    }
-
     fn get_base_endpoint(&self) -> String {
-        return self._endpoint.clone();
+        let mut endpoint = "conversations/".to_string();
+        endpoint.push_str(&self.id);
+        endpoint
     }
 }
 
@@ -258,9 +275,7 @@ impl ResourceFilter for ConversationsFilter {
 /// Conversation Builder
 ///
 #[derive(Debug)]
-pub struct ConversationBuilder {
-    pub endpoint: String,
-}
+pub struct ConversationBuilder {}
 
 impl BuildIter for ConversationBuilder {
     type Item = Conversation;
@@ -273,7 +288,6 @@ impl BuildIter for ConversationBuilder {
     fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
         let mut in_data = data.clone();
         in_data.set_api(&api);
-        in_data.set_endpoint(&self.endpoint);
         in_data
     }
     ///
