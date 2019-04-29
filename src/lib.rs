@@ -17,6 +17,7 @@ mod internal;
 pub mod iter;
 mod list;
 pub mod types;
+mod reports;
 
 pub use crate::api::MailchimpApi;
 pub use crate::api_root::ApiRoot;
@@ -25,3 +26,4 @@ pub use crate::automations::{Automations, AutomationsFilter};
 pub use crate::campaigns::{CampaignFilter, Campaigns};
 pub use crate::conversations::Conversations;
 pub use crate::list::{ListFilter, Lists};
+pub use crate::reports::Reports;

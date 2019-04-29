@@ -48,6 +48,7 @@ impl Default for CampaignDeliveryStatusType {
         }
     }
 }
+
 ///
 /// The days of the week to send a daily RSS Campaign.
 ///

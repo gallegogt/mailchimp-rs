@@ -12,14 +12,18 @@ pub struct ECommerceReportType {
     /// all order totals minus shipping and tax totals.
     #[serde(default)]
     pub total_revenue: f32,
+    /// No Description
+    #[serde(default)]
+    pub currency_code: String,
 }
 
 impl Default for ECommerceReportType {
     fn default() -> Self {
-        ECommerceReportType {
+        Self {
             total_orders: 0,
             total_spent: 0.0,
             total_revenue: 0.0,
+            currency_code: String::new(),
         }
     }
 }

@@ -35,6 +35,7 @@ mod list_webhooks;
 mod ping;
 mod workflow_email;
 mod conversation_messages;
+mod report;
 
 pub use self::api_root::*;
 pub use self::authorized_apps::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType};
@@ -73,3 +74,4 @@ pub use self::list_webhooks::*;
 pub use self::ping::*;
 pub use self::workflow_email::*;
 pub use self::conversation_messages::*;
+pub use self::report::*;
