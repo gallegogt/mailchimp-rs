@@ -148,14 +148,29 @@ Below I present a list where I will be updating to the extent possible the diffe
     * ✅ Get conversation messages
     * ✅ Get a specific conversation message
 
-### 🔘 Reporting
 ### 🔘 Reports
+    * ✅ Get campaign reports
+    * ✅ Get a specific campaign report
+    * 🔘 Campaign Abuse
+    * 🔘 Campaign Advice
+    * 🔘 Campaign Open Reports
+    * 🔘 Click Reports
+    * 🔘 Get domain performance stats
+    * 🔘 Ecommerce Product Activity
+    * 🔘 EepURL Reports
+    * 🔘 Email Activity
+    * 🔘 Google Analytics
+    * 🔘 Location
+    * 🔘 Sent To
+    * 🔘 Sub-Reports
+    * 🔘 Unsubscribes
 
+### 🔘 E-commerce Stores
+### 🔘 Reporting
 ### 🔘 Campaign Folders
 ### 🔘 Batch Operations
 ### 🔘 Connected Sites
 ### 🔘 Batch Webhooks
-### 🔘 E-commerce Stores
 ### 🔘 Facebook Ads
 ### 🔘 File Manager Files
 ### 🔘 File Manager Folders
