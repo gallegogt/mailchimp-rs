@@ -63,6 +63,63 @@ Rust Code:
   }
 ```
 
+### Example get all mailchimp reports
+
+```rust
+  extern crate mailchimp;
+
+  use mailchimp::types::ReportType;
+  use mailchimp::{MailchimpApi, Reports};
+
+  fn main() {
+      // Init API
+      let api = MailchimpApi::new("<API_KEY>");
+
+      // Create Instance of Reports
+      let reports = Reports::new(api);
+
+      // Get information about all reports.
+      let reports_iter = reports.iter_reports(None);
+
+      for report in reports_iter {
+          print_report_type(&report);
+          println!("=============================================");
+      }
+  }
+
+  fn print_report_type(report: &ReportType) {
+      println!("\n\nReports");
+      println!("\tid    {:?}", report.id);
+      println!("\tcampaign_title    {:?}", report.campaign_title);
+      println!("\treport_type    {:?}", report.report_type);
+      println!("\tlist_id    {:?}", report.list_id);
+      println!("\tlist_is_active    {:?}", report.list_is_active);
+      println!("\tlist_is_active    {:?}", report.list_is_active);
+      println!("\tlist_name    {:?}", report.list_name);
+      println!("\tsubject_line    {:?}", report.subject_line);
+      println!("\tpreview_text    {:?}", report.preview_text);
+      println!("\temails_sent    {:?}", report.emails_sent);
+      println!("\tabuse_reports    {:?}", report.abuse_reports);
+      println!("\tunsubscribed    {:?}", report.unsubscribed);
+      println!("\tsend_time    {:?}", report.send_time);
+      println!("\trss_last_send    {:?}", report.rss_last_send);
+      println!("\tbounces    {:?}", report.bounces);
+      println!("\tforwards    {:?}", report.forwards);
+      println!("\topens    {:?}", report.opens);
+      println!("\tclicks    {:?}", report.clicks);
+      println!("\topens    {:?}", report.opens);
+      println!("\tfacebook_likes    {:?}", report.facebook_likes);
+      println!("\tlist_stats    {:?}", report.list_stats);
+      println!("\tab_split    {:?}", report.ab_split);
+      println!("\ttimewarp    {:?}", report.timewarp);
+      println!("\ttimeseries    {:?}", report.timeseries);
+      println!("\tshare_report    {:?}", report.share_report);
+      println!("\tecommerce    {:?}", report.ecommerce);
+      println!("\tdelivery_status    {:?}", report.delivery_status);
+  }
+
+```
+
 ### More examples in ``examples/*``
 
 # Status of Development
