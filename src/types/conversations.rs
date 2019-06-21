@@ -1,13 +1,15 @@
+use super::conversation_messages::{
+    CollectionConversationMessages, ConversationMessage, MessagesBuider, MessagesFilter,
+};
 ///
 /// Conversations
 ///
 use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::internal::request::MailchimpResult;
-use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter, MalchimpIter};
-use std::collections::HashMap;
-use super::conversation_messages::{ConversationMessage, MessagesFilter, CollectionConversationMessages, MessagesBuider};
+use crate::iter::{BuildIter, MailchimpCollection, MalchimpIter, ResourceFilter};
 use log::error;
+use std::collections::HashMap;
 
 ///
 /// Conversation tracking is a paid feature that lets you view subscribers’
@@ -78,7 +80,8 @@ impl Conversation {
         // POST /conversations/{conversation_id}/messages
         let mut endpoint = self.get_base_endpoint();
         endpoint.push_str("/messages");
-        self._api.post::<ConversationMessage, ParamMessage>(&endpoint, message)
+        self._api
+            .post::<ConversationMessage, ParamMessage>(&endpoint, message)
     }
 
     ///
@@ -129,7 +132,10 @@ impl Conversation {
     ///
     /// Get a specific conversation message
     ///
-    pub fn get_conversation_message<'a>(&self, message_id: &'a str) -> MailchimpResult<ConversationMessage> {
+    pub fn get_conversation_message<'a>(
+        &self,
+        message_id: &'a str,
+    ) -> MailchimpResult<ConversationMessage> {
         let mut endpoint = self.get_base_endpoint();
         endpoint.push_str("/messages/");
         endpoint.push_str(message_id);

@@ -358,10 +358,7 @@ mod tests {
         );
         let api = Api::<MockRequest>::new("us6", "access_token", Box::new(mock_transport));
         let resp = api
-            .get_edge::<CollectionReports>(
-                "/reports",
-                HashMap::new(),
-            )
+            .get_edge::<CollectionReports>("/reports", HashMap::new())
             .unwrap();
 
         assert_eq!(

@@ -16,9 +16,8 @@ extern crate mailchimp;
 use dotenv::dotenv;
 use std::env;
 
-use mailchimp::{Reports, MailchimpApi};
-use mailchimp::types::{ReportsFilter, ReportType};
-use std::collections::HashMap;
+use mailchimp::types::ReportType;
+use mailchimp::{MailchimpApi, Reports};
 
 fn main() {
     // Init dotenv
@@ -33,8 +32,8 @@ fn main() {
     // Create Instance of Reports
     let reports = Reports::new(api);
 
-    // Get information about all lists in the account.
-    let reports_iter = reports.get_reports(None);
+    // Get information about all reports.
+    let reports_iter = reports.iter_reports(None);
 
     for report in reports_iter {
         print_report_type(&report);

@@ -52,7 +52,7 @@ fn main() {
                 println!("\tFrom Email       {:?}", cm_it.from_email);
                 println!("\tFrom Label     {:?}", cm_it.from_label);
             }
-        },
+        }
         Err(e) => print!("Get conversation Info Error {:?}", e),
     };
 }

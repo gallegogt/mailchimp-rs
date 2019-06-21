@@ -1,8 +1,6 @@
 use super::api::MailchimpApi;
 use super::internal::request::MailchimpResult;
-use super::types::{
-    ReportType, ReportsBuilder, ReportsFilter, CollectionReports,
-};
+use super::types::{CollectionReports, ReportType, ReportsBuilder, ReportsFilter};
 use crate::iter::{MalchimpIter, ResourceFilter};
 use log::error;
 use std::collections::HashMap;
@@ -33,10 +31,7 @@ impl Reports {
     ///
     /// Get campaign reports
     ///
-    pub fn get_reports(
-        &self,
-        filter: Option<ReportsFilter>,
-    ) -> MalchimpIter<ReportsBuilder> {
+    pub fn iter_reports(&self, filter: Option<ReportsFilter>) -> MalchimpIter<ReportsBuilder> {
         // GET /reports
         let endpoint = "reports";
         let mut filter_params = ReportsFilter::default();

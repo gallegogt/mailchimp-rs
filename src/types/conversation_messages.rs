@@ -181,7 +181,6 @@ impl ResourceFilter for MessagesFilter {
             );
         }
 
-
         if self.before_timestamp.is_some() {
             payload.insert(
                 "before_timestamp".to_string(),

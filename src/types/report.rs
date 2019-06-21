@@ -1,10 +1,9 @@
-use std::collections::HashMap;
-use super::link::LinkType;
-use super::ecommerce::ECommerceReportType;
 use super::campaign::CampaignDeliveryStatusType;
+use super::ecommerce::ECommerceReportType;
+use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
-
+use std::collections::HashMap;
 
 ///
 /// An object describing the bounce summary for the campaign.
@@ -49,7 +48,7 @@ impl Default for ForwardsType {
     fn default() -> Self {
         Self {
             forwards_count: 0,
-            forwards_opens: 0
+            forwards_opens: 0,
         }
     }
 }
@@ -392,7 +391,6 @@ impl Default for ShareReportType {
     }
 }
 
-
 // ============ Reports ==============
 ///
 ///
@@ -405,7 +403,7 @@ pub struct ReportType {
     #[serde(default)]
     pub campaign_title: String,
     /// The type of campaign (regular, plain-text, ab_split, rss, automation, variate, or auto).
-    #[serde(default, rename="type")]
+    #[serde(default, rename = "type")]
     pub report_type: String,
     /// The unique list id.
     #[serde(default)]

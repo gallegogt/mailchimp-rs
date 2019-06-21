@@ -16,8 +16,8 @@ mod conversations;
 mod internal;
 pub mod iter;
 mod list;
-pub mod types;
 mod reports;
+pub mod types;
 
 pub use crate::api::MailchimpApi;
 pub use crate::api_root::ApiRoot;
