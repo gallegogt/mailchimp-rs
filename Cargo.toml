@@ -1,9 +1,9 @@
 [package]
 name = "mailchimp"
-version = "0.1.11"
+version = "0.1.12"
 authors = ["Yolier Galan Tasse <gallegogt@gmail.com>"]
 edition = "2018"
-description = "Library for the development of applications that require the use of the [Mailchimp](https://developer.mailchimp.com) API, using the Rust programming language"
+description = "[Unofficial] Library for the development of applications that require the use of the [Mailchimp](https://developer.mailchimp.com) API, using the Rust programming language"
 readme = "README.md"
 license-file = "LICENCE"
 repository = "https://github.com/gallegogt/mailchimp-rs.git"
@@ -27,11 +27,11 @@ doc = true
 [dev-dependencies]
 # This library is meant to be used on development or testing environments
 # in which setting environment variables is not practical.
-dotenv = "^0.13"
+dotenv = "^0.14"
 # Eclipse Paho MQTT Rust Client Library
 paho-mqtt = {version="^0.5", default-features=false}
 # MD5
-md5 = "0.6.1"
+md5 = "^0.6"
 
 [dependencies]
 # The core APIs, including the Serialize and Deserialize traits. Always
