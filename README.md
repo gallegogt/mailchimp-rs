@@ -1,6 +1,5 @@
 # [UNOFFICIAL] Mailchimp API Implementation
 
-### [UNOFFICIAL] Library for the development of applications that require the use of the [Mailchimp](https://developer.mailchimp.com) API, using the Rust programming language
 
 NOTA: NOTE: The library is in development, in the section "**Implementation Status**" I show you that I have implemented and that not.
 ---
