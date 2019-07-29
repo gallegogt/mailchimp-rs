@@ -1,29 +1,6 @@
 use super::contact::ContactType;
 use super::link::LinkType;
-
-// ============ Contact ==============
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct IndustryStatsType {
-    /// The average unique open rate for all campaigns in the account’s specified industry.
-    #[serde(default)]
-    pub open_rate: f32,
-    /// The average bounce rate for all campaigns in the account’s specified industry.
-    #[serde(default)]
-    pub bounce_rate: f32,
-    /// The average unique click rate for all campaigns in the account’s specified industry.
-    #[serde(default)]
-    pub click_rate: f32,
-}
-
-impl Default for IndustryStatsType {
-    fn default() -> Self {
-        IndustryStatsType {
-            open_rate: 0.0,
-            bounce_rate: 0.0,
-            click_rate: 0.0,
-        }
-    }
-}
+use super::industry_stats::IndustryStatsType;
 
 // ============ API Root ==============
 // GET /

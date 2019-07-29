@@ -1,3 +1,4 @@
+mod industry_stats;
 mod api_root;
 mod authorized_apps;
 mod automation_campaign;
@@ -5,8 +6,8 @@ mod automation_email_queue;
 mod automation_subscriber;
 mod campaign;
 mod campaign_content;
-mod campaign_feedback;
 mod campaign_send_checklist;
+mod campaign_feedback;
 mod contact;
 mod conversation_messages;
 mod conversations;
@@ -37,6 +38,8 @@ mod ping;
 mod report;
 mod workflow_email;
 
+
+pub use self::industry_stats::*;
 pub use self::api_root::*;
 pub use self::authorized_apps::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType};
 pub use self::automation_campaign::*;
