@@ -4,6 +4,7 @@ version = "0.1.13"
 authors = ["Yolier Galan Tasse <gallegogt@gmail.com>"]
 description = "[Unofficial] Library for the development of applications that require the use of the [Mailchimp](https://developer.mailchimp.com) API, using the Rust programming language"
 readme = "README.md"
+edition = "2018"
 license-file = "LICENCE"
 repository = "https://github.com/gallegogt/mailchimp-rs.git"
 homepage = "https://github.com/gallegogt/mailchimp-rs"

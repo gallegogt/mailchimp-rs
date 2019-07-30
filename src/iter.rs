@@ -1,13 +1,26 @@
+//! Implement Iter
+//!
+
 use crate::api::MailchimpApi;
 use log::error;
 use serde::de::DeserializeOwned;
 use std::collections::HashMap;
 
-// ===================== FILTER ==========
+///
+/// Resource Filter
+///
 pub trait ResourceFilter {
+    ///
+    /// Build request payload for this resource
+    ///
     fn build_payload(&self) -> HashMap<String, String>;
 }
 
+///
+/// Struct Simple Filter
+///
+/// It filter have the the common fields for request filter
+///
 #[derive(Debug, Clone)]
 pub struct SimpleFilter {
     /// A comma-separated list of fields to return. Reference
@@ -63,7 +76,9 @@ impl ResourceFilter for SimpleFilter {
     }
 }
 
-// ===================== Collection ==========
+///
+/// Mailchimp Collection
+///
 pub trait MailchimpCollection<T> {
     /// Total Items
     fn get_total_items(&self) -> u64;
@@ -72,25 +87,29 @@ pub trait MailchimpCollection<T> {
     fn get_values(&self) -> Vec<T>;
 }
 
-// ===================== BuildIter ==========
+///
+/// Build Iter
+///
 pub trait BuildIter {
+    /// Define the type of the Filter
     type FilterItem;
+    /// Define the type of Item inner of collection
     type Item;
+    /// Define the type collection
     type Collection;
 
     ///
-    /// Crea un recurso a partir del dato pasado por parámetro
+    /// Create a resource from the data passed by parameter
     ///
     fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item;
     ///
-    /// Actualiza el offset
+    /// Update Filter Offset
     ///
     fn update_filter_offset(&self, filter: &Self::FilterItem) -> Self::FilterItem;
 }
 
-// ========================== MalchimpIter ==========================
 ///
-/// MalchimpIter
+/// Malchimp Iterator
 ///
 #[derive(Debug, Clone)]
 pub struct MalchimpIter<B>
@@ -98,14 +117,19 @@ where
     B: BuildIter,
     B::FilterItem: ResourceFilter,
 {
+    /// Builder
     pub builder: B,
+    /// Data
     pub data: Vec<B::Item>,
+    /// Current Filter
     pub cur_filters: B::FilterItem,
+    /// Current Iterator Index
     pub cur_it: u64,
+    /// Total items in collection
     pub total_items: u64,
-    // Mailchimp API
+    /// Mailchimp API
     pub api: MailchimpApi,
-    // Endpoint
+    /// Endpoint
     pub endpoint: String,
 }
 

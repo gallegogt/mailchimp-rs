@@ -1,9 +1,12 @@
-use super::contact::ContactType;
-use super::link::LinkType;
-use super::industry_stats::IndustryStatsType;
+//! Implement API Root Model Types
 
-// ============ API Root ==============
-// GET /
+use super::contact::ContactType;
+use super::industry_stats::IndustryStatsType;
+use super::link::LinkType;
+
+///
+/// API Root Type (GET /)
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ApiRootType {
     /// The Mailchimp account ID, used for features like list subscribe forms.

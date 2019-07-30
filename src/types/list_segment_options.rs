@@ -1,4 +1,6 @@
-// ============ Segment Conditions ==============
+///
+/// Segment Conditions
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SegmentConditionsType {
     /// The type of segment, for example: date, language, Mandrill, static, and more.
@@ -14,7 +16,9 @@ impl Default for SegmentConditionsType {
     }
 }
 
-// ============ Segment Options ==============
+///
+/// Segment Options
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SegmentOptionsType {
     /// The id for an existing saved segment.

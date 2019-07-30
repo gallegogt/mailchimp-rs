@@ -49,6 +49,9 @@ pub struct ListInterestCategory {
     _endpoint: String,
 }
 
+///
+/// Interest Category Param
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct InterestCategoryParam {
     /// The text description of this category. This field appears on signup forms
@@ -332,6 +335,7 @@ impl ResourceFilter for ListInterestCategoryFilter {
 ///
 #[derive(Debug)]
 pub struct ListInterestCategoryBuilder {
+    /// Resource Endpoint
     pub endpoint: String,
 }
 

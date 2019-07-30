@@ -1,6 +1,6 @@
-///
-/// Conversations
-///
+//! Conversations
+//!
+
 use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
@@ -61,7 +61,7 @@ impl Default for ConversationMessage {
 }
 
 ///
-/// ParamMessage
+/// Param Message
 ///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ParamMessage {
@@ -121,6 +121,9 @@ impl Default for CollectionConversationMessages {
     }
 }
 
+///
+/// Messages Filter
+///
 #[derive(Debug, Clone)]
 pub struct MessagesFilter {
     /// A comma-separated list of fields to return. Reference

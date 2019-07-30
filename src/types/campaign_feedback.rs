@@ -1,3 +1,6 @@
+//! Implement Feedback Types
+//!
+
 use super::empty::EmptyType;
 use super::link::LinkType;
 use crate::api::MailchimpApi;
@@ -5,7 +8,9 @@ use crate::internal::request::MailchimpResult;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
 use std::collections::HashMap;
 
-// ============ Campaign Content ==============
+///
+/// Campaign Feedback Type
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CampaignFeedbackType {
     /// The individual id for the feedback item.
@@ -50,6 +55,9 @@ pub struct CampaignFeedbackType {
     _endpoint: String,
 }
 
+///
+/// Collection Campaign Feedback
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CollectionCampaignFeedback {
     /// A collection of feedback items for a campaign.
@@ -89,8 +97,12 @@ impl Default for CollectionCampaignFeedback {
     }
 }
 
+///
+/// Campaign Feedback Builder
+///
 #[derive(Debug)]
 pub struct CampaignFeedbackBuilder {
+    /// Endpoint
     pub endpoint: String,
 }
 
@@ -118,6 +130,9 @@ impl BuildIter for CampaignFeedbackBuilder {
     }
 }
 
+///
+/// Update Feedback Param
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UpdateFeedbackParam {
     /// The block id for the editable block that the feedback addresses.

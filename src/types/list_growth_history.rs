@@ -3,7 +3,9 @@ use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
 use std::collections::HashMap;
 
-// ============ Growth History  GrowthHistory ==============
+///
+/// List Growth History Type
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ListGrowthHistoryType {
     /// The list id for the growth activity report.
@@ -68,8 +70,9 @@ impl Default for CollectionListGrowthHistory {
     }
 }
 
-/// ================================= ITER =====================
-
+///
+/// List Growth History Filter
+///
 #[derive(Debug, Clone)]
 pub struct ListGrowthHistoryFilter {
     /// A comma-separated list of fields to return. Reference
@@ -143,6 +146,9 @@ impl ResourceFilter for ListGrowthHistoryFilter {
     }
 }
 
+///
+/// List Growth History Builder
+///
 #[derive(Debug)]
 pub struct ListGrowthHistoryBuilder {}
 

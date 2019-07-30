@@ -70,6 +70,9 @@ impl BuildIter for ListMemberTagBuilder {
     }
 }
 
+///
+/// List Member Tag Type
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ListMemberTagType {
     /// The name of the tag.
@@ -81,6 +84,9 @@ pub struct ListMemberTagType {
     pub status: String,
 }
 
+///
+/// List Member Tag Param
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ListMemberTagParam {
     /// A list of tags assigned to the list member.

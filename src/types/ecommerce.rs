@@ -1,4 +1,9 @@
-// ============ E-Commerce stats for a campaign. ==============
+//! ECommerce Report Type
+//!
+
+///
+/// E-Commerce stats for a campaign.
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ECommerceReportType {
     /// The total orders for a campaign.

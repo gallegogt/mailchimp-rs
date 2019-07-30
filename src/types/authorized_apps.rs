@@ -1,9 +1,15 @@
+//! Implement Authorized App Model Types
+
 use super::LinkType;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::iter::MailchimpCollection;
 
-// ============ Authorized Apps ==============
-// POST /authorized-apps
+///
+/// Created Authorized App Type
+///
+/// Endpoint
+///     POST /authorized-apps
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreatedAuthorizedAppType {
     /// The access token issued by the auth server.
@@ -17,8 +23,12 @@ pub struct CreatedAuthorizedAppType {
     pub _links: Vec<LinkType>,
 }
 
-// ============ Authorized App ==============
-// GET /authorized-apps/{app_id}
+///
+/// Authorized App Type
+///
+/// Endpoint
+///     GET /authorized-apps/{app_id}
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AuthorizedAppType {
     /// The ID for the application.
@@ -42,9 +52,9 @@ pub struct AuthorizedAppType {
 }
 
 impl MailchimpApiUpdate for AuthorizedAppType {
-    /**
-     * Update API
-     */
+    ///
+    /// Update API
+    ///
     fn set_api(&mut self, n_api: &MailchimpApi) {
         self._api = n_api.clone()
     }
@@ -53,8 +63,12 @@ impl MailchimpApiUpdate for AuthorizedAppType {
 /// List of AuthorizedAppType
 pub type AuthorizedAppList = Vec<AuthorizedAppType>;
 
-// ============ Authorized Apps ==============
-// GET /authorized-apps
+///
+/// Authorized Apps Type
+///
+/// Endpoint
+///     GET /authorized-apps
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AuthorizedAppsType {
     /// An array of objects, each representing an authorized application.

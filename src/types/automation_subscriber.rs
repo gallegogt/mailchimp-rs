@@ -1,10 +1,18 @@
+//! Implement Automation Subscribers Types
+//!
+
 use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
 
-// ============ Automation Subscribers ==============
-// GET /automations/{workflow_id}/removed-subscribers
-// Subscriber who was removed from an Automation workflow
+///
+/// Automation Subscribers
+///
+/// Subscriber who was removed from an Automation workflow
+///
+/// Endpoint
+///     GET /automations/{workflow_id}/removed-subscribers
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AutomationSubscriberType {
     /// The MD5 hash of the lowercase version of the list member’s email address.
@@ -24,7 +32,12 @@ pub struct AutomationSubscriberType {
     pub _links: Vec<LinkType>,
 }
 
-// GET /automations/{workflow_id}/removed-subscribers
+///
+/// Collection Automation Subscriber
+///
+/// Endpoint
+///     GET /automations/{workflow_id}/removed-subscribers
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CollectionAutomationSubscriber {
     /// A string that uniquely identifies an Automation workflow.
@@ -64,8 +77,9 @@ impl Default for CollectionAutomationSubscriber {
     }
 }
 
-/// ================================= ITER =====================
-
+///
+/// Automation Subscriber Builder
+///
 #[derive(Debug)]
 pub struct AutomationSubscriberBuilder {}
 

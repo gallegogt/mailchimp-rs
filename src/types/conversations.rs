@@ -1,9 +1,10 @@
+//! Conversations
+//!
+
 use super::conversation_messages::{
     CollectionConversationMessages, ConversationMessage, MessagesBuider, MessagesFilter,
 };
-///
-/// Conversations
-///
+
 use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::internal::request::MailchimpResult;
@@ -54,7 +55,7 @@ pub struct Conversation {
 }
 
 ///
-/// ParamMessage
+/// Param Message
 ///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ParamMessage {
@@ -144,7 +145,9 @@ impl Conversation {
         payload.insert("message_id".to_string(), message_id.to_string());
         self._api.get::<ConversationMessage>(&endpoint, payload)
     }
-
+    ///
+    /// Update API
+    ///
     pub fn set_api(&mut self, n_api: &MailchimpApi) {
         self._api = n_api.clone();
     }
@@ -157,7 +160,7 @@ impl Conversation {
 }
 
 ///
-/// CollectionConversations
+/// Collection Conversations
 ///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CollectionConversations {
@@ -194,6 +197,9 @@ impl Default for CollectionConversations {
     }
 }
 
+///
+/// Conversations Filter
+///
 #[derive(Debug, Clone)]
 pub struct ConversationsFilter {
     /// A comma-separated list of fields to return. Reference

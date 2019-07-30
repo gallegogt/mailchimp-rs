@@ -31,7 +31,6 @@ mailchimp = "0.1"
 Rust Code:
 
 ```rust
-  extern crate mailchimp;
   use mailchimp::MailchimpApi;
   use mailchimp::{Automations, AutomationsFilter};
   use std::collections::HashMap;

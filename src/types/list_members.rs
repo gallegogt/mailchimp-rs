@@ -545,8 +545,9 @@ impl Default for CollectionListMembers {
     }
 }
 
-/// ================================= ITER =====================
-
+///
+/// List Members Filter
+///
 #[derive(Debug, Clone)]
 pub struct ListMembersFilter {
     /// A comma-separated list of fields to return. Reference
@@ -750,9 +751,12 @@ impl ResourceFilter for ListMembersFilter {
     }
 }
 
+///
+/// List Members Builder
+///
 #[derive(Debug)]
 pub struct ListMembersBuilder {
-    // Endpoint
+    /// Resource Endpoint
     pub endpoint: String,
 }
 
@@ -816,6 +820,7 @@ pub struct ListMemberParams {
     /// VIP status for subscriber.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub vip: Option<bool>,
+    /// location
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub location: Option<SubscriberLocation>,
     /// The marketing permissions for the subscriber.

@@ -1,4 +1,9 @@
-// ============ Contact ==============
+//! Implement Contact Types
+//!
+
+///
+/// Contact Type
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ContactType {
     /// The company name for the account.

@@ -38,7 +38,9 @@ use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
 use log::error;
 use std::collections::HashMap;
 
-// ============ Campaign Defaults	 ==============
+///
+/// Campaign Defaults Type
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CampaignDefaultsType {
     /// The default from name for campaigns sent to this list.
@@ -66,7 +68,9 @@ impl Default for CampaignDefaultsType {
     }
 }
 
-// ============ Statistics ==============
+///
+/// Statistics
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct StatisticsType {
     /// The number of active members in the list.
@@ -148,8 +152,12 @@ impl Default for StatisticsType {
     }
 }
 
-// ============ List ==============
-// GET /lists/{list_id}
+///
+/// List Type
+///
+/// Endpoint
+///      GET /lists/{list_id}
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ListType {
     /// A string that uniquely identifies this list.
@@ -240,7 +248,12 @@ impl MailchimpApiUpdate for ListType {
     }
 }
 
-// GET /lists
+///
+/// List Type
+///
+/// Endpoint
+///      GET /lists
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ListsType {
     /// An array of objects, each representing an email in an Automation workflow.
@@ -1080,6 +1093,9 @@ impl ListType {
         }
     }
 
+    ///
+    /// Get Specific Segment
+    ///
     pub fn get_specific_segment<'a>(&self, segment_id: &'a str) -> MailchimpResult<ListSegment> {
         // GET /lists/{list_id}/segments/{segment_id}
         let mut endpoint = self.get_base_endpoint();

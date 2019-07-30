@@ -1,3 +1,5 @@
+//! Implement Automations Model Types
+
 use super::automation_subscriber::{
     AutomationSubscriberBuilder, AutomationSubscriberType, CollectionAutomationSubscriber,
 };
@@ -13,7 +15,9 @@ use crate::iter::MailchimpCollection;
 use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
 use std::collections::HashMap;
 
-// ============ Automation Delay ==============
+///
+/// Automation Delay Type
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AutomationDelayType {
     /// The delay amount for an automation email.
@@ -42,7 +46,9 @@ impl Default for AutomationDelayType {
     }
 }
 
-// ============ Recipient ==============
+///
+/// Recipient Type
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RecipientType {
     /// The unique list id.
@@ -103,7 +109,9 @@ impl RecipientType {
     }
 }
 
-// ============ Salesforce CRM Tracking ==============
+///
+/// Salesforce CRM Tracking Type
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SalesforceCRMTrackingType {
     /// Create a campaign in a connected Salesforce account.
@@ -123,7 +131,9 @@ impl Default for SalesforceCRMTrackingType {
     }
 }
 
-// ============ Capsule CRM Tracking ==============
+///
+/// Capsule CRM Tracking
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CapsuleCRMTrackingType {
     /// Update contact notes for a campaign based on a subscriber’s email addresses.
@@ -137,7 +147,9 @@ impl Default for CapsuleCRMTrackingType {
     }
 }
 
-// ============ Campaign Report Summary ==============
+///
+/// Campaign Report Summary
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CampaignReportSummaryType {
     /// The total number of opens for a campaign.
@@ -177,7 +189,9 @@ impl Default for CampaignReportSummaryType {
     }
 }
 
-// ============ Automation Trigger ==============
+///
+/// Automation Trigger
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AutomationTriggerType {
     /// The type of Automation workflow.
@@ -207,7 +221,9 @@ impl AutomationTriggerType {
     }
 }
 
-// ============ Automation Campaign Settings ==============
+///
+/// Automation Campaign Settings
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AutomationCampaignSettingsType {
     /// The subject line for the campaign.
@@ -263,6 +279,7 @@ pub struct AutomationCampaignSettingsType {
     pub drag_and_drop: Option<bool>,
 }
 
+/// Campaigns Settings Type
 pub type CampaignSettingsType = AutomationCampaignSettingsType;
 
 impl Default for AutomationCampaignSettingsType {
@@ -349,7 +366,9 @@ impl AutomationCampaignSettingsType {
     }
 }
 
-// ============ Automation Tracking Options ==============
+///
+/// Automation Tracking Option
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AutomationTrackingOptionsType {
     /// Whether to track opens. Defaults to true.
@@ -399,10 +418,15 @@ impl Default for AutomationTrackingOptionsType {
     }
 }
 
+/// Campaign Tracking Options Type
 pub type CampaignTrackingOptionsType = AutomationTrackingOptionsType;
 
-// ============ Automation Workflows ==============
-// GET /automations/{workflow_id}
+///
+/// Automation Workflows
+///
+/// Endpoint
+///     GET /automations/{workflow_id}
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AutomationWorkflowType {
     /// A string that identifies the Automation.
@@ -463,6 +487,9 @@ impl MailchimpApiUpdate for AutomationWorkflowType {
     }
 }
 
+///
+/// Update Params For Workflow Email
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct UpdateParamsForWorkflowEmail {
     /// Settings for the campaign including the email subject, from name, and from email address.
@@ -728,8 +755,12 @@ impl AutomationWorkflowType {
     }
 }
 
-// ============ Authorized Apps ==============
-// GET /automations
+///
+/// Automations
+///
+/// Endpoint
+///     GET /automations
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CollectionAutomation {
     /// An array of objects, each representing an authorized application.
@@ -765,6 +796,9 @@ impl Default for CollectionAutomation {
     }
 }
 
+///
+/// Automation Modifier
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AutomationModifier {
     /// The settings for the Automation workflow.
@@ -781,7 +815,9 @@ pub struct AutomationModifier {
     pub trigger_settings: Option<AutomationTriggerType>,
 }
 
-// ============ Workflow Email ==============
+///
+/// Workflow Email
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SocialCardType {
     /// The url for the header image for the card.

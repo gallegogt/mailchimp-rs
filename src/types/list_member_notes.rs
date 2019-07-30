@@ -142,13 +142,12 @@ impl Default for CollectionListMemberNote {
     }
 }
 
-/// ================================= ITER =====================
-
 ///
 /// ListMemberNoteBuilder
 ///
 #[derive(Debug)]
 pub struct ListMemberNoteBuilder {
+    /// Resource Endpoint
     pub endpoint: String,
 }
 

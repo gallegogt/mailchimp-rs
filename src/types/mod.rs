@@ -1,4 +1,7 @@
-mod industry_stats;
+//!
+//! Mailchimp Types
+//!
+
 mod api_root;
 mod authorized_apps;
 mod automation_campaign;
@@ -6,13 +9,14 @@ mod automation_email_queue;
 mod automation_subscriber;
 mod campaign;
 mod campaign_content;
-mod campaign_send_checklist;
 mod campaign_feedback;
+mod campaign_send_checklist;
 mod contact;
 mod conversation_messages;
 mod conversations;
 mod ecommerce;
 mod empty;
+mod industry_stats;
 mod link;
 mod list;
 mod list_abuse_report;
@@ -38,8 +42,6 @@ mod ping;
 mod report;
 mod workflow_email;
 
-
-pub use self::industry_stats::*;
 pub use self::api_root::*;
 pub use self::authorized_apps::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType};
 pub use self::automation_campaign::*;
@@ -54,6 +56,7 @@ pub use self::conversation_messages::*;
 pub use self::conversations::*;
 pub use self::ecommerce::*;
 pub use self::empty::*;
+pub use self::industry_stats::*;
 pub use self::link::LinkType;
 pub use self::list::*;
 pub use self::list_abuse_report::*;

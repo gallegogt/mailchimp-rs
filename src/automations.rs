@@ -1,3 +1,31 @@
+//! Implement Mailchimp Automations Endpoint
+//!
+//! Mailchimp’s free Automation feature lets you build a series of
+//! emails that send to subscribers when triggered by a specific date, activity,
+//! or event. Use the API to manage Automation workflows, emails, and queues.
+//!
+//! ```
+//!     use mailchimp::MailchimpApi;
+//!     use mailchimp::{Automations, AutomationsFilter};
+//!     use std::collections::HashMap;
+//!
+//!     fn main() {
+//!         let api = MailchimpApi::new("<API_KEY>");
+//!
+//!         // Create Instance
+//!         let automations = Automations::new(api);
+//!
+//!         // Get information about all automations in the account.
+//!         for w in automations.iter(AutomationsFilter::default()) {
+//!             println!("Title             {:?}", settings.title);
+//!             println!("Emails Sent       {:?}", w.emails_sent);
+//!             println!("Report Summary    {:?}", w.report_summary);
+//!             println!("Start Time        {:?}", w.start_time);
+//!         }
+//!     }
+//! ```
+//!
+
 use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
 use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
@@ -8,6 +36,7 @@ use super::types::{
 use log::error;
 use std::collections::HashMap;
 
+/// Automation Request Filter
 #[derive(Debug, Clone)]
 pub struct AutomationsFilter {
     /// A comma-separated list of fields to return. Reference

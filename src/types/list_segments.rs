@@ -272,6 +272,7 @@ impl ResourceFilter for ListSegmentFilter {
 ///
 #[derive(Debug)]
 pub struct ListSegmentBuilder {
+    /// Resource Endpoint
     pub endpoint: String,
 }
 

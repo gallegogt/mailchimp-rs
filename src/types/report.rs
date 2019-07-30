@@ -1,10 +1,10 @@
 use super::campaign::CampaignDeliveryStatusType;
 use super::ecommerce::ECommerceReportType;
+use super::industry_stats::IndustryStatsType;
 use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
 use std::collections::HashMap;
-use super::industry_stats::IndustryStatsType;
 
 ///
 /// An object describing the bounce summary for the campaign.
@@ -143,7 +143,6 @@ impl Default for FacebookLikesType {
         }
     }
 }
-
 
 ///
 /// The average campaign statistics for your list. This won’t be present if we
@@ -441,7 +440,9 @@ pub struct ReportType {
     pub _links: Vec<LinkType>,
 }
 
-//
+///
+/// Collection Reports
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CollectionReports {
     /// An array of objects, each representing a report resource.
@@ -477,7 +478,8 @@ impl Default for CollectionReports {
     }
 }
 
-/// ================================= ITER =====================
+///
+/// Reports Filter
 ///
 #[derive(Debug, Clone)]
 pub struct ReportsFilter {
@@ -565,6 +567,9 @@ impl ResourceFilter for ReportsFilter {
     }
 }
 
+///
+/// Reports Builder
+///
 #[derive(Debug)]
 pub struct ReportsBuilder {}
 

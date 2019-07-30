@@ -165,12 +165,12 @@ impl Default for CollectionListWebhooks {
     }
 }
 
-/// ================================= ITER =====================
 ///
 /// ListWebhooksBuilder
 ///
 #[derive(Debug)]
 pub struct ListWebhooksBuilder {
+    /// Resource Endpoint
     pub endpoint: String,
 }
 

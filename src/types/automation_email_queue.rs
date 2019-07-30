@@ -1,10 +1,17 @@
+//! Implement Automations Email Queue Types
+//!
+
 use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
 use std::collections::HashMap;
 
-// ============ Workflow Email ==============
-// GET /automations/{workflow_id}/emails/{workflow_email_id}/queue/{subscriber_hash}
+///
+/// Workflow Email
+///
+/// Endpoint
+///     GET /automations/{workflow_id}/emails/{workflow_email_id}/queue/{subscriber_hash}
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AutomationEmailQueueType {
     /// The MD5 hash of the lowercase version of the list member’s email address.
@@ -33,7 +40,12 @@ pub struct AutomationEmailQueueType {
     pub _links: Vec<LinkType>,
 }
 
-/// GET /automations/{workflow_id}/emails/{workflow_email_id}/queue
+///
+/// Collection Automation Email Queue
+///
+/// Endpoint
+///     GET /automations/{workflow_id}/emails/{workflow_email_id}/queue
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CollectionAutomationEmailQueue {
     /// A string that uniquely identifies an Automation workflow.
@@ -77,8 +89,9 @@ impl Default for CollectionAutomationEmailQueue {
     }
 }
 
-/// ================================= ITER =====================
-
+///
+/// Automation Email Queue Filter
+///
 #[derive(Debug, Clone)]
 pub struct AutomationEmailQueueFilter {
     /// A comma-separated list of fields to return. Reference
@@ -134,6 +147,9 @@ impl ResourceFilter for AutomationEmailQueueFilter {
     }
 }
 
+///
+/// Automation Email Queue Builder
+///
 #[derive(Debug)]
 pub struct AutomationEmailQueueBuilder {}
 

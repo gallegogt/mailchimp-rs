@@ -1,3 +1,6 @@
+//! Implement Campaign Types
+//!
+
 use super::automation_campaign::{
     CampaignReportSummaryType, CampaignSettingsType, CampaignTrackingOptionsType, RecipientType,
     SocialCardType,
@@ -348,8 +351,12 @@ impl Default for VariateSettingsType {
     }
 }
 
-// ============ Campaign ==============
-// GET /campaigns/{campaign_id}
+///
+/// Campaign
+///
+/// Endpoint
+///     GET /campaigns/{campaign_id}
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CampaignType {
     /// A string that uniquely identifies this campaign.
@@ -444,7 +451,12 @@ impl MailchimpApiUpdate for CampaignType {
     }
 }
 
-// GET /campaigns
+///
+/// Campaigns
+///
+/// Endpoint
+///     GET /campaigns
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CampaignsType {
     /// An array of objects, each representing an email in an Automation workflow.
@@ -479,6 +491,9 @@ impl Default for CampaignsType {
     }
 }
 
+///
+/// Schedule Batch Delivery
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ScheduleBatchDelivery {
     /// The delay, in minutes, between batches.
@@ -498,6 +513,9 @@ impl Default for ScheduleBatchDelivery {
     }
 }
 
+///
+/// Schedule Param
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ScheduleParam {
     /// The UTC date and time to schedule the campaign for delivery in ISO 8601 format.
@@ -517,6 +535,9 @@ pub struct ScheduleParam {
     pub batch_delivery: Option<ScheduleBatchDelivery>,
 }
 
+///
+/// Email Param
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmailParam {
     /// An array of email addresses to send the test email to.
@@ -528,6 +549,9 @@ pub struct EmailParam {
 }
 
 impl EmailParam {
+    ///
+    /// New
+    ///
     pub fn new(test_emails: Vec<String>, send_type: String) -> Self {
         EmailParam {
             test_emails: test_emails,
@@ -536,6 +560,9 @@ impl EmailParam {
     }
 }
 
+///
+/// Update Cmapaign Param
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UpdateCampaignParam {
     /// List settings for the campaign.
@@ -799,6 +826,9 @@ impl CampaignType {
         }
     }
 
+    ///
+    /// Get Feedback Info
+    ///
     pub fn get_feedback_info<'a>(
         &self,
         feedback_id: &'a str,

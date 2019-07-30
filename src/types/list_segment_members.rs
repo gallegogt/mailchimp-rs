@@ -41,13 +41,12 @@ impl Default for CollectionListSegmentMembers {
     }
 }
 
-/// ================================= ITER =====================
-
 ///
 /// ListSegmentMembersBuilder
 ///
 #[derive(Debug)]
 pub struct ListSegmentMembersBuilder {
+    /// Resource Endpoint
     pub endpoint: String,
 }
 

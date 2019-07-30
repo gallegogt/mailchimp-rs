@@ -10,9 +10,6 @@
 /// To run this example you need to create a archive named ``.env`` in the root of the directory with the following info
 /// MAILCHIMP_API_KEY=<API KEY>
 ///
-extern crate dotenv;
-extern crate mailchimp;
-
 use dotenv::dotenv;
 use std::env;
 

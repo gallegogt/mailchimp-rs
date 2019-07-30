@@ -1,3 +1,30 @@
+//! Implement Mailchimp Lists Endpoint
+//!
+//! A Mailchimp list is a powerful and flexible tool that helps you manage your
+//! contacts. Learn how to get started with lists in Mailchimp.
+//!
+//! ```
+//!     use mailchimp::MailchimpApi;
+//!     use mailchimp::{ListFilter, Lists, MailchimpApi};
+//!     use std::collections::HashMap;
+//!
+//!     fn main() {
+//!         let api = MailchimpApi::new("<API_KEY>");
+//!
+//!         // Create Instance of Lists
+//!         let lists = Lists::new(api);
+//!
+//!         // Get information about all lists in the account.
+//!         let lists_c = lists.iter(ListFilter::default());
+//!         for w in lists_c {
+//!             println!("\ID       {:?}",  w.id.unwrap());
+//!             println!("\tName    {:?}", w.name);
+//!             println!("\tStats   {:?}", w.stats);
+//!         }
+//!     }
+//! ```
+//!
+
 use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
 use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
@@ -5,6 +32,7 @@ use super::types::{ListParam, ListType, ListsType};
 use log::error;
 use std::collections::HashMap;
 
+/// List Filter
 #[derive(Debug, Clone)]
 pub struct ListFilter {
     /// A comma-separated list of fields to return.

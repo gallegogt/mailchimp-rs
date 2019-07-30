@@ -252,6 +252,7 @@ impl ResourceFilter for ListMergeFieldFilter {
 ///
 #[derive(Debug)]
 pub struct ListMergeFieldBuilder {
+    /// Resource Endpoint
     pub endpoint: String,
 }
 

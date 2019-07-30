@@ -1,3 +1,28 @@
+//! Implement Mailchimp Authorized Apps Endpoint
+//!
+//! Manage registered, connected apps for your Mailchimp account with the Authorized Apps endpoints.
+//!
+//! ```
+//!     use mailchimp::{AuthorizedApps, AuthorizedFilter, MailchimpApi};
+//!     use std::collections::HashMap;
+//!
+//!     fn main() {
+//!         let api = MailchimpApi::new("<API_KEY>");
+//!
+//!         // Create Instance
+//!          let authorized_apps = AuthorizedApps::new(api);
+//!
+//!         // Get information about all authorized apps.
+//!         for app in authorized_apps.iter(AuthorizedFilter::default()); {
+//!             println!("ID   {:?}", app.id);
+//!             println!("Name   {:?}", app.name);
+//!             println!("Descriptions   {:?}", app.description);
+//!             println!("Users   {:?}", app.users);
+//!         }
+//!     }
+//! ```
+//!
+
 use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
 use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
@@ -5,6 +30,7 @@ use crate::types::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppTy
 use log::error;
 use std::collections::HashMap;
 
+/// Authorized Request Filter
 #[derive(Debug, Clone)]
 pub struct AuthorizedFilter {
     /// A comma-separated list of fields to return. Reference

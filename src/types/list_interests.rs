@@ -44,7 +44,9 @@ pub struct ListInterest {
     #[serde(default)]
     _endpoint: String,
 }
-
+///
+/// Interest Param
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct InterestParam {
     /// The text description of this category. This field appears on signup forms
@@ -173,6 +175,7 @@ impl Default for CollectionListInterest {
 ///
 #[derive(Debug)]
 pub struct ListInterestBuilder {
+    /// Resource Endpoint
     pub endpoint: String,
 }
 

@@ -1,3 +1,6 @@
+//! Implement Campaign Send Checklist Types
+//!
+
 use super::link::LinkType;
 
 ///

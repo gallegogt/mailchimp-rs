@@ -1,4 +1,4 @@
-// ============ LinkType ==============
+/// LinkType
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LinkType {
     /// Desc: As with an HTML ‘rel’ attribute, this describes the type of link.

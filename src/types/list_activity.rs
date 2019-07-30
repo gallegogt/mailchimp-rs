@@ -2,7 +2,6 @@ use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
 
-// ============ List Activity ==============
 ///
 ///  Get up to the previous 180 days of daily detailed aggregated activity stats
 /// for a list, not including Automation activity.
@@ -46,7 +45,9 @@ pub struct ListActivityType {
     pub _links: Vec<LinkType>,
 }
 
-//
+///
+/// Collection List Activity
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CollectionListActivity {
     /// Recent list activity.
@@ -86,8 +87,9 @@ impl Default for CollectionListActivity {
     }
 }
 
-/// ================================= ITER =====================
-
+///
+/// List Activity Builder
+///
 #[derive(Debug)]
 pub struct ListActivityBuilder {}
 

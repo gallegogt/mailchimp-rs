@@ -2,7 +2,6 @@ use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
 
-// ============ List Clients ==============
 ///
 /// Get information about the most popular email clients for subscribers in a specific Mailchimp list.
 ///
@@ -16,7 +15,9 @@ pub struct ListClientType {
     pub members: u64,
 }
 
-//
+///
+/// Collection List Clients
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CollectionListClients {
     /// Recent list activity.
@@ -56,8 +57,9 @@ impl Default for CollectionListClients {
     }
 }
 
-/// ================================= ITER =====================
-
+///
+/// List Clients Builder
+///
 #[derive(Debug)]
 pub struct ListClientsBuilder {}
 

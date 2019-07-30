@@ -14,8 +14,11 @@ use crate::internal::request::MailchimpResult;
 use crate::iter::{MalchimpIter, ResourceFilter};
 use std::collections::HashMap;
 
-// ============ Workflow Email ==============
-// GET /automations/{workflow_id}/emails/{workflow_email_id}
+/// Workflow Email
+///
+/// Endpoint
+///
+///     GET /automations/{workflow_id}/emails/{workflow_email_id}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct WorkflowEmailType {
     /// A string that uniquely identifies the Automation email.
@@ -244,7 +247,10 @@ impl WorkflowEmailType {
     }
 }
 
-// GET /automations/{workflow_id}/emails
+/// Workflow Emails Type
+///
+/// Endpoint
+///     GET /automations/{workflow_id}/emails
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct WorkflowEmailsType {
     /// An array of objects, each representing an email in an Automation workflow.

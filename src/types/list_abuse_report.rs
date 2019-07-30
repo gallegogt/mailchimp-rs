@@ -3,7 +3,9 @@ use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
 use std::collections::HashMap;
 
-// ============ Abuse Reports ==============
+///
+/// Abuse Reports
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ListAbuseReportType {
     /// The id for the abuse report
@@ -77,7 +79,9 @@ impl Default for CollectionListAbuseReport {
     }
 }
 
-/// ================================= ITER =====================
+///
+/// List AbuseReport Builder
+///
 #[derive(Debug)]
 pub struct ListAbuseReportBuilder {}
 

@@ -1,6 +1,5 @@
-use crate::reqwest::Client;
 use reqwest::header::HeaderMap;
-use reqwest::{Error, Response, StatusCode, Url};
+use reqwest::{Client, Error, Response, StatusCode, Url};
 use serde::ser::Serialize;
 use serde_json;
 

@@ -1,3 +1,6 @@
+//! Implement Campaign Content Types
+//!
+
 use super::link::LinkType;
 use std::collections::HashMap;
 
@@ -47,6 +50,9 @@ impl Default for UploadArchive {
     }
 }
 
+///
+/// Variate Content
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct VariateContent {
     /// Label used to identify the content option.
@@ -84,7 +90,9 @@ impl Default for VariateContent {
     }
 }
 
-// ============ Campaign Content ==============
+///
+/// Campaign Content Type
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CampaignContentType {
     /// Content options for multivariate campaigns.
@@ -104,7 +112,9 @@ pub struct CampaignContentType {
     pub _links: Vec<LinkType>,
 }
 
-// ============ Campaign Content ==============
+///
+/// Campaign Content Param
+///
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CampaignContentParam {
     /// The plain-text portion of the campaign. If left unspecified, we’ll generate this automatically.

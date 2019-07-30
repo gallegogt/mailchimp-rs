@@ -1,12 +1,20 @@
-extern crate log;
-extern crate reqwest;
+//! Mailchimp API
 
-extern crate serde;
+#![deny(
+    bad_style,
+    missing_docs,
+    trivial_casts,
+    trivial_numeric_casts,
+    unsafe_code,
+    unstable_features,
+    unused_import_braces,
+    unused_qualifications
+)]
+#![cfg_attr(not(debug_assertions), deny(warnings))]
+
 #[macro_use]
 extern crate serde_derive;
-extern crate serde_json;
 
-// pub mod models;
 mod api;
 mod api_root;
 mod authorized_apps;

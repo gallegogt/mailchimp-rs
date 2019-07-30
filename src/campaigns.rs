@@ -1,3 +1,30 @@
+//! Implement Mailchimp Campaigns Endpoint
+//!
+//! Campaigns are how you send emails to your Mailchimp list. Use the Campaigns
+//! API calls to manage campaigns in your Mailchimp account.
+//!
+//! ```
+//!     use mailchimp::MailchimpApi;
+//!     use mailchimp::{CampaignFilter, Campaigns};
+//!     use std::collections::HashMap;
+//!
+//!     fn main() {
+//!         let api = MailchimpApi::new("<API_KEY>");
+//!
+//!         // Create Instance of Lists
+//!         let r_campaigns = Campaigns::new(api);
+//!
+//!         // Get information about all campaigns in the account.
+//!         for w in r_campaigns.iter(CampaignFilter::default()) {
+//!             println!("\t Campaign ID    {:?}", w.id.as_ref().unwrap().to_string());
+//!             println!("\t Campaign Type    {:?}", w.campaign_type);
+//!             println!("\t Campaign Title   {:?}", w.settings.unwrap().title);
+//!             println!("\t Emails Sent   {:?}", w.emails_sent.unwrap());
+//!         }
+//!     }
+//! ```
+//!
+
 use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
 use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
@@ -5,6 +32,9 @@ use super::types::{CampaignType, CampaignsType};
 use log::error;
 use std::collections::HashMap;
 
+///
+/// Campaign Request Filter
+///
 #[derive(Debug, Clone)]
 pub struct CampaignFilter {
     /// A comma-separated list of fields to return.
