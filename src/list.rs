@@ -17,7 +17,7 @@
 //!         // Get information about all lists in the account.
 //!         let lists_c = lists.iter(ListFilter::default());
 //!         for w in lists_c {
-//!             println!("\ID       {:?}",  w.id.unwrap());
+//!             println!("\tID       {:?}",  w.id.unwrap());
 //!             println!("\tName    {:?}", w.name);
 //!             println!("\tStats   {:?}", w.stats);
 //!         }
