@@ -14,6 +14,7 @@ use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
 use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// Automation Delay Type
@@ -475,14 +476,14 @@ pub struct AutomationWorkflowType {
 
     /// Mailchimp APi
     #[serde(default, skip)]
-    pub _api: MailchimpApi,
+    pub _api: Rc<MailchimpApi>,
 }
 
 impl MailchimpApiUpdate for AutomationWorkflowType {
     /**
      * Update API
      */
-    fn set_api(&mut self, n_api: &MailchimpApi) {
+    fn set_api(&mut self, n_api: Rc<MailchimpApi>) {
         self._api = n_api.clone()
     }
 }
@@ -561,7 +562,7 @@ impl AutomationWorkflowType {
         match response {
             Ok(automation) => {
                 let mut au = automation;
-                au.set_api(&self._api);
+                au.set_api(self._api.clone());
                 Ok(au)
             }
             Err(e) => Err(e),
@@ -586,7 +587,7 @@ impl AutomationWorkflowType {
                         let mut inner = endpoint.clone();
                         inner.push_str(data.id.as_ref().unwrap());
                         let mut inner_data = data.clone();
-                        inner_data.set_api(&self._api);
+                        inner_data.set_api(self._api.clone());
                         inner_data.set_endpoint(&inner);
                         inner_data
                     })
@@ -626,7 +627,7 @@ impl AutomationWorkflowType {
         match response {
             Ok(workflow_email) => {
                 let mut eml = workflow_email;
-                eml.set_api(&self._api);
+                eml.set_api(self._api.clone());
                 eml.set_endpoint(&endpoint);
                 Ok(eml)
             }
@@ -681,7 +682,7 @@ impl AutomationWorkflowType {
         match response {
             Ok(workflow_email) => {
                 let mut we = workflow_email;
-                we.set_api(&self._api);
+                we.set_api(self._api.clone());
                 we.set_endpoint(&endpoint);
                 Ok(we)
             }

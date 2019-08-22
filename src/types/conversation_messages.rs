@@ -5,6 +5,7 @@ use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// The most recent message in the conversation.
@@ -214,7 +215,7 @@ impl BuildIter for MessagesBuider {
     ///
     /// Return a new data updated
     ///
-    fn update_item(&self, data: &Self::Item, _: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, _: Rc<MailchimpApi>) -> Self::Item {
         let in_data = data.clone();
         in_data
     }

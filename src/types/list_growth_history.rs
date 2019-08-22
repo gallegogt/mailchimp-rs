@@ -2,6 +2,7 @@ use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// List Growth History Type
@@ -160,7 +161,7 @@ impl BuildIter for ListGrowthHistoryBuilder {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item, _: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, _: Rc<MailchimpApi>) -> Self::Item {
         let in_data = data.clone();
         in_data
     }

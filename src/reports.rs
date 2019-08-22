@@ -4,6 +4,7 @@ use super::types::{CollectionReports, ReportType, ReportsBuilder, ReportsFilter}
 use crate::iter::{MalchimpIter, ResourceFilter};
 use log::error;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// Reports
@@ -16,7 +17,7 @@ use std::collections::HashMap;
 ///
 #[derive(Debug, Clone)]
 pub struct Reports {
-    api: MailchimpApi,
+    api: Rc<MailchimpApi>,
 }
 
 impl Reports {
@@ -25,7 +26,7 @@ impl Reports {
     ///     api: MailchimpApi
     ///
     pub fn new(api: MailchimpApi) -> Self {
-        Reports { api: api }
+        Reports { api: Rc::new(api) }
     }
 
     ///

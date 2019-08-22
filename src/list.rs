@@ -29,6 +29,7 @@ use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
 use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
 use super::types::{ListParam, ListType, ListsType};
+use std::rc::Rc;
 use log::error;
 use std::collections::HashMap;
 
@@ -186,7 +187,7 @@ impl ResourceFilter for ListFilter {
 ///
 #[derive(Debug, Clone)]
 pub struct Lists {
-    api: MailchimpApi,
+    api: Rc<MailchimpApi>,
 }
 
 #[derive(Debug)]
@@ -199,7 +200,7 @@ impl BuildIter for ListsBuilder {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: Rc<MailchimpApi>) -> Self::Item {
         let mut in_data = data.clone();
         in_data.set_api(api);
         in_data
@@ -220,7 +221,7 @@ impl Lists {
     ///     api: MailchimpApi
     ///
     pub fn new(api: MailchimpApi) -> Self {
-        Lists { api: api }
+        Lists { api: Rc::new(api) }
     }
 
     ///
@@ -254,7 +255,7 @@ impl Lists {
         match response {
             Ok(data) => {
                 let mut d = data;
-                d.set_api(&self.api);
+                d.set_api(self.api.clone());
                 Ok(d)
             }
             Err(e) => Err(e),

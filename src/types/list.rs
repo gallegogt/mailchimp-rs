@@ -37,6 +37,7 @@ use crate::iter::MailchimpCollection;
 use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
 use log::error;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// Campaign Defaults Type
@@ -233,7 +234,7 @@ pub struct ListType {
     pub _links: Option<Vec<LinkType>>,
 
     #[serde(skip)]
-    _api: MailchimpApi,
+    _api: Rc<MailchimpApi>,
 }
 
 ///
@@ -243,8 +244,8 @@ impl MailchimpApiUpdate for ListType {
     /**
      * Update API
      */
-    fn set_api(&mut self, n_api: &MailchimpApi) {
-        self._api = n_api.clone()
+    fn set_api(&mut self, n_api: Rc<MailchimpApi>) {
+        self._api = n_api
     }
 }
 
@@ -416,7 +417,7 @@ impl ListType {
         {
             Ok(data) => {
                 let mut n_data = data.clone();
-                n_data.set_api(&self._api);
+                n_data.set_api(self._api.clone());
                 n_data.set_endpoint(&endpoint.clone());
                 Ok(data)
             }
@@ -439,7 +440,7 @@ impl ListType {
         {
             Ok(data) => {
                 let mut n_data = data.clone();
-                n_data.set_api(&self._api);
+                n_data.set_api(self._api.clone());
                 n_data.set_endpoint(&endpoint);
                 Ok(n_data)
             }
@@ -504,7 +505,7 @@ impl ListType {
         {
             Ok(data) => {
                 let mut n_data = data.clone();
-                n_data.set_api(&self._api);
+                n_data.set_api(self._api.clone());
                 n_data.set_endpoint(&endpoint.clone());
                 Ok(data)
             }
@@ -524,7 +525,7 @@ impl ListType {
         {
             Ok(data) => {
                 let mut n_data = data.clone();
-                n_data.set_api(&self._api);
+                n_data.set_api(self._api.clone());
                 n_data.set_endpoint(&endpoint);
                 Ok(n_data)
             }
@@ -1107,7 +1108,7 @@ impl ListType {
         {
             Ok(data) => {
                 let mut n_data = data;
-                n_data.set_api(&self._api);
+                n_data.set_api(self._api.clone());
                 n_data.set_endpoint(&endpoint.clone());
                 Ok(n_data)
             }

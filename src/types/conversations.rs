@@ -4,6 +4,7 @@
 use super::conversation_messages::{
     CollectionConversationMessages, ConversationMessage, MessagesBuider, MessagesFilter,
 };
+use std::rc::Rc;
 
 use super::link::LinkType;
 use crate::api::MailchimpApi;
@@ -51,7 +52,7 @@ pub struct Conversation {
 
     /// Mailchimp API
     #[serde(skip)]
-    _api: MailchimpApi,
+    _api: Rc<MailchimpApi>,
 }
 
 ///
@@ -148,8 +149,8 @@ impl Conversation {
     ///
     /// Update API
     ///
-    pub fn set_api(&mut self, n_api: &MailchimpApi) {
-        self._api = n_api.clone();
+    pub fn set_api(&mut self, n_api: Rc<MailchimpApi>) {
+        self._api = n_api;
     }
 
     fn get_base_endpoint(&self) -> String {
@@ -297,9 +298,9 @@ impl BuildIter for ConversationBuilder {
     ///
     /// Return a new data updated
     ///
-    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: Rc<MailchimpApi>) -> Self::Item {
         let mut in_data = data.clone();
-        in_data.set_api(&api);
+        in_data.set_api(api);
         in_data
     }
     ///

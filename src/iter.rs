@@ -2,6 +2,7 @@
 //!
 
 use crate::api::MailchimpApi;
+use std::rc::Rc;
 use log::error;
 use serde::de::DeserializeOwned;
 use std::collections::HashMap;
@@ -101,7 +102,7 @@ pub trait BuildIter {
     ///
     /// Create a resource from the data passed by parameter
     ///
-    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item;
+    fn update_item(&self, data: &Self::Item, api: Rc<MailchimpApi>) -> Self::Item;
     ///
     /// Update Filter Offset
     ///
@@ -128,7 +129,7 @@ where
     /// Total items in collection
     pub total_items: u64,
     /// Mailchimp API
-    pub api: MailchimpApi,
+    pub api: Rc<MailchimpApi>,
     /// Endpoint
     pub endpoint: String,
 }
@@ -163,7 +164,7 @@ where
         if (self.cur_it as usize) < self.data.len() {
             let data = &self.data[self.cur_it as usize];
             self.cur_it += 1;
-            return Some(self.builder.update_item(data, &self.api));
+            return Some(self.builder.update_item(data, self.api.clone()));
         }
 
         None

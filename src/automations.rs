@@ -35,6 +35,7 @@ use super::types::{
 };
 use log::error;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 /// Automation Request Filter
 #[derive(Debug, Clone)]
@@ -147,7 +148,7 @@ impl ResourceFilter for AutomationsFilter {
 ///
 #[derive(Debug, Clone)]
 pub struct Automations {
-    api: MailchimpApi,
+    api: Rc<MailchimpApi>,
 }
 
 #[derive(Debug)]
@@ -161,9 +162,9 @@ impl BuildIter for AutomationsBuilder {
     ///
     /// Create new resource, with the api instance updated
     ///
-    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: Rc<MailchimpApi>) -> Self::Item {
         let mut in_data = data.clone();
-        in_data.set_api(&api);
+        in_data.set_api(api);
         in_data
     }
     ///
@@ -182,7 +183,7 @@ impl Automations {
     ///     api: MailchimpApi
     ///
     pub fn new(api: MailchimpApi) -> Self {
-        Automations { api: api }
+        Automations { api: Rc::new(api) }
     }
 
     ///
@@ -250,7 +251,7 @@ impl Automations {
         match response {
             Ok(automation) => {
                 let mut au = automation;
-                au.set_api(&self.api);
+                au.set_api(self.api.clone());
                 Ok(au)
             }
             Err(e) => Err(e),
@@ -282,7 +283,7 @@ impl Automations {
         match response {
             Ok(automation) => {
                 let mut au = automation;
-                au.set_api(&self.api);
+                au.set_api(self.api.clone());
                 Ok(au)
             }
             Err(e) => Err(e),

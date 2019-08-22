@@ -3,6 +3,7 @@
 use super::LinkType;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::iter::MailchimpCollection;
+use std::rc::Rc;
 
 ///
 /// Created Authorized App Type
@@ -48,15 +49,15 @@ pub struct AuthorizedAppType {
     pub _links: Vec<LinkType>,
     /// A list of link types and descriptions for the API schema documents.
     #[serde(skip)]
-    pub _api: MailchimpApi,
+    pub _api: Rc<MailchimpApi>,
 }
 
 impl MailchimpApiUpdate for AuthorizedAppType {
     ///
     /// Update API
     ///
-    fn set_api(&mut self, n_api: &MailchimpApi) {
-        self._api = n_api.clone()
+    fn set_api(&mut self, n_api: Rc<MailchimpApi>) {
+        self._api = n_api
     }
 }
 

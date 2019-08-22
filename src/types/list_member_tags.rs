@@ -1,6 +1,7 @@
 use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
+use std::rc::Rc;
 
 ///
 /// Response for endpoint  GET /lists/{list_id}/members/{subscriber_hash}/tags
@@ -56,7 +57,7 @@ impl BuildIter for ListMemberTagBuilder {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item, _: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, _: Rc<MailchimpApi>) -> Self::Item {
         let in_data = data.clone();
         in_data
     }

@@ -17,6 +17,7 @@ use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
 use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// The days of the week to send a daily RSS Campaign.
@@ -439,15 +440,15 @@ pub struct CampaignType {
 
     // Mailchimp API
     #[serde(skip)]
-    _api: MailchimpApi,
+    _api: Rc<MailchimpApi>,
 }
 
 impl MailchimpApiUpdate for CampaignType {
     /**
      * Update API
      */
-    fn set_api(&mut self, n_api: &MailchimpApi) {
-        self._api = n_api.clone()
+    fn set_api(&mut self, n_api: Rc<MailchimpApi>) {
+        self._api = n_api
     }
 }
 
@@ -849,7 +850,7 @@ impl CampaignType {
         match self._api.get::<CampaignFeedbackType>(&endpoint, payload) {
             Ok(feedback) => {
                 let mut n_f = feedback;
-                n_f.set_api(&self._api);
+                n_f.set_api(self._api.clone());
                 n_f.set_endpoint(&endpoint);
                 Ok(n_f)
             }

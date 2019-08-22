@@ -2,6 +2,7 @@ use super::link::LinkType;
 use super::list_members::ListMember;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
+use std::rc::Rc;
 
 ///
 /// Response for endpoint GET /lists/{list_id}/segments/{segment_id}/members
@@ -58,7 +59,7 @@ impl BuildIter for ListSegmentMembersBuilder {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: Rc<MailchimpApi>) -> Self::Item {
         let mut in_data = data.clone();
         in_data.set_api(api);
         in_data.set_endpoint(&self.endpoint);

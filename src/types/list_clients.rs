@@ -1,6 +1,7 @@
 use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
+use std::rc::Rc;
 
 ///
 /// Get information about the most popular email clients for subscribers in a specific Mailchimp list.
@@ -71,7 +72,7 @@ impl BuildIter for ListClientsBuilder {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item, _: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, _: Rc<MailchimpApi>) -> Self::Item {
         let in_data = data.clone();
         in_data
     }

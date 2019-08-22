@@ -13,6 +13,7 @@ use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
 use crate::iter::{MalchimpIter, ResourceFilter};
 use std::collections::HashMap;
+use std::rc::Rc;
 
 /// Workflow Email
 ///
@@ -84,7 +85,7 @@ pub struct WorkflowEmailType {
 
     /// Mailchimp APi
     #[serde(skip)]
-    _api: MailchimpApi,
+    _api: Rc<MailchimpApi>,
     // Endpoint del Recurso
     #[serde(skip)]
     _endpoint: String,
@@ -94,8 +95,8 @@ impl MailchimpApiUpdate for WorkflowEmailType {
     /**
      * Update API
      */
-    fn set_api(&mut self, n_api: &MailchimpApi) {
-        self._api = n_api.clone()
+    fn set_api(&mut self, n_api: Rc<MailchimpApi>) {
+        self._api = n_api
     }
 }
 

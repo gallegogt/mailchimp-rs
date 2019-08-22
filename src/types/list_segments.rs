@@ -10,6 +10,7 @@ use crate::internal::request::MailchimpResult;
 use crate::iter::{BuildIter, MailchimpCollection, MalchimpIter, ResourceFilter, SimpleFilter};
 use log::error;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// List Segment
@@ -52,7 +53,7 @@ pub struct ListSegment {
 
     /// Mailchimp API
     #[serde(skip)]
-    _api: MailchimpApi,
+    _api: Rc<MailchimpApi>,
     /// Endpoint
     #[serde(skip)]
     _endpoint: String,
@@ -284,7 +285,7 @@ impl BuildIter for ListSegmentBuilder {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: Rc<MailchimpApi>) -> Self::Item {
         let mut in_data = data.clone();
         in_data.set_api(api);
         in_data.set_endpoint(&self.endpoint);
@@ -435,7 +436,7 @@ impl ListSegment {
         {
             Ok(data) => {
                 let mut n_data = data.clone();
-                n_data.set_api(&self._api);
+                n_data.set_api(self._api.clone());
                 n_data.set_endpoint(&endpoint);
                 Ok(data)
             }
@@ -446,8 +447,8 @@ impl ListSegment {
     ///
     /// Set API
     ///
-    pub fn set_api(&mut self, n_api: &MailchimpApi) {
-        self._api = n_api.clone();
+    pub fn set_api(&mut self, n_api: Rc<MailchimpApi>) {
+        self._api = n_api;
     }
 
     /// Set Endpoint

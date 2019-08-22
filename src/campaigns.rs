@@ -31,6 +31,7 @@ use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
 use super::types::{CampaignType, CampaignsType};
 use log::error;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// Campaign Request Filter
@@ -192,7 +193,7 @@ impl ResourceFilter for CampaignFilter {
 ///
 #[derive(Debug, Clone)]
 pub struct Campaigns {
-    api: MailchimpApi,
+    api: Rc<MailchimpApi>,
 }
 
 #[derive(Debug)]
@@ -206,7 +207,7 @@ impl BuildIter for CampaignsBuilder {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: Rc<MailchimpApi>) -> Self::Item {
         let mut in_data = data.clone();
         in_data.set_api(api);
         in_data
@@ -227,7 +228,7 @@ impl Campaigns {
     ///     api: MailchimpApi
     ///
     pub fn new(api: MailchimpApi) -> Self {
-        Campaigns { api: api }
+        Campaigns { api: Rc::new(api) }
     }
 
     ///
@@ -254,7 +255,7 @@ impl Campaigns {
         match response {
             Ok(data) => {
                 let mut d = data;
-                d.set_api(&self.api);
+                d.set_api(self.api.clone());
                 Ok(d)
             }
             Err(e) => Err(e),

@@ -2,6 +2,7 @@ use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// Abuse Reports
@@ -93,7 +94,7 @@ impl BuildIter for ListAbuseReportBuilder {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item, _: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, _: Rc<MailchimpApi>) -> Self::Item {
         let in_data = data.clone();
         in_data
     }

@@ -6,6 +6,7 @@ use super::types::{
 use crate::iter::{MalchimpIter, ResourceFilter};
 use log::error;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// Conversations
@@ -15,7 +16,7 @@ use std::collections::HashMap;
 ///
 #[derive(Debug, Clone)]
 pub struct Conversations {
-    api: MailchimpApi,
+    api: Rc<MailchimpApi>,
 }
 
 impl Conversations {
@@ -24,7 +25,7 @@ impl Conversations {
     ///     api: MailchimpApi
     ///
     pub fn new(api: MailchimpApi) -> Self {
-        Conversations { api: api }
+        Conversations { api: Rc::new(api) }
     }
 
     ///

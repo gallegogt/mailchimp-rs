@@ -5,6 +5,7 @@ use crate::types::Ping;
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// Mailchimp API
@@ -225,5 +226,5 @@ pub trait MailchimpApiUpdate {
     /**
      * Update API
      */
-    fn set_api(&mut self, api: &MailchimpApi);
+    fn set_api(&mut self, api: Rc<MailchimpApi>);
 }

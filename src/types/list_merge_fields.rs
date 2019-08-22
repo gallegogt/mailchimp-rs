@@ -10,6 +10,7 @@ use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
 use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// Merge Field Options
@@ -91,7 +92,7 @@ pub struct ListMergeField {
 
     /// Mailchimp API
     #[serde(skip)]
-    _api: MailchimpApi,
+    _api: Rc<MailchimpApi>,
 
     /// Endpoint
     #[serde(skip)]
@@ -264,7 +265,7 @@ impl BuildIter for ListMergeFieldBuilder {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: Rc<MailchimpApi>) -> Self::Item {
         let mut in_data = data.clone();
         in_data.set_api(api);
         in_data.set_endpoint(&self.endpoint);
@@ -305,8 +306,8 @@ impl ListMergeField {
     ///
     /// Set API
     ///
-    pub fn set_api(&mut self, api: &MailchimpApi) {
-        self._api = api.clone();
+    pub fn set_api(&mut self, api: Rc<MailchimpApi>) {
+        self._api = api;
     }
     ///
     /// Set Endpoint

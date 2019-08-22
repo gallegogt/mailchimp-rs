@@ -2,6 +2,11 @@ use reqwest::header::HeaderMap;
 use reqwest::{Client, Error, Response, StatusCode, Url};
 use serde::ser::Serialize;
 use serde_json;
+use lazy_static::lazy_static;
+
+lazy_static! {
+    static ref CLIENT: Client = Client::new();
+}
 
 // import macro error
 use log::error;
@@ -107,18 +112,14 @@ pub trait HttpReq {
 /// MailchimpRequest
 ///
 #[derive(Debug, Clone)]
-pub struct MailchimpRequest {
-    client: Box<Client>,
-}
+pub struct MailchimpRequest {}
 
 impl MailchimpRequest {
     ///
     /// Devuelve una instancia nueva
     ///
     pub fn new() -> Self {
-        MailchimpRequest {
-            client: Box::new(Client::new()),
-        }
+        MailchimpRequest {}
     }
 }
 
@@ -135,11 +136,9 @@ impl HttpReq for MailchimpRequest {
         basic_auth: &Option<BasicAuth>,
     ) -> MailchimpResult<String> {
         let builder = match basic_auth {
-            Some(auth) => self
-                .client
-                .get(url)
+            Some(auth) => CLIENT.get(url)
                 .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
-            None => self.client.get(url),
+            None => CLIENT.get(url),
         };
 
         let result = builder.headers(headers).send();
@@ -162,11 +161,9 @@ impl HttpReq for MailchimpRequest {
         P: Serialize,
     {
         let builder = match basic_auth {
-            Some(auth) => self
-                .client
-                .post(url)
+            Some(auth) => CLIENT.post(url)
                 .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
-            None => self.client.post(url),
+            None => CLIENT.post(url),
         };
         let result = builder.headers(headers).json(&payload).send();
         self.process_response(result, "POST")
@@ -188,11 +185,10 @@ impl HttpReq for MailchimpRequest {
         P: Serialize,
     {
         let builder = match basic_auth {
-            Some(auth) => self
-                .client
+            Some(auth) => CLIENT
                 .patch(url)
                 .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
-            None => self.client.post(url),
+            None => CLIENT.post(url),
         };
         let result = builder.headers(headers).json(&payload).send();
         self.process_response(result, "PATCH")
@@ -214,11 +210,9 @@ impl HttpReq for MailchimpRequest {
         P: Serialize,
     {
         let builder = match basic_auth {
-            Some(auth) => self
-                .client
-                .patch(url)
+            Some(auth) => CLIENT.patch(url)
                 .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
-            None => self.client.post(url),
+            None => CLIENT.post(url),
         };
         let result = builder.headers(headers).json(&payload).send();
         self.process_response(result, "PUT")
@@ -235,11 +229,10 @@ impl HttpReq for MailchimpRequest {
         basic_auth: &Option<BasicAuth>,
     ) -> MailchimpResult<String> {
         let builder = match basic_auth {
-            Some(auth) => self
-                .client
+            Some(auth) => CLIENT
                 .delete(url)
                 .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
-            None => self.client.get(url),
+            None => CLIENT.get(url),
         };
 
         let result = builder.headers(headers).send();

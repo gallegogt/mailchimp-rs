@@ -29,6 +29,7 @@ use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
 use crate::types::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType};
 use log::error;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 /// Authorized Request Filter
 #[derive(Debug, Clone)]
@@ -93,7 +94,7 @@ impl ResourceFilter for AuthorizedFilter {
 ///
 #[derive(Debug, Clone)]
 pub struct AuthorizedApps {
-    api: MailchimpApi,
+    api: Rc<MailchimpApi>,
 }
 #[derive(Debug)]
 pub struct AuthorizedAppsBuilder {}
@@ -106,7 +107,7 @@ impl BuildIter for AuthorizedAppsBuilder {
     ///
     /// Create new resource, with the api instance updated
     ///
-    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: Rc<MailchimpApi>) -> Self::Item {
         let mut in_data = data.clone();
         in_data.set_api(api);
         in_data
@@ -127,7 +128,7 @@ impl AuthorizedApps {
     ///     api: MailchimpApi
     ///
     pub fn new(api: MailchimpApi) -> Self {
-        AuthorizedApps { api: api }
+        AuthorizedApps { api: Rc::new(api) }
     }
 
     ///

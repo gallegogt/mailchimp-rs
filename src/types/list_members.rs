@@ -11,6 +11,7 @@ use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
 use crate::iter::{BuildIter, MailchimpCollection, MalchimpIter, ResourceFilter, SimpleFilter};
 use std::collections::HashMap;
+use std::rc::Rc;
 
 use log::error;
 
@@ -216,7 +217,7 @@ pub struct ListMember {
 
     /// Mailchimp API
     #[serde(skip)]
-    _api: MailchimpApi,
+    _api: Rc<MailchimpApi>,
     /// Endpoint Base for the instance
     #[serde(skip)]
     _endpoint: String,
@@ -233,7 +234,7 @@ impl ListMember {
     ///
     pub fn permanently_delete(&self) -> Option<MailchimpErrorType> {
         // POST /lists/{list_id}/members/{subscriber_hash}/actions/delete-permanent
-        let mut b_endpoint = self._endpoint.clone();
+        let mut b_endpoint = self.build_list_endpoint();
         b_endpoint.push_str("/actions/delete-permanent");
         match self
             ._api
@@ -243,10 +244,24 @@ impl ListMember {
             Err(e) => Some(e),
         }
     }
+
     ///
-    /// Permanently delete a list member
+    /// Delete a member from a list/segment
     ///
-    /// Delete a member from a list.
+    pub fn archive(&self) -> Option<MailchimpErrorType> {
+        // DELETE /lists/{list_id}/members/{subscriber_hash}
+        let b_endpoint = self.build_list_endpoint();
+        match self
+            ._api
+            .delete::<EmptyType>(b_endpoint.as_str(), HashMap::new())
+        {
+            Ok(_) => None,
+            Err(e) => Some(e),
+        }
+    }
+
+    ///
+    /// Delete a member from a list/segment
     ///
     pub fn delete(&self) -> Option<MailchimpErrorType> {
         // DELETE /lists/{list_id}/members/{subscriber_hash}
@@ -263,8 +278,8 @@ impl ListMember {
     /**
      * Update API
      */
-    pub fn set_api(&mut self, n_api: &MailchimpApi) {
-        self._api = n_api.clone()
+    pub fn set_api(&mut self, n_api: Rc<MailchimpApi>) {
+        self._api = n_api
     }
 
     ///
@@ -285,6 +300,10 @@ impl ListMember {
         let mut endpoint = self._endpoint.clone() + "/";
         endpoint.push_str(&self.id);
         endpoint
+    }
+
+    fn build_list_endpoint(&self) -> String {
+        format!("/list/{}/members/{}", self.list_id, self.id)
     }
 
     ///
@@ -768,7 +787,7 @@ impl BuildIter for ListMembersBuilder {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: Rc<MailchimpApi>) -> Self::Item {
         let mut in_data = data.clone();
         in_data.set_api(api);
         in_data.set_endpoint(&self.endpoint);

@@ -5,6 +5,7 @@ use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
 use std::collections::HashMap;
+use std::rc::Rc;
 
 ///
 /// Interests
@@ -39,7 +40,7 @@ pub struct ListInterest {
 
     /// Mailchimp API
     #[serde(skip)]
-    _api: MailchimpApi,
+    _api: Rc<MailchimpApi>,
     /// Edpoint
     #[serde(default)]
     _endpoint: String,
@@ -78,8 +79,8 @@ impl ListInterest {
     ///
     /// Update the api instance
     ///
-    pub fn set_api(&mut self, n_api: &MailchimpApi) {
-        self._api = n_api.clone()
+    pub fn set_api(&mut self, n_api: Rc<MailchimpApi>) {
+        self._api = n_api
     }
     ///
     /// Update the endpoint value
@@ -187,7 +188,7 @@ impl BuildIter for ListInterestBuilder {
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
-    fn update_item(&self, data: &Self::Item, api: &MailchimpApi) -> Self::Item {
+    fn update_item(&self, data: &Self::Item, api: Rc<MailchimpApi>) -> Self::Item {
         let mut in_data = data.clone();
         in_data.set_api(api);
         in_data.set_endpoint(&self.endpoint);
