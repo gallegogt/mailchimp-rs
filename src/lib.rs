@@ -26,6 +26,7 @@ pub mod iter;
 mod list;
 mod reports;
 pub mod types;
+mod landing_pages;
 
 pub use crate::api::MailchimpApi;
 pub use crate::api_root::ApiRoot;
@@ -36,3 +37,4 @@ pub use crate::conversations::Conversations;
 pub use crate::internal::error_type::MailchimpErrorType;
 pub use crate::list::{ListFilter, Lists};
 pub use crate::reports::Reports;
+pub use crate::landing_pages::LandingPages;

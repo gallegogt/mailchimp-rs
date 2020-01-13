@@ -41,6 +41,7 @@ mod list_webhooks;
 mod ping;
 mod report;
 mod workflow_email;
+mod landing_pages;
 
 pub use self::api_root::*;
 pub use self::authorized_apps::{AuthorizedAppType, AuthorizedAppsType, CreatedAuthorizedAppType};
@@ -81,3 +82,4 @@ pub use self::list_webhooks::*;
 pub use self::ping::*;
 pub use self::report::*;
 pub use self::workflow_email::*;
+pub use self::landing_pages::*;

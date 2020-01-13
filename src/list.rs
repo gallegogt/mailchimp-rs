@@ -29,9 +29,9 @@ use super::api::{MailchimpApi, MailchimpApiUpdate};
 use super::internal::request::MailchimpResult;
 use super::iter::{BuildIter, MalchimpIter, ResourceFilter};
 use super::types::{ListParam, ListType, ListsType};
-use std::rc::Rc;
 use log::error;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 /// List Filter
 #[derive(Debug, Clone)]
@@ -197,6 +197,7 @@ impl BuildIter for ListsBuilder {
     type Item = ListType;
     type FilterItem = ListFilter;
     type Collection = ListsType;
+
     ///
     /// Crea un recurso a partir del dato pasado por parámetro
     ///
@@ -205,6 +206,7 @@ impl BuildIter for ListsBuilder {
         in_data.set_api(api);
         in_data
     }
+
     ///
     /// Actualiza el offset
     ///

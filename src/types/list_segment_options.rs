@@ -93,16 +93,22 @@ pub enum SegmentConditionsType {
 /// Segment condition without a value
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SegmentConditionFlag {
+    /// Condition Field
     pub field: String,
+    /// Condition Op
     pub op: SegmentConditionOp,
 }
 
 /// Segment condition with a value and optionally extra data
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SegmentConditionInner {
+    /// field
     pub field: String,
+    /// op
     pub op: SegmentConditionOp,
+    /// value
     pub value: Value,
+    /// Extra
     #[serde(skip_serializing_if = "Option::is_none")]
     pub extra: Option<String>,
 }
@@ -110,11 +116,17 @@ pub struct SegmentConditionInner {
 /// Segment condition on a geo-spatial value
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SegmentGeoCondition {
+    /// field
     pub field: String,
+    /// Op
     pub op: SegmentConditionOp,
+    /// Value
     pub value: Value,
+    /// addr
     pub addr: String,
+    /// lat
     pub lat: String,
+    /// lng
     pub lng: String,
 }
 
