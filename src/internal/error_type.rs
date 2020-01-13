@@ -1,4 +1,6 @@
-// ============ Error Response ==============
+use std::{error::Error, fmt};
+
+/// ============ Error Response ==============
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MailchimpErrorType {
     /// Desc: An absolute URI that identifies the problem type. When dereferenced, it should provide human-readable documentation for the problem type.
@@ -28,3 +30,11 @@ impl Default for MailchimpErrorType {
         }
     }
 }
+
+impl fmt::Display for MailchimpErrorType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(f, "HTTP {} {}: \"{}\" {} ({})", self.status, self.title, self.detail, self.instance, self.error_type)
+    }
+}
+
+impl Error for MailchimpErrorType {}

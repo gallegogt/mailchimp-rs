@@ -33,5 +33,6 @@ pub use crate::authorized_apps::{AuthorizedApps, AuthorizedFilter};
 pub use crate::automations::{Automations, AutomationsFilter};
 pub use crate::campaigns::{CampaignFilter, Campaigns};
 pub use crate::conversations::Conversations;
+pub use crate::internal::error_type::MailchimpErrorType;
 pub use crate::list::{ListFilter, Lists};
 pub use crate::reports::Reports;
