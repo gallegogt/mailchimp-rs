@@ -1,5 +1,7 @@
 use super::link::LinkType;
 use super::list_members::{ListMember, ListMemberParams};
+use serde::{Deserialize, Serialize};
+
 ///
 ///  Batch subscribe or unsubscribe list members Response
 ///

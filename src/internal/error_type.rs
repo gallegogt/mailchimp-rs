@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::{error::Error, fmt};
 
 /// ============ Error Response ==============
@@ -33,7 +34,11 @@ impl Default for MailchimpErrorType {
 
 impl fmt::Display for MailchimpErrorType {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "HTTP {} {}: \"{}\" {} ({})", self.status, self.title, self.detail, self.instance, self.error_type)
+        write!(
+            f,
+            "HTTP {} {}: \"{}\" {} ({})",
+            self.status, self.title, self.detail, self.instance, self.error_type
+        )
     }
 }
 

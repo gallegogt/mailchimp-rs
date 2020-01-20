@@ -36,15 +36,12 @@ md5 = "^0.6"
 [dependencies]
 # The core APIs, including the Serialize and Deserialize traits. Always
 # required when using Serde.
-serde = "^1.0"
-# Support for #[derive(Serialize, Deserialize)]. Required if you want Serde
-# to work for structs and enums defined in your crate.
-serde_derive = "^1.0"
+serde = { version = "^1.0", features=["derive"] }
 # Each data format lives in its own crate; the sample code below uses JSON
 # but you may be using a different one.
 serde_json = "1.0"
 # HTTP Request Library
-reqwest="^0.9"
+reqwest={version = "^0.10", features = ["blocking", "json"]}
 # Log
 log = "^0.4"
 # Lazy Static

@@ -12,9 +12,6 @@
 )]
 #![cfg_attr(not(debug_assertions), deny(warnings))]
 
-#[macro_use]
-extern crate serde_derive;
-
 mod api;
 mod api_root;
 mod authorized_apps;
@@ -23,10 +20,10 @@ mod campaigns;
 mod conversations;
 mod internal;
 pub mod iter;
+mod landing_pages;
 mod list;
 mod reports;
 pub mod types;
-mod landing_pages;
 
 pub use crate::api::MailchimpApi;
 pub use crate::api_root::ApiRoot;
@@ -35,6 +32,6 @@ pub use crate::automations::{Automations, AutomationsFilter};
 pub use crate::campaigns::{CampaignFilter, Campaigns};
 pub use crate::conversations::Conversations;
 pub use crate::internal::error_type::MailchimpErrorType;
+pub use crate::landing_pages::LandingPages;
 pub use crate::list::{ListFilter, Lists};
 pub use crate::reports::Reports;
-pub use crate::landing_pages::LandingPages;

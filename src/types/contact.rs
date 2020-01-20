@@ -1,5 +1,6 @@
 //! Implement Contact Types
 //!
+use serde::{Deserialize, Serialize};
 
 ///
 /// Contact Type

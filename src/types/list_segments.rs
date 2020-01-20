@@ -1,4 +1,6 @@
 use super::empty::EmptyType;
+use serde::{Deserialize, Serialize};
+
 use super::link::LinkType;
 use super::list_batch_members::ListBatchErrors;
 use super::list_members::ListMember;

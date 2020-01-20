@@ -1,6 +1,7 @@
 use super::contact::ContactType;
 use super::empty::EmptyType;
 use super::link::LinkType;
+
 use super::list_abuse_report::{
     CollectionListAbuseReport, ListAbuseReportBuilder, ListAbuseReportType,
 };
@@ -36,6 +37,7 @@ use crate::internal::request::MailchimpResult;
 use crate::iter::MailchimpCollection;
 use crate::iter::{MalchimpIter, ResourceFilter, SimpleFilter};
 use log::error;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::rc::Rc;
 

@@ -1,3 +1,8 @@
+//!
+//! IndustryStats Type
+//!
+use serde::{Deserialize, Serialize};
+
 ///
 /// The average campaign statistics for your industry.
 ///

@@ -1,14 +1,15 @@
-///
-/// Merge Fields
-///
-/// Manage merge fields (formerly merge vars) for a specific list. Learn more about merge field limits in Mailchimp.
-///
 use super::empty::EmptyType;
 use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
 use crate::iter::{BuildIter, MailchimpCollection, ResourceFilter};
+///
+/// Merge Fields
+///
+/// Manage merge fields (formerly merge vars) for a specific list. Learn more about merge field limits in Mailchimp.
+///
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::rc::Rc;
 

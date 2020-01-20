@@ -3,6 +3,7 @@
 use super::contact::ContactType;
 use super::industry_stats::IndustryStatsType;
 use super::link::LinkType;
+use serde::{Deserialize, Serialize};
 
 ///
 /// API Root Type (GET /)

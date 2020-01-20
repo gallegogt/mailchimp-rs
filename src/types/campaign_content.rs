@@ -2,6 +2,7 @@
 //!
 
 use super::link::LinkType;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 ///

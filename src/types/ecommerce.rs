@@ -1,6 +1,7 @@
 //! ECommerce Report Type
 //!
 
+use serde::{Deserialize, Serialize};
 ///
 /// E-Commerce stats for a campaign.
 ///

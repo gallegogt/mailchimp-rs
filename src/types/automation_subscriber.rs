@@ -4,6 +4,7 @@
 use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
+use serde::{Deserialize, Serialize};
 use std::rc::Rc;
 
 ///

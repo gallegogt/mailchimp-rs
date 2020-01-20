@@ -2,6 +2,7 @@
 //!
 
 use super::link::LinkType;
+use serde::{Deserialize, Serialize};
 
 ///
 /// A list of feedback items to review before sending your campaign.

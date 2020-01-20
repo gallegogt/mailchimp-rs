@@ -12,6 +12,7 @@ use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
 use crate::iter::{MalchimpIter, ResourceFilter};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::rc::Rc;
 

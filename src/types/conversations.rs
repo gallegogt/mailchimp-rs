@@ -4,6 +4,7 @@
 use super::conversation_messages::{
     CollectionConversationMessages, ConversationMessage, MessagesBuider, MessagesFilter,
 };
+use serde::{Deserialize, Serialize};
 use std::rc::Rc;
 
 use super::link::LinkType;

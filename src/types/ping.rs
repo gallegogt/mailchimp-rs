@@ -1,3 +1,8 @@
+//!
+//! Ping type
+//!
+use serde::{Deserialize, Serialize};
+
 ///
 /// A health check for the API that won’t return any account-specific information.
 ///

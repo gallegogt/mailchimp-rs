@@ -3,12 +3,13 @@ use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::internal::error_type::MailchimpErrorType;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
+use serde::{Deserialize, Serialize};
+
 ///
 /// Landing Pages
 ///
 /// Manage your Landing Pages, including publishing and unpublishing.
 ///
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::rc::Rc;
 

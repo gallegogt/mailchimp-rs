@@ -1,8 +1,11 @@
+use lazy_static::lazy_static;
 use reqwest::header::HeaderMap;
-use reqwest::{Client, Error, Response, StatusCode, Url};
+use reqwest::{
+    blocking::{Client, Response},
+    Error, StatusCode, Url,
+};
 use serde::ser::Serialize;
 use serde_json;
-use lazy_static::lazy_static;
 
 lazy_static! {
     static ref CLIENT: Client = Client::new();
@@ -136,7 +139,8 @@ impl HttpReq for MailchimpRequest {
         basic_auth: &Option<BasicAuth>,
     ) -> MailchimpResult<String> {
         let builder = match basic_auth {
-            Some(auth) => CLIENT.get(url)
+            Some(auth) => CLIENT
+                .get(url)
                 .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
             None => CLIENT.get(url),
         };
@@ -161,7 +165,8 @@ impl HttpReq for MailchimpRequest {
         P: Serialize,
     {
         let builder = match basic_auth {
-            Some(auth) => CLIENT.post(url)
+            Some(auth) => CLIENT
+                .post(url)
                 .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
             None => CLIENT.post(url),
         };
@@ -210,7 +215,8 @@ impl HttpReq for MailchimpRequest {
         P: Serialize,
     {
         let builder = match basic_auth {
-            Some(auth) => CLIENT.patch(url)
+            Some(auth) => CLIENT
+                .patch(url)
                 .basic_auth(auth.username.clone(), Some(auth.api_token.clone())),
             None => CLIENT.post(url),
         };
@@ -247,7 +253,7 @@ impl MailchimpRequest {
         method: &'a str,
     ) -> MailchimpResult<String> {
         match response {
-            Ok(mut resp) => match resp.status() {
+            Ok(resp) => match resp.status() {
                 StatusCode::OK => match resp.text() {
                     Ok(txt) => Ok(txt),
                     Err(e) => {

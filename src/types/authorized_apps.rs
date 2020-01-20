@@ -3,6 +3,7 @@
 use super::LinkType;
 use crate::api::{MailchimpApi, MailchimpApiUpdate};
 use crate::iter::MailchimpCollection;
+use serde::{Deserialize, Serialize};
 use std::rc::Rc;
 
 ///

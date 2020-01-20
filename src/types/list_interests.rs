@@ -4,6 +4,7 @@ use crate::api::MailchimpApi;
 use crate::internal::error_type::MailchimpErrorType;
 use crate::internal::request::MailchimpResult;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::rc::Rc;
 
