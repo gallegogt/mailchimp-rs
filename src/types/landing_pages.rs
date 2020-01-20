@@ -2,7 +2,6 @@ use super::empty::EmptyType;
 use super::link::LinkType;
 use crate::api::MailchimpApi;
 use crate::internal::error_type::MailchimpErrorType;
-use crate::internal::request::MailchimpResult;
 use crate::iter::{BuildIter, MailchimpCollection, SimpleFilter};
 ///
 /// Landing Pages
