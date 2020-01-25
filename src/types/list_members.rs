@@ -73,6 +73,16 @@ impl Default for ListMarketingPermision {
 }
 
 ///
+/// Returns up to 50 tags applied to this member. To retrieve all tags see `get_tags`.
+///
+#[derive(Serialize, Deserialize, Default, Debug, Clone)]
+#[serde(default)]
+pub struct MemberTag {
+    id: u64,
+    name: String,
+}
+
+///
 /// Open and click rates for this subscriber.
 ///
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -205,7 +215,7 @@ pub struct ListMember {
     pub tags_count: u64,
     /// The tags applied to this member.
     #[serde(default)]
-    pub tags: Vec<String>,
+    pub tags: Vec<MemberTag>,
     /// IP address the subscriber signed up from.
     #[serde(default)]
     pub ip_signup: String,
